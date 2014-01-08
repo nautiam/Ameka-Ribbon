@@ -51,20 +51,45 @@
 #define DLG_Photic                      316
 #define DLG_Setting                     317
 #define DLG_Wave                        318
+#define DLG_Montage                     320
 #define IDC_COMBO1                      1000
 #define IDC_CHECK1                      1001
 #define IDC_CHECK2                      1002
 #define IDC_CHECK3                      1003
 #define IDC_LIST1                       1004
+#define evt_lv                          1004
 #define IDC_EDIT1                       1005
+#define log_view                        1005
 #define IDC_EDIT2                       1006
 #define IDC_EDIT3                       1007
+#define info_2ndName                    1007
 #define IDC_DATETIMEPICKER1             1008
+#define info_birthday                   1008
 #define IDC_EDIT4                       1009
 #define IDC_EDIT5                       1010
+#define info_view                       1010
 #define IDC_TAB1                        1011
 #define opt_com_baud                    1013
 #define opt_com_portNo                  1014
+#define evt_add                         1015
+#define evt_rename                      1016
+#define evt_del                         1017
+#define evt_ok                          1018
+#define evt_cancel                      1019
+#define evt_list                        1020
+#define info_1stname                    1021
+#define info_famName                    1022
+#define info_ok                         1023
+#define info_cancel                     1024
+#define log_ok                          1025
+#define log_cancel                      1026
+#define opt_tab                         1030
+#define opt_ok                          1031
+#define opt_cancel                      1032
+#define opt_txt1                        1033
+#define opt_txt2                        1034
+#define IDC_LIST2                       1040
+#define IDC_LIST3                       1041
 #define ID_WRITE_PASTEASHYPERLINK       32770
 #define MN_Open                         32771
 #define MN_Close                        32772
@@ -98,9 +123,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        319
+#define _APS_NEXT_RESOURCE_VALUE        321
 #define _APS_NEXT_COMMAND_VALUE         32799
-#define _APS_NEXT_CONTROL_VALUE         1015
+#define _APS_NEXT_CONTROL_VALUE         1042
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

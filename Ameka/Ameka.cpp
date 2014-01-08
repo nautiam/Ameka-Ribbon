@@ -24,6 +24,7 @@
 
 #include "SerialCtrl.h"
 #include "AmekaUserConfig.h"
+#include "afxcmn.h"
 
 
 #ifdef _DEBUG
@@ -51,6 +52,7 @@ BEGIN_MESSAGE_MAP(CAmekaApp, CWinAppEx)
 	ON_COMMAND(MN_StartDemo, &CAmekaApp::OnDemo)
 	ON_COMMAND(MN_StopDemo, &CAmekaApp::OnStop)
 	ON_COMMAND(MN_OpenPort, &CAmekaApp::OnPortOpen)
+	ON_COMMAND(MN_Montage, &CAmekaApp::OnMontage)
 END_MESSAGE_MAP()
 
 
@@ -365,6 +367,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnOK();
+	CTabCtrl tab_ctrl;
 };
 
 COptionDlg::COptionDlg() : CDialogEx(COptionDlg::IDD)
@@ -377,6 +380,7 @@ void COptionDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, opt_com_portNo, m_portNo);
 	DDX_Text(pDX, opt_com_baud, m_baudRate);
 
+	DDX_Control(pDX, opt_tab, tab_ctrl);
 }
 
 BEGIN_MESSAGE_MAP(COptionDlg, CDialogEx)
@@ -612,3 +616,38 @@ void CSettingDlg::OnSetup()
 	// TODO: Add your command handler code here
 }
 
+//------------------------------------------------------------------//
+// CMontageDlg
+class CMontageDlg : public CDialogEx
+{
+public:
+	CMontageDlg();
+
+// Dialog Data
+	enum { IDD = DLG_Montage};
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+// Implementation
+protected:
+	DECLARE_MESSAGE_MAP()
+};
+
+CMontageDlg::CMontageDlg() : CDialogEx(CMontageDlg::IDD)
+{
+}
+
+void CMontageDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+}
+
+BEGIN_MESSAGE_MAP(CMontageDlg, CDialogEx)
+END_MESSAGE_MAP()
+//Show Montage Dialog
+void CAmekaApp::OnMontage()
+{
+	CMontageDlg montageDlg;
+	montageDlg.DoModal();
+}

@@ -64,6 +64,7 @@ public:
 	afx_msg void OnDemo();			//Graph demo
 	afx_msg void OnStop();			//Graph demo
 	afx_msg void OnPortOpen();		//Open Serial COM Port
+	afx_msg void OnMontage();		//Montage
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnScalerate();
 };
