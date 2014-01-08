@@ -88,8 +88,8 @@
 #define opt_cancel                      1032
 #define opt_txt1                        1033
 #define opt_txt2                        1034
-#define IDC_LIST2                       1040
 #define IDC_LIST3                       1041
+#define IDC_BUTTON1                     1042
 #define ID_WRITE_PASTEASHYPERLINK       32770
 #define MN_Open                         32771
 #define MN_Close                        32772
@@ -125,7 +125,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        321
 #define _APS_NEXT_COMMAND_VALUE         32799
-#define _APS_NEXT_CONTROL_VALUE         1042
+#define _APS_NEXT_CONTROL_VALUE         1043
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif
