@@ -348,6 +348,7 @@ int ReadThread::Run()
 				{
 					m_serialIO->m_bState = S_UNINITTIALZED;
 					m_serialIO->m_serialCtrl.ClosePort();
+					AfxMessageBox("The program has problem. Please close and reopen the program.");
 					LOG(INFO) << "Close port and reopen port";
 				}
 
@@ -398,6 +399,7 @@ int ReadThread::Run()
 			{
 				m_serialIO->m_bState = S_UNINITTIALZED;
 				m_serialIO->m_serialCtrl.ClosePort();
+				AfxMessageBox("The program has problem. Please close and reopen the program.");
 				LOG(INFO) << "Close port and reopen port";
 			}           
         }
@@ -501,7 +503,7 @@ int ReadThread::packetProcessing()
 				if (m_serialIO->RawData->pushData(temp) != 0)
 				{
 					//AfxMessageBox("Error");
-					//LOG(WARNING) << "Raw data buffer is full";
+					LOG(WARNING) << "Raw data buffer is full";
 				}
 			}
 			break;
