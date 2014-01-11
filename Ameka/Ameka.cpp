@@ -26,11 +26,13 @@
 #include "AmekaUserConfig.h"
 #include "afxcmn.h"
 
+#include <vector>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
+using namespace std;
 
 // CAmekaApp
 
@@ -55,6 +57,165 @@ BEGIN_MESSAGE_MAP(CAmekaApp, CWinAppEx)
 	ON_COMMAND(MN_Montage, &CAmekaApp::OnMontage)
 END_MESSAGE_MAP()
 
+//--------------------------//
+//Tab Dialog
+
+//------------------------------------------------------------------//
+// COM
+
+vector<string> Tokenize(CString str, string delimiters);
+
+class CTabCOMDlg : public CDialogEx
+{
+public:
+	CTabCOMDlg();
+// Dialog Data
+	enum { IDD = DLG_Opt_COM };
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+// Implementation
+protected:
+	virtual BOOL OnInitDialog();
+	DECLARE_MESSAGE_MAP()
+public:
+};
+
+CTabCOMDlg::CTabCOMDlg() : CDialogEx(CTabCOMDlg::IDD)
+{
+	
+}
+
+int CTabCOMDlg::OnInitDialog()
+{
+	return 0;
+}
+
+void CTabCOMDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+}
+
+BEGIN_MESSAGE_MAP(CTabCOMDlg, CDialogEx)
+END_MESSAGE_MAP()
+
+//------------------------------------------------------------------//
+// Rec
+
+class CTabRecDlg : public CDialogEx
+{
+public:
+	CTabRecDlg();
+// Dialog Data
+	enum { IDD = DLG_Opt_Rec };
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+// Implementation
+protected:
+	virtual BOOL OnInitDialog();
+	DECLARE_MESSAGE_MAP()
+public:
+};
+
+CTabRecDlg::CTabRecDlg() : CDialogEx(CTabRecDlg::IDD)
+{
+	
+}
+
+int CTabRecDlg::OnInitDialog()
+{
+	return 0;
+}
+
+void CTabRecDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+}
+
+BEGIN_MESSAGE_MAP(CTabRecDlg, CDialogEx)
+END_MESSAGE_MAP()
+
+//------------------------------------------------------------------//
+// Event
+
+class CTabEventDlg : public CDialogEx
+{
+public:
+	CTabEventDlg();
+// Dialog Data
+	enum { IDD = DLG_Opt_Event };
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+// Implementation
+protected:
+	virtual BOOL OnInitDialog();
+	DECLARE_MESSAGE_MAP()
+public:
+};
+
+CTabEventDlg::CTabEventDlg() : CDialogEx(CTabEventDlg::IDD)
+{
+	
+}
+
+int CTabEventDlg::OnInitDialog()
+{
+	return 0;
+}
+
+void CTabEventDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+}
+
+BEGIN_MESSAGE_MAP(CTabEventDlg, CDialogEx)
+END_MESSAGE_MAP()
+
+//------------------------------------------------------------------//
+// View
+
+class CTabViewDlg : public CDialogEx
+{
+public:
+	CTabViewDlg();
+// Dialog Data
+	enum { IDD = DLG_Opt_View };
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+// Implementation
+protected:
+	virtual BOOL OnInitDialog();
+	DECLARE_MESSAGE_MAP()
+public:
+};
+
+CTabViewDlg::CTabViewDlg() : CDialogEx(CTabViewDlg::IDD)
+{
+	
+}
+
+int CTabViewDlg::OnInitDialog()
+{
+	return 0;
+}
+
+void CTabViewDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+}
+
+BEGIN_MESSAGE_MAP(CTabViewDlg, CDialogEx)
+END_MESSAGE_MAP()
+
+
+//-------------------------------------------------------//
 
 // CAmekaApp construction
 
@@ -102,6 +263,7 @@ CAmekaApp theApp;
 
 
 // CAmekaApp initialization
+
 
 BOOL CAmekaApp::InitInstance()
 {
@@ -286,6 +448,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnSetup();
+	afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedCancel();
 };
 
 CSettingDlg::CSettingDlg() : CDialogEx(CSettingDlg::IDD)
@@ -299,6 +463,8 @@ void CSettingDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CSettingDlg, CDialogEx)
 	ON_COMMAND(MN_Setting, &CSettingDlg::OnSetup)
+	ON_BN_CLICKED(IDOK, &CSettingDlg::OnBnClickedOk)
+	ON_BN_CLICKED(IDCANCEL, &CSettingDlg::OnBnClickedCancel)
 END_MESSAGE_MAP()
 
 //Show Setting Dialog
@@ -325,6 +491,9 @@ protected:
 // Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedok();
+	afx_msg void OnBnClickedcancel();
 };
 
 CInfoDlg::CInfoDlg() : CDialogEx(CInfoDlg::IDD)
@@ -337,6 +506,8 @@ void CInfoDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CInfoDlg, CDialogEx)
+	ON_BN_CLICKED(info_ok, &CInfoDlg::OnBnClickedok)
+	ON_BN_CLICKED(info_cancel, &CInfoDlg::OnBnClickedcancel)
 END_MESSAGE_MAP()
 
 //Show Setting Dialog
@@ -355,23 +526,34 @@ public:
 	COptionDlg();
 	CString m_baudRate;
 	CString m_portNo;
+	CString m_LP;
+	CString m_HP;
+	CString m_sensitivity;
+	CString m_speed;
+
+	CDialog* mDlg[4];
+
+	int mPrePos;
 
 // Dialog Data
 	enum { IDD = DLG_Option };
-
+	CTabCtrl tab_ctrl;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 // Implementation
 protected:
+	virtual BOOL OnInitDialog();
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnOK();
-	CTabCtrl tab_ctrl;
+	afx_msg void OnTabSel(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedcancel();
 };
 
 COptionDlg::COptionDlg() : CDialogEx(COptionDlg::IDD)
 {
+	
 }
 
 void COptionDlg::DoDataExchange(CDataExchange* pDX)
@@ -379,12 +561,46 @@ void COptionDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Text(pDX, opt_com_portNo, m_portNo);
 	DDX_Text(pDX, opt_com_baud, m_baudRate);
+	DDX_Text(pDX, view_lp, m_LP);
+	DDX_Text(pDX, view_hp, m_HP);
+	DDX_Text(pDX, view_sensitivity, m_sensitivity);
+	DDX_Text(pDX, view_speed, m_speed);
 
 	DDX_Control(pDX, opt_tab, tab_ctrl);
 }
 
+int COptionDlg::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+	tab_ctrl.InsertItem(0,"Serial COM");
+    tab_ctrl.InsertItem(1,"View");
+	tab_ctrl.InsertItem(2,"Event");
+	tab_ctrl.InsertItem(3,"Recording");
+
+	mDlg[0] = new CTabCOMDlg;
+	mDlg[1] = new CTabViewDlg;
+	mDlg[2] = new CTabEventDlg;
+	mDlg[3] = new CTabRecDlg;
+
+	mDlg[0]->Create(DLG_Opt_COM,this);
+	mDlg[1]->Create(DLG_Opt_View, this);
+	mDlg[2]->Create(DLG_Opt_Event, this);
+	mDlg[3]->Create(DLG_Opt_Rec, this);
+
+    mDlg[0]->ShowWindow(true);
+    mDlg[1]->ShowWindow(false);
+	mDlg[2]->ShowWindow(false);
+	mDlg[3]->ShowWindow(false);
+    tab_ctrl.SetCurSel(0);
+	mPrePos = 0;
+
+	return 0;
+}
+
 BEGIN_MESSAGE_MAP(COptionDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &COptionDlg::OnOK)
+	ON_NOTIFY(TCN_SELCHANGE, opt_tab, &COptionDlg::OnTabSel)
+	ON_BN_CLICKED(opt_cancel, &COptionDlg::OnBnClickedcancel)
 END_MESSAGE_MAP()
 
 //Show Setting Dialog
@@ -393,6 +609,7 @@ void CAmekaApp::OnOption()
 	COptionDlg optionDlg;
 	optionDlg.DoModal();
 }
+
 
 //------------------------------------------------------------------//
 // CPhoticDlg
@@ -410,6 +627,9 @@ protected:
 // Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedCancel();
 };
 
 CPhoticDlg::CPhoticDlg() : CDialogEx(CPhoticDlg::IDD)
@@ -422,6 +642,8 @@ void CPhoticDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CPhoticDlg, CDialogEx)
+	ON_BN_CLICKED(IDOK, &CPhoticDlg::OnBnClickedOk)
+	ON_BN_CLICKED(IDCANCEL, &CPhoticDlg::OnBnClickedCancel)
 END_MESSAGE_MAP()
 
 //Show Setting Dialog
@@ -447,6 +669,9 @@ protected:
 // Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedok();
+	afx_msg void OnBnClickedcancel();
 };
 
 CLogDlg::CLogDlg() : CDialogEx(CLogDlg::IDD)
@@ -459,6 +684,8 @@ void CLogDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CLogDlg, CDialogEx)
+	ON_BN_CLICKED(log_ok, &CLogDlg::OnBnClickedok)
+	ON_BN_CLICKED(log_cancel, &CLogDlg::OnBnClickedcancel)
 END_MESSAGE_MAP()
 
 //Show Setting Dialog
@@ -484,6 +711,9 @@ protected:
 // Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedCancel();
 };
 
 CWaveDlg::CWaveDlg() : CDialogEx(CWaveDlg::IDD)
@@ -496,6 +726,8 @@ void CWaveDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CWaveDlg, CDialogEx)
+	ON_BN_CLICKED(IDOK, &CWaveDlg::OnBnClickedOk)
+	ON_BN_CLICKED(IDCANCEL, &CWaveDlg::OnBnClickedCancel)
 END_MESSAGE_MAP()
 
 //Show Setting Dialog
@@ -521,6 +753,9 @@ protected:
 // Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedok();
+	afx_msg void OnBnClickedcancel();
 };
 
 CEventDlg::CEventDlg() : CDialogEx(CEventDlg::IDD)
@@ -533,6 +768,8 @@ void CEventDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CEventDlg, CDialogEx)
+	ON_BN_CLICKED(evt_ok, &CEventDlg::OnBnClickedok)
+	ON_BN_CLICKED(evt_cancel, &CEventDlg::OnBnClickedcancel)
 END_MESSAGE_MAP()
 
 //Show Setting Dialog
@@ -593,7 +830,6 @@ void CAmekaApp::OnPortOpen()
 void COptionDlg::OnOK()
 {
 	// TODO: Add your control notification handler code here
-	CDialogEx::OnOK();
 
 	theApp.m_portNo = m_portNo;
 	theApp.m_baudRate = m_baudRate;
@@ -605,10 +841,69 @@ void COptionDlg::OnOK()
 	file << theApp.m_baudRate;
 	file << std::endl;
 	file.close();
+
+	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
+	int count = 0;
+	//Set items for LowPassFilter
+	CMFCRibbonComboBox* pSen = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_ScaleRate));
+	pSen->RemoveAllItems();
+	vector<string> vecSen = Tokenize(m_sensitivity," ");
+	for (vector<string>::iterator it = vecSen.begin(); it != vecSen.end(); it++) {
+		pSen->AddItem((*it).c_str(),count++);
+	}
+	//Set items for LowPassFilter
+	count = 0;
+	CMFCRibbonComboBox* pSpeed = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_SpeedRate));
+	pSpeed->RemoveAllItems();
+	vector<string> vecSpeed = Tokenize(m_speed," ");
+	for (vector<string>::iterator it = vecSpeed.begin(); it != vecSpeed.end(); it++) {
+		pSen->AddItem((*it).c_str(),count++);
+	}
+	//Set items for LowPassFilter
+	count = 0;
+	CMFCRibbonComboBox* pLP = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_LP));
+	pLP->RemoveAllItems();
+	vector<string> vecLP = Tokenize(m_LP," ");
+	for (vector<string>::iterator it = vecLP.begin(); it != vecLP.end(); it++) {
+		pSen->AddItem((*it).c_str(),count++);
+	}
+	//Set items for LowPassFilter
+	count = 0;
+	CMFCRibbonComboBox* pHP = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_HP));
+	pHP->RemoveAllItems();
+	vector<string> vecHP = Tokenize(m_HP," ");
+	for (vector<string>::iterator it = vecHP.begin(); it != vecHP.end(); it++) {
+		pSen->AddItem((*it).c_str(),count++);
+	}
+
+	CDialogEx::OnOK();
 }
 
 
+vector<string> Tokenize(CString buf, string delimiters = " ")
+{   
+    vector<string> tokens;
+	std::string str = buf.GetBuffer(buf.GetLength());
+    string::size_type nwpos; //position of first non white space, which means it is     first real char
+    nwpos = str.find_first_not_of(delimiters, 0); //ignore the whitespace before the first word
 
+    string::size_type pos = str.find_first_of(delimiters, nwpos);
+
+    while (string::npos != pos || string::npos != nwpos)
+    {
+        // Found a token, add it to the vector.
+        tokens.push_back(str.substr(nwpos, pos - nwpos));
+        // Skip delimiters.  Note the "not_of"
+        nwpos = str.find_first_not_of(delimiters, pos);
+        // Find next "non-delimiter"
+        pos = str.find_first_of(delimiters, nwpos);
+    }
+    return tokens;
+};
 
 
 void CSettingDlg::OnSetup()
@@ -632,6 +927,9 @@ protected:
 // Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedCancel();
 };
 
 CMontageDlg::CMontageDlg() : CDialogEx(CMontageDlg::IDD)
@@ -644,10 +942,128 @@ void CMontageDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CMontageDlg, CDialogEx)
+	ON_BN_CLICKED(IDOK, &CMontageDlg::OnBnClickedOk)
+	ON_BN_CLICKED(IDCANCEL, &CMontageDlg::OnBnClickedCancel)
 END_MESSAGE_MAP()
 //Show Montage Dialog
 void CAmekaApp::OnMontage()
 {
 	CMontageDlg montageDlg;
 	montageDlg.DoModal();
+}
+
+
+
+void COptionDlg::OnTabSel(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	// TODO: Add your control notification handler code here
+	mDlg[mPrePos]->ShowWindow(false);
+	mPrePos = tab_ctrl.GetCurSel();
+	mDlg[mPrePos]->ShowWindow(true);
+	*pResult = 0;
+}
+
+
+void COptionDlg::OnBnClickedcancel()
+{
+	// TODO: Add your control notification handler code here
+	CDialogEx::OnCancel();
+}
+
+
+void CMontageDlg::OnBnClickedOk()
+{
+	// TODO: Add your control notification handler code here
+	CDialogEx::OnOK();
+}
+
+
+void CMontageDlg::OnBnClickedCancel()
+{
+	// TODO: Add your control notification handler code here
+	CDialogEx::OnCancel();
+}
+
+
+void CEventDlg::OnBnClickedok()
+{
+	// TODO: Add your control notification handler code here
+	CDialogEx::OnOK();
+}
+
+
+void CEventDlg::OnBnClickedcancel()
+{
+	// TODO: Add your control notification handler code here
+	CDialogEx::OnCancel();
+}
+
+
+void CInfoDlg::OnBnClickedok()
+{
+	// TODO: Add your control notification handler code here
+	CDialogEx::OnOK();
+}
+
+
+void CInfoDlg::OnBnClickedcancel()
+{
+	// TODO: Add your control notification handler code here
+	CDialogEx::OnCancel();
+}
+
+
+void CLogDlg::OnBnClickedok()
+{
+	// TODO: Add your control notification handler code here
+	CDialogEx::OnOK();
+}
+
+
+void CLogDlg::OnBnClickedcancel()
+{
+	// TODO: Add your control notification handler code here
+	CDialogEx::OnCancel();
+}
+
+
+void CPhoticDlg::OnBnClickedOk()
+{
+	// TODO: Add your control notification handler code here
+	CDialogEx::OnOK();
+}
+
+
+void CPhoticDlg::OnBnClickedCancel()
+{
+	// TODO: Add your control notification handler code here
+	CDialogEx::OnCancel();
+}
+
+
+void CSettingDlg::OnBnClickedOk()
+{
+	// TODO: Add your control notification handler code here
+	CDialogEx::OnOK();
+}
+
+
+void CSettingDlg::OnBnClickedCancel()
+{
+	// TODO: Add your control notification handler code here
+	CDialogEx::OnCancel();
+}
+
+
+void CWaveDlg::OnBnClickedOk()
+{
+	// TODO: Add your control notification handler code here
+	CDialogEx::OnOK();
+}
+
+
+void CWaveDlg::OnBnClickedCancel()
+{
+	// TODO: Add your control notification handler code here
+	CDialogEx::OnCancel();
 }

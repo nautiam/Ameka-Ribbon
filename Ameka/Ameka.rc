@@ -347,18 +347,14 @@ BEGIN
     LTEXT           "Log View",IDC_STATIC,7,21,29,8
 END
 
-DLG_Option DIALOGEX 0, 0, 309, 176
+DLG_Option DIALOGEX 0, 0, 293, 175
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Option"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",opt_ok,198,155,50,14
-    PUSHBUTTON      "Cancel",opt_cancel,252,155,50,14
-    CONTROL         "",opt_tab,"SysTabControl32",WS_BORDER,7,7,295,13
-    LTEXT           "Port Name",opt_txt1,14,40,34,8
-    LTEXT           "Baud Rate",opt_txt2,14,64,34,8
-    COMBOBOX        opt_com_portNo,49,35,89,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        opt_com_baud,49,58,89,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",opt_ok,180,154,50,14
+    PUSHBUTTON      "Cancel",opt_cancel,236,154,50,14
+    CONTROL         "",opt_tab,"SysTabControl32",0x0,7,7,151,33
 END
 
 DLG_Photic DIALOGEX 0, 0, 309, 176
@@ -480,13 +476,13 @@ BEGIN
     DLG_Option, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 302
+        RIGHTMARGIN, 286
         VERTGUIDE, 49
         VERTGUIDE, 138
         VERTGUIDE, 150
         VERTGUIDE, 198
         TOPMARGIN, 7
-        BOTTOMMARGIN, 169
+        BOTTOMMARGIN, 168
         HORZGUIDE, 48
         HORZGUIDE, 72
         HORZGUIDE, 96
@@ -542,29 +538,6 @@ BEGIN
 0x6546, 0x616d, 0x656c, "\000" 
     IDC_COMBO1, 0x403, 8, 0
 0x6e55, 0x6e6b, 0x776f, 0x006e, 
-    0
-END
-
-DLG_Option DLGINIT
-BEGIN
-    opt_com_portNo, 0x403, 5, 0
-0x4f43, 0x314d, "\000" 
-    opt_com_portNo, 0x403, 5, 0
-0x4f43, 0x324d, "\000" 
-    opt_com_portNo, 0x403, 5, 0
-0x4f43, 0x334d, "\000" 
-    opt_com_portNo, 0x403, 5, 0
-0x4f43, 0x344d, "\000" 
-    opt_com_portNo, 0x403, 5, 0
-0x4f43, 0x354d, "\000" 
-    opt_com_portNo, 0x403, 5, 0
-0x4f43, 0x364d, "\000" 
-    opt_com_baud, 0x403, 5, 0
-0x3639, 0x3030, "\000" 
-    opt_com_baud, 0x403, 6, 0
-0x3931, 0x3032, 0x0030, 
-    opt_com_baud, 0x403, 7, 0
-0x3131, 0x3235, 0x3030, "\000" 
     0
 END
 
@@ -767,6 +740,71 @@ BEGIN
     PUSHBUTTON      "Save as...",IDC_BUTTON1,131,239,50,14
 END
 
+DLG_Opt_COM DIALOGEX 0, 0, 270, 157
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Port Name",IDC_STATIC,19,35,33,8
+    LTEXT           "Baud Rate",IDC_STATIC,19,52,33,8
+    COMBOBOX        opt_com_portNo,54,30,66,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        opt_com_baud,54,47,66,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+END
+
+DLG_Opt_View DIALOGEX 0, 0, 270, 157
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Sensitivity",IDC_STATIC,19,34,34,8
+    LTEXT           "Paper Speed",IDC_STATIC,11,56,42,8
+    LTEXT           "LowPass Filter",IDC_STATIC,7,82,46,8
+    LTEXT           "HighPass Filter",IDC_STATIC,6,106,48,8
+    EDITTEXT        view_sensitivity,54,28,190,14,ES_AUTOHSCROLL
+    EDITTEXT        view_speed,54,51,190,14,ES_AUTOHSCROLL
+    EDITTEXT        view_lp,54,76,190,14,ES_AUTOHSCROLL
+    EDITTEXT        view_hp,54,100,190,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Default Setting",view_btdef,54,130,68,14
+END
+
+DLG_Opt_Rec DIALOGEX 0, 0, 271, 159
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "EEG File Path",IDC_STATIC,10,34,43,8
+    EDITTEXT        IDC_EDIT1,54,28,187,14,ES_AUTOHSCROLL
+    CONTROL         "Encrypt",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,54,57,41,10
+    LTEXT           "Video File Path",IDC_STATIC,5,83,48,8
+    EDITTEXT        IDC_EDIT2,54,77,187,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BUTTON1,243,28,16,14
+    PUSHBUTTON      "...",IDC_BUTTON2,244,77,16,14
+END
+
+DLG_Opt_Event DIALOGEX 0, 0, 272, 158
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_DISABLED
+EXSTYLE WS_EX_STATICEDGE
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Event 1",IDC_STATIC,27,34,26,8
+    LTEXT           "Event 3",IDC_STATIC,27,58,26,8
+    LTEXT           "Event 5",IDC_STATIC,27,80,26,8
+    LTEXT           "Event 7",IDC_STATIC,28,105,26,8
+    LTEXT           "Event 9",IDC_STATIC,27,130,26,8
+    EDITTEXT        IDC_EDIT1,54,29,72,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT2,54,52,72,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT3,54,75,72,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT4,54,100,72,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT5,54,125,72,14,ES_AUTOHSCROLL
+    LTEXT           "Event 2",IDC_STATIC,151,34,26,8
+    LTEXT           "Event 4",IDC_STATIC,151,57,26,8
+    LTEXT           "Event 6",IDC_STATIC,151,80,26,8
+    LTEXT           "Event 8",IDC_STATIC,151,105,26,8
+    LTEXT           "Event 10",IDC_STATIC,147,130,30,8
+    EDITTEXT        IDC_EDIT6,178,29,74,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT7,178,52,74,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT8,178,75,74,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT9,178,100,74,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT10,178,125,74,14,ES_AUTOHSCROLL
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -783,8 +821,111 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 253
     END
+
+    DLG_Opt_COM, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 263
+        VERTGUIDE, 16
+        VERTGUIDE, 54
+        VERTGUIDE, 120
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 150
+        HORZGUIDE, 43
+        HORZGUIDE, 60
+    END
+
+    DLG_Opt_View, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 263
+        VERTGUIDE, 54
+        VERTGUIDE, 244
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 150
+        HORZGUIDE, 42
+        HORZGUIDE, 65
+        HORZGUIDE, 90
+        HORZGUIDE, 114
+        HORZGUIDE, 131
+    END
+
+    DLG_Opt_Rec, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 264
+        VERTGUIDE, 54
+        VERTGUIDE, 241
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 152
+        HORZGUIDE, 42
+        HORZGUIDE, 67
+        HORZGUIDE, 91
+    END
+
+    DLG_Opt_Event, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 265
+        VERTGUIDE, 54
+        VERTGUIDE, 126
+        VERTGUIDE, 138
+        VERTGUIDE, 178
+        VERTGUIDE, 252
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 151
+        HORZGUIDE, 43
+        HORZGUIDE, 66
+        HORZGUIDE, 89
+        HORZGUIDE, 114
+        HORZGUIDE, 139
+    END
 END
 #endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+DLG_Opt_COM DLGINIT
+BEGIN
+    opt_com_portNo, 0x403, 5, 0
+0x4f43, 0x314d, "\000" 
+    opt_com_portNo, 0x403, 5, 0
+0x4f43, 0x324d, "\000" 
+    opt_com_portNo, 0x403, 5, 0
+0x4f43, 0x334d, "\000" 
+    opt_com_portNo, 0x403, 5, 0
+0x4f43, 0x344d, "\000" 
+    opt_com_portNo, 0x403, 5, 0
+0x4f43, 0x354d, "\000" 
+    opt_com_portNo, 0x403, 5, 0
+0x4f43, 0x364d, "\000" 
+    opt_com_portNo, 0x403, 5, 0
+0x4f43, 0x374d, "\000" 
+    opt_com_portNo, 0x403, 5, 0
+0x4f43, 0x384d, "\000" 
+    opt_com_portNo, 0x403, 5, 0
+0x4f43, 0x394d, "\000" 
+    opt_com_portNo, 0x403, 6, 0
+0x4f43, 0x314d, 0x0030, 
+    opt_com_baud, 0x403, 5, 0
+0x3639, 0x3030, "\000" 
+    opt_com_baud, 0x403, 6, 0
+0x3931, 0x3032, 0x0030, 
+    opt_com_baud, 0x403, 7, 0
+0x3131, 0x3235, 0x3030, "\000" 
+    0
+END
+
+DLG_Montage DLGINIT
+BEGIN
+    IDC_COMBO1, 0x403, 11, 0
+0x6f6d, 0x6f6e, 0x2820, 0x6573, 0x2963, "\000" 
+    0
+END
 
 #endif    // Vietnamese (Vietnam) resources
 /////////////////////////////////////////////////////////////////////////////

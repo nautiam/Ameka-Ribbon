@@ -12,6 +12,9 @@
 // AmekaDoc.h : interface of the CAmekaDoc class
 //
 
+#include "AmekaUserConfig.h"
+
+#define arrLen 4096
 
 #pragma once
 
@@ -41,6 +44,12 @@ public:
 public:
 	virtual ~CAmekaDoc();
 	static CAmekaDoc* GetDoc();
+
+	Aelectrode mElec;
+	//Alead mLead;
+	Amontage mMontage;
+	DSPData mDSP;
+	amekaData<uint16_t>* dataBuffer;
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;

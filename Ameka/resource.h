@@ -52,6 +52,10 @@
 #define DLG_Setting                     317
 #define DLG_Wave                        318
 #define DLG_Montage                     320
+#define DLG_Opt_COM                     321
+#define DLG_Opt_View                    323
+#define DLG_Opt_Rec                     324
+#define DLG_Opt_Event                   325
 #define IDC_COMBO1                      1000
 #define IDC_CHECK1                      1001
 #define IDC_CHECK2                      1002
@@ -60,9 +64,12 @@
 #define evt_lv                          1004
 #define IDC_EDIT1                       1005
 #define log_view                        1005
+#define view_sensitivity                1005
 #define IDC_EDIT2                       1006
+#define view_speed                      1006
 #define IDC_EDIT3                       1007
 #define info_2ndName                    1007
+#define view_lp                         1007
 #define IDC_DATETIMEPICKER1             1008
 #define info_birthday                   1008
 #define IDC_EDIT4                       1009
@@ -86,10 +93,17 @@
 #define opt_tab                         1030
 #define opt_ok                          1031
 #define opt_cancel                      1032
-#define opt_txt1                        1033
-#define opt_txt2                        1034
 #define IDC_LIST3                       1041
 #define IDC_BUTTON1                     1042
+#define view_sp                         1045
+#define view_hp                         1045
+#define view_btdef                      1046
+#define IDC_BUTTON2                     1047
+#define IDC_EDIT6                       1048
+#define IDC_EDIT7                       1049
+#define IDC_EDIT8                       1050
+#define IDC_EDIT9                       1051
+#define IDC_EDIT10                      1052
 #define ID_WRITE_PASTEASHYPERLINK       32770
 #define MN_Open                         32771
 #define MN_Close                        32772
@@ -118,14 +132,16 @@
 #define MN_ScaleRate                    32797
 #define ID_COMBO3                       32798
 #define MN_SpeedRate                    32798
+#define MN_HP                           32798
+#define MN_LP                           32799
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        321
-#define _APS_NEXT_COMMAND_VALUE         32799
-#define _APS_NEXT_CONTROL_VALUE         1043
+#define _APS_NEXT_RESOURCE_VALUE        326
+#define _APS_NEXT_COMMAND_VALUE         32800
+#define _APS_NEXT_CONTROL_VALUE         1053
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

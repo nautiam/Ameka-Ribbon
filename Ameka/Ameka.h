@@ -22,6 +22,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "AmekaDoc.h"
+
 #define portNo "COM2"
 #define baudRate "115200"
 #define settingFileName "AmekaSetting.amek"
@@ -37,15 +39,15 @@ class CAmekaApp : public CWinAppEx
 {
 public:
 	CAmekaApp();
-
+	CSerialIO* pIO;
+	CString m_baudRate;
+	CString m_portNo;
+	CList<CAmekaDoc*, CAmekaDoc*> docList;
 
 // Overrides
 public:
 	virtual BOOL InitInstance();
 	virtual int ExitInstance();
-	CSerialIO* pIO;
-	CString m_baudRate;
-	CString m_portNo;
 
 // Implementation
 	UINT  m_nAppLook;

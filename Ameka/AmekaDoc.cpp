@@ -42,11 +42,16 @@ END_MESSAGE_MAP()
 CAmekaDoc::CAmekaDoc()
 {
 	// TODO: add one-time construction code here
-
+	dataBuffer = new amekaData<uint16_t>(arrLen);
+	theApp.docList.AddTail(this);
 }
 
 CAmekaDoc::~CAmekaDoc()
 {
+	delete dataBuffer;
+	dataBuffer = NULL;
+	POSITION pos = theApp.docList.Find(this);
+	theApp.docList.RemoveAt(pos);
 }
 
 BOOL CAmekaDoc::OnNewDocument()

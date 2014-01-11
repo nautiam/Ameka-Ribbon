@@ -118,75 +118,78 @@ void CAmekaView::OnDraw(CDC* pDC)
 	CRect mrect(0,0,rect.Width(),rect.Height());
 	MemDC.FillRect(mrect,&brush);
 	
-	distance = graphData.paperSpeed*graphData.dotPmm/graphData.sampleRate;
-	EnterCriticalSection(&csess);
-	uint16_t numPos = crtPos/distance;
-	uint16_t firstPos,secondPos;
-
-	if (!isCountFull)
-		firstPos = numPos>=count?0:count-1-numPos;
-	else
-		firstPos = (count-1+bufLen-numPos)%bufLen;
-
-	int j,tmp;
-	/*
-	CPen thick_pen(PS_SOLID, 1, penRGB);
-	MemDC.SelectObject(&thick_pen);
-	*/
-	for(int i = 0; i < channelNum; i++)
+	if (isCountFull || count != 0)
 	{
-		j = 0;
-		while(crtPos - distance*(j+1) > 0)
+		distance = graphData.paperSpeed*graphData.dotPmm/graphData.sampleRate;
+		EnterCriticalSection(&csess);
+		uint16_t numPos = crtPos/distance;
+		uint16_t firstPos,secondPos;
+
+		if (!isCountFull)
+			firstPos = numPos>=count?0:count-1-numPos;
+		else
+			firstPos = (count-1+bufLen-numPos)%bufLen;
+
+		int j,tmp;
+		/*
+		CPen thick_pen(PS_SOLID, 1, penRGB);
+		MemDC.SelectObject(&thick_pen);
+		*/
+		for(int i = 0; i < channelNum; i++)
 		{
-			tmp = (rect.Height()*i/channelNum) + (rect.Height()/channelNum)/2 - (((float)dataBuffer[(count-1+bufLen-j)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
-			if (tmp > rect.Height())
-			tmp = rect.Height();
-			if (tmp < 0)
-				tmp = 0;
-			//MemDC.SetPixel(0, tmp, penRGB);
-			MemDC.MoveTo(crtPos - distance*j, tmp);
-			tmp = (rect.Height()*i/channelNum) + (rect.Height()/channelNum)/2 - (((float)dataBuffer[(count-1+bufLen-j-1)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
-			if (tmp > rect.Height())
-			tmp = rect.Height();
-			if (tmp < 0)
-				tmp = 0;
-			//MemDC.SetPixel(0, tmp, penRGB);
-			MemDC.LineTo(crtPos - distance*(j+1), tmp);
-			j++;
+			j = 0;
+			while(crtPos - distance*(j+1) > 0)
+			{
+				tmp = (rect.Height()*i/channelNum) + (rect.Height()/channelNum)/2 - (((float)dataBuffer[(count-1+bufLen-j)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
+				if (tmp > rect.Height())
+				tmp = rect.Height();
+				if (tmp < 0)
+					tmp = 0;
+				//MemDC.SetPixel(0, tmp, penRGB);
+				MemDC.MoveTo(crtPos - distance*j, tmp);
+				tmp = (rect.Height()*i/channelNum) + (rect.Height()/channelNum)/2 - (((float)dataBuffer[(count-1+bufLen-j-1)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
+				if (tmp > rect.Height())
+				tmp = rect.Height();
+				if (tmp < 0)
+					tmp = 0;
+				//MemDC.SetPixel(0, tmp, penRGB);
+				MemDC.LineTo(crtPos - distance*(j+1), tmp);
+				j++;
+			}
 		}
-	}
 
 
 
-	for(int i = 0; i < channelNum; i++)
-	{
-		j = 0;
-		while(rect.Width() - distance*j >= crtPos )
+		for(int i = 0; i < channelNum; i++)
 		{
-			if (firstPos == 0)
-				break;
-			tmp = (rect.Height()*i/channelNum) + (rect.Height()/channelNum)/2 - (((float)dataBuffer[(firstPos+bufLen-j)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
-			if (tmp > rect.Height())
-			tmp = rect.Height();
-			if (tmp < 0)
-				tmp = 0;
-			//MemDC.SetPixel(0, tmp, penRGB);
-			MemDC.MoveTo(rect.Width()-distance*j, tmp);
-			tmp = (rect.Height()*i/channelNum) + (rect.Height()/channelNum)/2 - (((float)dataBuffer[(firstPos+bufLen-j-1)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
-			if (tmp > rect.Height())
-			tmp = rect.Height();
-			if (tmp < 0)
-				tmp = 0;
-			//MemDC.SetPixel(0, tmp, penRGB);
-			MemDC.LineTo(rect.Width()-distance*(j+1), tmp);
-			j++;
+			j = 0;
+			while(rect.Width() - distance*j >= crtPos )
+			{
+				if (firstPos == 0)
+					break;
+				tmp = (rect.Height()*i/channelNum) + (rect.Height()/channelNum)/2 - (((float)dataBuffer[(firstPos+bufLen-j)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
+				if (tmp > rect.Height())
+				tmp = rect.Height();
+				if (tmp < 0)
+					tmp = 0;
+				//MemDC.SetPixel(0, tmp, penRGB);
+				MemDC.MoveTo(rect.Width()-distance*j, tmp);
+				tmp = (rect.Height()*i/channelNum) + (rect.Height()/channelNum)/2 - (((float)dataBuffer[(firstPos+bufLen-j-1)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
+				if (tmp > rect.Height())
+				tmp = rect.Height();
+				if (tmp < 0)
+					tmp = 0;
+				//MemDC.SetPixel(0, tmp, penRGB);
+				MemDC.LineTo(rect.Width()-distance*(j+1), tmp);
+				j++;
+			}
 		}
-	}
 
-	CBrush brushS(sBarRGB);
-	//CBrush* pOldBrush1 = MemDC.SelectObject(&brushS);
-	MemDC.FillRect(CRect(crtPos, 0, crtPos + scanBarW, rect.Height()),&brushS);
-	LeaveCriticalSection(&csess);
+		CBrush brushS(sBarRGB);
+		//CBrush* pOldBrush1 = MemDC.SelectObject(&brushS);
+		MemDC.FillRect(CRect(crtPos, 0, crtPos + scanBarW, rect.Height()),&brushS);
+		LeaveCriticalSection(&csess);
+	}
 	pDC->BitBlt(0, 0, rect.Width(), rect.Height(), &MemDC, 0, 0, SRCCOPY);
 	UpdateWindow();
 	MemDC.SelectObject(pOldBmp); 
