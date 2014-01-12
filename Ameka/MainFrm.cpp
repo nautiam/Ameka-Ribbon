@@ -17,10 +17,13 @@
 #include "AmekaView.h"
 
 #include "MainFrm.h"
+#include <vector>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+using namespace std;
 
 // CMainFrame
 
@@ -40,6 +43,8 @@ END_MESSAGE_MAP()
 
 // CMainFrame construction/destruction
 
+vector<string> Tokenize(CString str, string delimiters);
+
 CMainFrame::CMainFrame()
 {
 	// TODO: add member initialization code here
@@ -49,6 +54,7 @@ CMainFrame::CMainFrame()
 CMainFrame::~CMainFrame()
 {
 }
+
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
@@ -103,6 +109,55 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// Switch the order of document name and application name on the window title bar. This
 	// improves the usability of the taskbar because the document name is visible with the thumbnail.
 	ModifyStyle(0, FWS_PREFIXTITLE);
+
+	int count = 0;
+	//Set items for LowPassFilter
+	CMFCRibbonComboBox* pSen = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, m_wndRibbonBar.FindByID(MN_ScaleRate));
+	if (pSen != NULL)
+	{
+		pSen->RemoveAllItems();
+		vector<string> vecSen = Tokenize(theApp.m_sensitivity," ");
+		for (vector<string>::iterator it = vecSen.begin(); it != vecSen.end(); it++) {
+			pSen->AddItem((*it).c_str(),count++);
+		}
+	}
+	//Set items for LowPassFilter
+	count = 0;
+	CMFCRibbonComboBox* pSpeed = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, m_wndRibbonBar.FindByID(MN_SpeedRate));
+	if (pSpeed != NULL)
+	{
+		pSpeed->RemoveAllItems();
+		vector<string> vecSpeed = Tokenize(theApp.m_speed," ");
+		for (vector<string>::iterator it = vecSpeed.begin(); it != vecSpeed.end(); it++) {
+			pSpeed->AddItem((*it).c_str(),count++);
+		}
+	}
+	//Set items for LowPassFilter
+	count = 0;
+	CMFCRibbonComboBox* pLP = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, m_wndRibbonBar.FindByID(MN_LP));
+	if (pLP != NULL)
+	{
+		pLP->RemoveAllItems();
+		vector<string> vecLP = Tokenize(theApp.m_LP," ");
+		for (vector<string>::iterator it = vecLP.begin(); it != vecLP.end(); it++) {
+			pLP->AddItem((*it).c_str(),count++);
+		}
+	}
+	//Set items for HighPassFilter
+	count = 0;
+	CMFCRibbonComboBox* pHP = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, m_wndRibbonBar.FindByID(MN_HP));
+	if (pHP != NULL)
+	{
+		pHP->RemoveAllItems();
+		vector<string> vecHP = Tokenize(theApp.m_HP," ");
+		for (vector<string>::iterator it = vecHP.begin(); it != vecHP.end(); it++) {
+			pHP->AddItem((*it).c_str(),count++);
+		}
+	}
 
 	return 0;
 }

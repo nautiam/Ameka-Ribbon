@@ -6,7 +6,6 @@
 #include <math.h>
 #include <Windows.h>
 
-#define dataNum 10
 
 #ifndef _USERCONFIG_H_
 #define _USERCONFIG_H_
@@ -62,6 +61,10 @@ struct RawDataType {
 	time_t time;
 };
 
+struct PrimaryDataType {
+	uint16_t* value;
+	time_t time;
+};
 
 class RingBuffer
 {

@@ -27,7 +27,9 @@
 #define new DEBUG_NEW
 #endif
 
-#define timeSleep 20
+#define timeSleep 25
+#define dataNum 8
+
 #define sBarRGB RGB(92,64,51)
 #define penRGB RGB(72,61,139)
 #define scanBarW 4
@@ -97,8 +99,6 @@ BOOL CAmekaView::PreCreateWindow(CREATESTRUCT& cs)
 
 void CAmekaView::OnDraw(CDC* pDC)
 {
-	int maxLen;
-
 	CAmekaDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
@@ -109,7 +109,7 @@ void CAmekaView::OnDraw(CDC* pDC)
 
 	CRect rect;
     GetClientRect(&rect);
-	Wbmp.CreateCompatibleBitmap(&MemDC, rect.Width(), rect.Height() );
+	Wbmp.CreateCompatibleBitmap(pDC, rect.Width(), rect.Height() );
 
 	CBitmap* pOldBmp = MemDC.SelectObject(&Wbmp);
 	
@@ -123,7 +123,7 @@ void CAmekaView::OnDraw(CDC* pDC)
 		distance = graphData.paperSpeed*graphData.dotPmm/graphData.sampleRate;
 		EnterCriticalSection(&csess);
 		uint16_t numPos = crtPos/distance;
-		uint16_t firstPos,secondPos;
+		uint16_t firstPos;
 
 		if (!isCountFull)
 			firstPos = numPos>=count?0:count-1-numPos;

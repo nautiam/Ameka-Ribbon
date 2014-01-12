@@ -42,7 +42,7 @@ END_MESSAGE_MAP()
 CAmekaDoc::CAmekaDoc()
 {
 	// TODO: add one-time construction code here
-	dataBuffer = new amekaData<uint16_t>(arrLen);
+	dataBuffer = new amekaData<RawDataType>(arrLen);
 	theApp.docList.AddTail(this);
 }
 

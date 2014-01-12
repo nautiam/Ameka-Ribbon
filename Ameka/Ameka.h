@@ -42,6 +42,10 @@ public:
 	CSerialIO* pIO;
 	CString m_baudRate;
 	CString m_portNo;
+	CString m_speed;
+	CString m_sensitivity;
+	CString m_LP;
+	CString m_HP;
 	CList<CAmekaDoc*, CAmekaDoc*> docList;
 
 // Overrides

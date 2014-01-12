@@ -49,7 +49,7 @@ public:
 	//Alead mLead;
 	Amontage mMontage;
 	DSPData mDSP;
-	amekaData<uint16_t>* dataBuffer;
+	amekaData<RawDataType>* dataBuffer;
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;

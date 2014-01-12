@@ -27,10 +27,18 @@
 #include "afxcmn.h"
 
 #include <vector>
+#include "afxwin.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+#define strSen "10 15 30 60 90 120"
+#define strSpeed "15 30 75 150 200 300"
+#define strLP "15 20 30 40 50 60 70"
+#define strHP "1 2 3 5 8"
+#define strCOM "COM1 COM2 COM3 COM4 COM5 COM6 COM7 COM8 COM9 COM10"
+#define strBaud "9600 14400 19200 38400 56000 115200 "
 
 using namespace std;
 
@@ -89,12 +97,15 @@ CTabCOMDlg::CTabCOMDlg() : CDialogEx(CTabCOMDlg::IDD)
 
 int CTabCOMDlg::OnInitDialog()
 {
+	CDialog::OnInitDialog();
 	return 0;
 }
 
 void CTabCOMDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Text(pDX, opt_com_portNo, theApp.m_portNo);
+	DDX_Text(pDX, opt_com_baud, theApp.m_baudRate);
 }
 
 BEGIN_MESSAGE_MAP(CTabCOMDlg, CDialogEx)
@@ -118,6 +129,10 @@ protected:
 	virtual BOOL OnInitDialog();
 	DECLARE_MESSAGE_MAP()
 public:
+	afx_msg void OnBnClickedeeg();
+	CEdit rec_ed_eeg;
+	CEdit rec_ed_video;
+	afx_msg void OnBnClickedvideo();
 };
 
 CTabRecDlg::CTabRecDlg() : CDialogEx(CTabRecDlg::IDD)
@@ -127,15 +142,20 @@ CTabRecDlg::CTabRecDlg() : CDialogEx(CTabRecDlg::IDD)
 
 int CTabRecDlg::OnInitDialog()
 {
+	CDialog::OnInitDialog();
 	return 0;
 }
 
 void CTabRecDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_EDIT1, rec_ed_eeg);
+	DDX_Control(pDX, IDC_EDIT2, rec_ed_video);
 }
 
 BEGIN_MESSAGE_MAP(CTabRecDlg, CDialogEx)
+	ON_BN_CLICKED(rec_eeg, &CTabRecDlg::OnBnClickedeeg)
+	ON_BN_CLICKED(rec_video, &CTabRecDlg::OnBnClickedvideo)
 END_MESSAGE_MAP()
 
 //------------------------------------------------------------------//
@@ -165,6 +185,7 @@ CTabEventDlg::CTabEventDlg() : CDialogEx(CTabEventDlg::IDD)
 
 int CTabEventDlg::OnInitDialog()
 {
+	CDialog::OnInitDialog();
 	return 0;
 }
 
@@ -194,6 +215,11 @@ protected:
 	virtual BOOL OnInitDialog();
 	DECLARE_MESSAGE_MAP()
 public:
+	CEdit m_view_speed;
+	CEdit m_view_sen;
+	CEdit m_view_lp;
+	CEdit m_view_hp;
+	afx_msg void OnBnClickedbtdef();
 };
 
 CTabViewDlg::CTabViewDlg() : CDialogEx(CTabViewDlg::IDD)
@@ -203,15 +229,29 @@ CTabViewDlg::CTabViewDlg() : CDialogEx(CTabViewDlg::IDD)
 
 int CTabViewDlg::OnInitDialog()
 {
+	CDialog::OnInitDialog();
+	m_view_sen.SetWindowTextA(theApp.m_sensitivity);
+	m_view_speed.SetWindowTextA(theApp.m_speed);
+	m_view_lp.SetWindowTextA(theApp.m_LP);
+	m_view_hp.SetWindowTextA(theApp.m_HP);
 	return 0;
 }
 
 void CTabViewDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Text(pDX, view_lp, theApp.m_LP);
+	DDX_Text(pDX, view_hp, theApp.m_HP);
+	DDX_Text(pDX, view_sensitivity, theApp.m_sensitivity);
+	DDX_Text(pDX, view_speed, theApp.m_speed);
+	DDX_Control(pDX, view_sensitivity, m_view_sen);
+	DDX_Control(pDX, view_speed, m_view_speed);
+	DDX_Control(pDX, view_lp, m_view_lp);
+	DDX_Control(pDX, view_hp, m_view_hp);
 }
 
 BEGIN_MESSAGE_MAP(CTabViewDlg, CDialogEx)
+	ON_BN_CLICKED(view_btdef, &CTabViewDlg::OnBnClickedbtdef)
 END_MESSAGE_MAP()
 
 
@@ -221,6 +261,11 @@ END_MESSAGE_MAP()
 
 CAmekaApp::CAmekaApp()
 {
+	m_sensitivity = strSen;
+	m_speed = strSpeed;
+	m_LP = strLP;
+	m_HP = strHP;
+
 	char line[100];
 	ifstream setFile;
 
@@ -239,6 +284,8 @@ CAmekaApp::CAmekaApp()
 		m_baudRate = line;
 		setFile.close();
 	}
+
+	
 
 	// support Restart Manager
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_ALL_ASPECTS;
@@ -546,9 +593,10 @@ protected:
 	virtual BOOL OnInitDialog();
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnOK();
+	//afx_msg void OnOK();
 	afx_msg void OnTabSel(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickedcancel();
+	afx_msg void OnBnClickedok();
 };
 
 COptionDlg::COptionDlg() : CDialogEx(COptionDlg::IDD)
@@ -559,13 +607,14 @@ COptionDlg::COptionDlg() : CDialogEx(COptionDlg::IDD)
 void COptionDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	/*
 	DDX_Text(pDX, opt_com_portNo, m_portNo);
 	DDX_Text(pDX, opt_com_baud, m_baudRate);
 	DDX_Text(pDX, view_lp, m_LP);
 	DDX_Text(pDX, view_hp, m_HP);
 	DDX_Text(pDX, view_sensitivity, m_sensitivity);
 	DDX_Text(pDX, view_speed, m_speed);
-
+	*/
 	DDX_Control(pDX, opt_tab, tab_ctrl);
 }
 
@@ -601,6 +650,7 @@ BEGIN_MESSAGE_MAP(COptionDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &COptionDlg::OnOK)
 	ON_NOTIFY(TCN_SELCHANGE, opt_tab, &COptionDlg::OnTabSel)
 	ON_BN_CLICKED(opt_cancel, &COptionDlg::OnBnClickedcancel)
+	ON_BN_CLICKED(opt_ok, &COptionDlg::OnBnClickedok)
 END_MESSAGE_MAP()
 
 //Show Setting Dialog
@@ -784,11 +834,13 @@ void CAmekaApp::OnEvent()
 //Demo Graph
 void CAmekaApp::OnDemo()
 {
-	CAmekaView *pView = CAmekaView::GetView();
-	if (!pView->isRunning)
+	if (theApp.pIO != NULL && (theApp.pIO->m_bState == S_CONNECTED || theApp.pIO->m_bState == S_NOCONNECTED))
 	{
-		pView->pThread = AfxBeginThread(pView->graphHandle, (LPVOID)pView);
-		pView->isRunning = true;
+		CAmekaView *pView = CAmekaView::GetView();
+		if (!pView->isRunning)
+		{
+			pView->pThread = AfxBeginThread(pView->graphHandle, (LPVOID)pView);
+		}	pView->isRunning = true;
 	}
 }
 
@@ -825,63 +877,6 @@ void CAmekaApp::OnPortOpen()
 }
 
 //------------------------------------------------------------------//
-
-
-void COptionDlg::OnOK()
-{
-	// TODO: Add your control notification handler code here
-
-	theApp.m_portNo = m_portNo;
-	theApp.m_baudRate = m_baudRate;
-	remove(settingFileName);
-	ofstream file;
-	file.open(settingFileName);
-	file << theApp.m_portNo;
-	file << std::endl;
-	file << theApp.m_baudRate;
-	file << std::endl;
-	file.close();
-
-	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
-	int count = 0;
-	//Set items for LowPassFilter
-	CMFCRibbonComboBox* pSen = DYNAMIC_DOWNCAST(
-		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_ScaleRate));
-	pSen->RemoveAllItems();
-	vector<string> vecSen = Tokenize(m_sensitivity," ");
-	for (vector<string>::iterator it = vecSen.begin(); it != vecSen.end(); it++) {
-		pSen->AddItem((*it).c_str(),count++);
-	}
-	//Set items for LowPassFilter
-	count = 0;
-	CMFCRibbonComboBox* pSpeed = DYNAMIC_DOWNCAST(
-		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_SpeedRate));
-	pSpeed->RemoveAllItems();
-	vector<string> vecSpeed = Tokenize(m_speed," ");
-	for (vector<string>::iterator it = vecSpeed.begin(); it != vecSpeed.end(); it++) {
-		pSen->AddItem((*it).c_str(),count++);
-	}
-	//Set items for LowPassFilter
-	count = 0;
-	CMFCRibbonComboBox* pLP = DYNAMIC_DOWNCAST(
-		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_LP));
-	pLP->RemoveAllItems();
-	vector<string> vecLP = Tokenize(m_LP," ");
-	for (vector<string>::iterator it = vecLP.begin(); it != vecLP.end(); it++) {
-		pSen->AddItem((*it).c_str(),count++);
-	}
-	//Set items for LowPassFilter
-	count = 0;
-	CMFCRibbonComboBox* pHP = DYNAMIC_DOWNCAST(
-		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_HP));
-	pHP->RemoveAllItems();
-	vector<string> vecHP = Tokenize(m_HP," ");
-	for (vector<string>::iterator it = vecHP.begin(); it != vecHP.end(); it++) {
-		pSen->AddItem((*it).c_str(),count++);
-	}
-
-	CDialogEx::OnOK();
-}
 
 
 vector<string> Tokenize(CString buf, string delimiters = " ")
@@ -1066,4 +1061,100 @@ void CWaveDlg::OnBnClickedCancel()
 {
 	// TODO: Add your control notification handler code here
 	CDialogEx::OnCancel();
+}
+
+
+
+void COptionDlg::OnBnClickedok()
+{
+	// TODO: Add your control notification handler code here
+	for (int i = 0; i < 4; i++)
+	{
+		mDlg[i]->UpdateData();
+	}
+	
+	remove(settingFileName);
+	ofstream file;
+	file.open(settingFileName);
+	file << theApp.m_portNo;
+	file << std::endl;
+	file << theApp.m_baudRate;
+	file << std::endl;
+	file.close();
+
+	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
+	int count = 0;
+	//Set items for LowPassFilter
+	CMFCRibbonComboBox* pSen = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_ScaleRate));
+	pSen->RemoveAllItems();
+	vector<string> vecSen = Tokenize(theApp.m_sensitivity," ");
+	for (vector<string>::iterator it = vecSen.begin(); it != vecSen.end(); it++) {
+		pSen->AddItem((*it).c_str(),count++);
+	}
+	//Set items for LowPassFilter
+	count = 0;
+	CMFCRibbonComboBox* pSpeed = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_SpeedRate));
+	pSpeed->RemoveAllItems();
+	vector<string> vecSpeed = Tokenize(theApp.m_speed," ");
+	for (vector<string>::iterator it = vecSpeed.begin(); it != vecSpeed.end(); it++) {
+		pSpeed->AddItem((*it).c_str(),count++);
+	}
+	//Set items for LowPassFilter
+	count = 0;
+	CMFCRibbonComboBox* pLP = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_LP));
+	pLP->RemoveAllItems();
+	vector<string> vecLP = Tokenize(theApp.m_LP," ");
+	for (vector<string>::iterator it = vecLP.begin(); it != vecLP.end(); it++) {
+		pLP->AddItem((*it).c_str(),count++);
+	}
+	//Set items for LowPassFilter
+	count = 0;
+	CMFCRibbonComboBox* pHP = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_HP));
+	pHP->RemoveAllItems();
+	vector<string> vecHP = Tokenize(theApp.m_HP," ");
+	for (vector<string>::iterator it = vecHP.begin(); it != vecHP.end(); it++) {
+		pHP->AddItem((*it).c_str(),count++);
+	}
+
+	EndDialog(0);
+}
+
+
+void CTabRecDlg::OnBnClickedeeg()
+{
+	// TODO: Add your control notification handler code here
+	CFolderPickerDialog dlgFolder;
+
+	if ( dlgFolder.DoModal() == IDOK )
+	{
+		CString tmp = dlgFolder.GetFolderPath();
+		rec_ed_eeg.SetWindowTextA(tmp);
+	}
+}
+
+
+void CTabRecDlg::OnBnClickedvideo()
+{
+	// TODO: Add your control notification handler code here
+	CFolderPickerDialog dlgFolder;
+
+	if ( dlgFolder.DoModal() == IDOK )
+	{
+		CString tmp = dlgFolder.GetFolderPath();
+		rec_ed_video.SetWindowTextA(tmp);
+	}
+}
+
+
+void CTabViewDlg::OnBnClickedbtdef()
+{
+	// TODO: Add your control notification handler code here
+	m_view_sen.SetWindowTextA(strSen);
+	m_view_speed.SetWindowTextA(strSpeed);
+	m_view_lp.SetWindowTextA(strLP);
+	m_view_hp.SetWindowTextA(strHP);
 }

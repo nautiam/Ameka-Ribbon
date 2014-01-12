@@ -246,7 +246,7 @@ BOOL ReadThread::InitInstance()
 int ReadThread::Run()
 {
     /* A. Viet add new */
-    DWORD	EventMask;
+    //DWORD	EventMask;
 	char buf[MAX_MESSAGE] = {0};
 	unsigned long lenMessage;
 	int counter = 0;

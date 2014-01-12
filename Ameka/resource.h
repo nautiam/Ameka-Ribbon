@@ -99,11 +99,13 @@
 #define view_hp                         1045
 #define view_btdef                      1046
 #define IDC_BUTTON2                     1047
+#define rec_video                       1047
 #define IDC_EDIT6                       1048
 #define IDC_EDIT7                       1049
 #define IDC_EDIT8                       1050
 #define IDC_EDIT9                       1051
 #define IDC_EDIT10                      1052
+#define rec_eeg                         1053
 #define ID_WRITE_PASTEASHYPERLINK       32770
 #define MN_Open                         32771
 #define MN_Close                        32772
@@ -140,8 +142,8 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        326
-#define _APS_NEXT_COMMAND_VALUE         32800
-#define _APS_NEXT_CONTROL_VALUE         1053
+#define _APS_NEXT_COMMAND_VALUE         32802
+#define _APS_NEXT_CONTROL_VALUE         1054
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif
