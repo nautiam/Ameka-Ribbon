@@ -925,6 +925,10 @@ protected:
 public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedCancel();
+	afx_msg void OnBnClickedadd();
+	CComboBox mon_l1;
+	CComboBox mon_l2;
+	CListBox mon_list;
 };
 
 CMontageDlg::CMontageDlg() : CDialogEx(CMontageDlg::IDD)
@@ -934,11 +938,15 @@ CMontageDlg::CMontageDlg() : CDialogEx(CMontageDlg::IDD)
 void CMontageDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, mon_1, mon_l1);
+	DDX_Control(pDX, mon_2, mon_l2);
+	DDX_Control(pDX, IDC_LIST3, mon_list);
 }
 
 BEGIN_MESSAGE_MAP(CMontageDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CMontageDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDCANCEL, &CMontageDlg::OnBnClickedCancel)
+	ON_BN_CLICKED(mon_add, &CMontageDlg::OnBnClickedadd)
 END_MESSAGE_MAP()
 //Show Montage Dialog
 void CAmekaApp::OnMontage()
@@ -1157,4 +1165,17 @@ void CTabViewDlg::OnBnClickedbtdef()
 	m_view_speed.SetWindowTextA(strSpeed);
 	m_view_lp.SetWindowTextA(strLP);
 	m_view_hp.SetWindowTextA(strHP);
+}
+
+
+void CMontageDlg::OnBnClickedadd()
+{
+	// TODO: Add your control notification handler code here
+	int pos1 = mon_l1.GetCurSel();
+	int pos2 = mon_l2.GetCurSel();
+	CString txt1;
+	CString txt2;
+	mon_l1.GetLBText(pos1, txt1);
+	mon_l2.GetLBText(pos2, txt2);
+	mon_list.AddString(txt1 + "->" + txt2);
 }

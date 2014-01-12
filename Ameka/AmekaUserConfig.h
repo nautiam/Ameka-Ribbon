@@ -5,14 +5,14 @@
 #include <mmc.h>
 #include <math.h>
 #include <Windows.h>
-
+#include <vector>
 
 #ifndef _USERCONFIG_H_
 #define _USERCONFIG_H_
 // Electrode struct
 struct Aelectrode {
 	uint16_t eID;
-	LPCTSTR eName;
+	CString eName;
 };
 // Lead struct
 struct Color{
@@ -30,9 +30,11 @@ struct Alead {
 };
 // Montage struct
 struct Amontage {
-	uint16_t mID;
-	LPCTSTR mName;
-	CList<int> mList;
+public:
+	uint16_t leadNum = 0;
+	vector<Alead> mList;
+	uint16_t mID = 0;
+	CString mName;
 };
 
 // DSP Engine

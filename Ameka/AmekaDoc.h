@@ -45,10 +45,9 @@ public:
 	virtual ~CAmekaDoc();
 	static CAmekaDoc* GetDoc();
 
-	Aelectrode mElec;
-	//Alead mLead;
 	Amontage mMontage;
 	DSPData mDSP;
+	vector<Aelectrode> mElec;
 	amekaData<RawDataType>* dataBuffer;
 #ifdef _DEBUG
 	virtual void AssertValid() const;
