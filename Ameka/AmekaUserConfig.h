@@ -9,31 +9,32 @@
 
 #ifndef _USERCONFIG_H_
 #define _USERCONFIG_H_
+
 // Electrode struct
-struct Aelectrode {
+typedef struct _Aelectrode {
 	uint16_t eID;
 	CString eName;
-};
-// Lead struct
-struct Color{
+} *LPAelectrode, Aelectrode;
+
+typedef struct _Color{
 	int R;
 	int G;
 	int B;
-	Color(int cl1, int cl2, int cl3){R=cl1;G=cl2;B=cl3;}
-};
-
-struct Alead {
+	_Color(int cl1, int cl2, int cl3){R=cl1;G=cl2;B=cl3;};
+} *LPColor, Color;
+// Lead struct
+typedef struct _Alead {
 	uint16_t lID;
 	uint16_t lFirstID;
 	uint16_t lSecondID;
-	Color color;
-};
+	//Color color;
+} *LPAlead, Alead;
 // Montage struct
 struct Amontage {
 public:
-	uint16_t leadNum = 0;
-	vector<Alead> mList;
-	uint16_t mID = 0;
+	uint16_t leadNum;
+	CList<LPAlead, LPAlead> mList;
+	uint16_t mID;
 	CString mName;
 };
 

@@ -2,7 +2,7 @@
 #include "SerialCtrl.h"
 #include "easylogging++.h"
 
-_INITIALIZE_EASYLOGGINGPP
+
 
 // Set cau hinh mac dinh cua cong com
 SerialCtrl::SerialCtrl(void):m_portStatus(FALSE),m_portHandle(NULL)
@@ -657,14 +657,6 @@ BOOL CSerialIO::Init()
 	m_readProcess->ResumeThread();
     m_writeProcess->ResumeThread();
 
-	el::Configurations defaultConf;
-	defaultConf.setToDefault();
-	//defaultConf.setGlobally(el::ConfigurationType::Filename, "logs\\Log.txt");
-	defaultConf.setGlobally(el::ConfigurationType::LogFlushThreshold, "1000");
-	defaultConf.setGlobally(el::ConfigurationType::Format, "%datetime %level %msg");
-	el::Loggers::reconfigureLogger("default", defaultConf);
-
-	LOG(INFO) << "Log using default file";
 	return retVal;
 }
 void CSerialIO::UnInit()

@@ -47,7 +47,7 @@ public:
 
 	Amontage mMontage;
 	DSPData mDSP;
-	vector<Aelectrode> mElec;
+	CList<LPAelectrode, LPAelectrode> mElec;
 	amekaData<RawDataType>* dataBuffer;
 #ifdef _DEBUG
 	virtual void AssertValid() const;

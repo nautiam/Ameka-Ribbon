@@ -109,6 +109,7 @@
 #define rec_eeg                         1053
 #define mon_1                           1054
 #define mon_2                           1055
+#define monctrl_list                    1057
 #define ID_WRITE_PASTEASHYPERLINK       32770
 #define MN_Open                         32771
 #define MN_Close                        32772
@@ -146,7 +147,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        326
 #define _APS_NEXT_COMMAND_VALUE         32806
-#define _APS_NEXT_CONTROL_VALUE         1056
+#define _APS_NEXT_CONTROL_VALUE         1058
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

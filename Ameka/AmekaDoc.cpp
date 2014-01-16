@@ -20,8 +20,11 @@
 #endif
 
 #include "AmekaDoc.h"
+#include "xmlParser.h"
 
 #include <propkey.h>
+
+#define xmlName "abc.xml"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -44,6 +47,8 @@ CAmekaDoc::CAmekaDoc()
 	// TODO: add one-time construction code here
 	dataBuffer = new amekaData<RawDataType>(arrLen);
 	theApp.docList.AddTail(this);
+
+	loadXML(xmlName);
 }
 
 CAmekaDoc::~CAmekaDoc()

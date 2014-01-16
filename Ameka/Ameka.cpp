@@ -25,6 +25,7 @@
 #include "SerialCtrl.h"
 #include "AmekaUserConfig.h"
 #include "afxcmn.h"
+#include "easylogging++.h"
 
 #include <vector>
 #include "afxwin.h"
@@ -39,6 +40,8 @@
 #define strHP "1 2 3 5 8"
 #define strCOM "COM1 COM2 COM3 COM4 COM5 COM6 COM7 COM8 COM9 COM10"
 #define strBaud "9600 14400 19200 38400 56000 115200 "
+
+_INITIALIZE_EASYLOGGINGPP
 
 using namespace std;
 
@@ -72,6 +75,7 @@ END_MESSAGE_MAP()
 // COM
 
 vector<string> Tokenize(CString str, string delimiters);
+CString itoS ( int x );
 
 class CTabCOMDlg : public CDialogEx
 {
@@ -88,6 +92,8 @@ protected:
 	virtual BOOL OnInitDialog();
 	DECLARE_MESSAGE_MAP()
 public:
+	CComboBox port_name;
+	CComboBox port_baud;
 };
 
 CTabCOMDlg::CTabCOMDlg() : CDialogEx(CTabCOMDlg::IDD)
@@ -98,6 +104,8 @@ CTabCOMDlg::CTabCOMDlg() : CDialogEx(CTabCOMDlg::IDD)
 int CTabCOMDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+	port_name.SetCurSel(0);
+	port_baud.SetCurSel(0);
 	return 0;
 }
 
@@ -106,6 +114,8 @@ void CTabCOMDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Text(pDX, opt_com_portNo, theApp.m_portNo);
 	DDX_Text(pDX, opt_com_baud, theApp.m_baudRate);
+	DDX_Control(pDX, opt_com_portNo, port_name);
+	DDX_Control(pDX, opt_com_baud, port_baud);
 }
 
 BEGIN_MESSAGE_MAP(CTabCOMDlg, CDialogEx)
@@ -261,6 +271,15 @@ END_MESSAGE_MAP()
 
 CAmekaApp::CAmekaApp()
 {
+	el::Configurations defaultConf;
+	defaultConf.setToDefault();
+	//defaultConf.setGlobally(el::ConfigurationType::Filename, "logs\\Log.txt");
+	defaultConf.setGlobally(el::ConfigurationType::LogFlushThreshold, "1000");
+	defaultConf.setGlobally(el::ConfigurationType::Format, "%datetime %level %msg");
+	el::Loggers::reconfigureLogger("default", defaultConf);
+
+	LOG(INFO) << "Log using default file";
+
 	m_sensitivity = strSen;
 	m_speed = strSpeed;
 	m_LP = strLP;
@@ -284,7 +303,6 @@ CAmekaApp::CAmekaApp()
 		m_baudRate = line;
 		setFile.close();
 	}
-
 	
 
 	// support Restart Manager
@@ -538,18 +556,30 @@ protected:
 // Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
+	virtual BOOL OnInitDialog();
 public:
 	afx_msg void OnBnClickedok();
 	afx_msg void OnBnClickedcancel();
+	CComboBox info_sex;
+	CButton info_handed;
 };
 
 CInfoDlg::CInfoDlg() : CDialogEx(CInfoDlg::IDD)
 {
 }
 
+int CInfoDlg::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+	info_sex.SetCurSel(0);
+	return 0;
+}
+
 void CInfoDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_COMBO1, info_sex);
+	DDX_Control(pDX, IDC_CHECK1, info_handed);
 }
 
 BEGIN_MESSAGE_MAP(CInfoDlg, CDialogEx)
@@ -803,18 +833,28 @@ protected:
 // Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
+	virtual BOOL OnInitDialog();
 public:
 	afx_msg void OnBnClickedok();
 	afx_msg void OnBnClickedcancel();
+	CComboBox event_list;
 };
 
 CEventDlg::CEventDlg() : CDialogEx(CEventDlg::IDD)
 {
 }
 
+int CEventDlg::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+	event_list.SetCurSel(0);
+	return 0;
+}
+
 void CEventDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, evt_list, event_list);
 }
 
 BEGIN_MESSAGE_MAP(CEventDlg, CDialogEx)
@@ -922,6 +962,7 @@ protected:
 // Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
+	virtual BOOL OnInitDialog();
 public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedCancel();
@@ -929,10 +970,34 @@ public:
 	CComboBox mon_l1;
 	CComboBox mon_l2;
 	CListBox mon_list;
+	CComboBox mon_lName;
 };
 
 CMontageDlg::CMontageDlg() : CDialogEx(CMontageDlg::IDD)
 {
+}
+
+int CMontageDlg::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+	mon_l1.SetCurSel(0);
+	mon_l2.SetCurSel(0);
+	mon_lName.SetCurSel(0);
+	CAmekaDoc* doc = CAmekaDoc::GetDoc();
+	int numOfItems = mon_list.GetCount();
+ 
+	for (int i =0; i<=numOfItems; i++){
+	mon_list.DeleteString(i);
+	}
+	POSITION pos = doc->mMontage.mList.GetHeadPosition();
+	for (int i = 0; i < doc->mMontage.mList.GetCount(); i++)
+	{
+	    LPAlead lead = doc->mMontage.mList.GetNext( pos );
+		CString tmp;
+		tmp = itoS(lead->lFirstID) + " -> " + itoS(lead->lSecondID);
+		mon_list.AddString(tmp);
+	}  
+	return 0;
 }
 
 void CMontageDlg::DoDataExchange(CDataExchange* pDX)
@@ -941,6 +1006,7 @@ void CMontageDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, mon_1, mon_l1);
 	DDX_Control(pDX, mon_2, mon_l2);
 	DDX_Control(pDX, IDC_LIST3, mon_list);
+	DDX_Control(pDX, IDC_COMBO1, mon_lName);
 }
 
 BEGIN_MESSAGE_MAP(CMontageDlg, CDialogEx)
@@ -1173,9 +1239,20 @@ void CMontageDlg::OnBnClickedadd()
 	// TODO: Add your control notification handler code here
 	int pos1 = mon_l1.GetCurSel();
 	int pos2 = mon_l2.GetCurSel();
-	CString txt1;
-	CString txt2;
-	mon_l1.GetLBText(pos1, txt1);
-	mon_l2.GetLBText(pos2, txt2);
-	mon_list.AddString(txt1 + "->" + txt2);
+	mon_list.AddString(itoS(pos1+1) + " -> " + itoS(pos2+1));
+	LPAlead node = new Alead;
+	node->lFirstID = pos1 + 1;
+	node->lSecondID = pos2 + 1;
+	CAmekaDoc* doc = CAmekaDoc::GetDoc();
+	doc->mMontage.mList.AddTail(node);
+	delete node;
+	node = NULL;
+}
+
+CString itoS ( int x)
+{
+	CString sout;
+	sout.Format("%i", x);
+
+	return sout;
 }
