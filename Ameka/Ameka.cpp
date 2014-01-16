@@ -963,6 +963,7 @@ protected:
 protected:
 	DECLARE_MESSAGE_MAP()
 	virtual BOOL OnInitDialog();
+	virtual int OnPaint();
 public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedCancel();
@@ -977,6 +978,26 @@ CMontageDlg::CMontageDlg() : CDialogEx(CMontageDlg::IDD)
 {
 }
 
+int CMontageDlg::OnPaint()
+{
+	CPaintDC dc(this);
+
+	CWnd* pImage = GetDlgItem(mon_pic);
+    CRect rc;
+    pImage->GetWindowRect(rc);
+    HRGN hRgn = CreateRoundRectRgn(0, 0, rc.Width(), rc.Height(), 40, 40);
+    HINSTANCE hIns = AfxGetInstanceHandle();
+	HBITMAP hBmp = CreateCompatibleBitmap(dc, rc.Width(), rc.Height());
+    HBRUSH hBr = CreatePatternBrush(hBmp); 
+	dc.Rectangle(0, 0, 4, 4);
+    DeleteObject(hIns);
+    DeleteObject(hBmp);
+    FillRgn(pImage->GetDC()->GetSafeHdc(), hRgn, hBr);
+	CDialog::OnPaint();
+
+	return 0;
+}
+
 int CMontageDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
@@ -984,11 +1005,7 @@ int CMontageDlg::OnInitDialog()
 	mon_l2.SetCurSel(0);
 	mon_lName.SetCurSel(0);
 	CAmekaDoc* doc = CAmekaDoc::GetDoc();
-	int numOfItems = mon_list.GetCount();
- 
-	for (int i =0; i<=numOfItems; i++){
-	mon_list.DeleteString(i);
-	}
+	mon_list.ResetContent();
 	POSITION pos = doc->mMontage.mList.GetHeadPosition();
 	for (int i = 0; i < doc->mMontage.mList.GetCount(); i++)
 	{
@@ -1245,8 +1262,6 @@ void CMontageDlg::OnBnClickedadd()
 	node->lSecondID = pos2 + 1;
 	CAmekaDoc* doc = CAmekaDoc::GetDoc();
 	doc->mMontage.mList.AddTail(node);
-	delete node;
-	node = NULL;
 }
 
 CString itoS ( int x)

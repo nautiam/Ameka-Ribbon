@@ -44,11 +44,76 @@ END_MESSAGE_MAP()
 
 CAmekaDoc::CAmekaDoc()
 {
+
 	// TODO: add one-time construction code here
 	dataBuffer = new amekaData<RawDataType>(arrLen);
 	theApp.docList.AddTail(this);
 
-	loadXML(xmlName);
+	TiXmlDocument doc(xmlName);
+	uint16_t count = 0;
+
+	if(!doc.LoadFile())
+	{
+//		LOG(ERROR) << doc.ErrorDesc();
+	}
+
+	TiXmlElement* root = doc.FirstChildElement();
+	if(root == NULL)
+	{
+//		LOG(ERROR) << "Failed to load file: No root element.";
+		doc.Clear();
+	}
+
+	for(TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
+	{
+		CString elemName = elem->Value();
+		const char* attr1;
+		const char* attr2;
+		const char* attr3;
+		
+		if(elemName == "Montage")
+		{
+			attr1 = elem->Attribute("channel1");
+			attr2 = elem->Attribute("channel2");
+			if(attr1 != NULL && attr2 != NULL)
+			{
+				count++;
+				LPAlead node = new Alead;
+				node->lFirstID = atoi(attr1);
+				node->lSecondID = atoi(attr2);
+				this->mMontage.mList.AddTail(node);
+				this->mMontage.leadNum++;
+			}
+		}
+		
+		if(elemName == "Electrode")
+		{
+			attr1 = elem->Attribute("channel1");
+			attr2 = elem->Attribute("name");
+			if(attr1 != NULL && attr2 != NULL)
+			{
+				LPAelectrode elec = new Aelectrode;
+				elec->eID = atoi(attr1);
+				elec->eName = attr2;
+				this->mElec.AddTail(elec);
+			}
+		}
+
+		if(elemName == "Filter")
+		{
+			attr1 = elem->Attribute("LP");
+			attr2 = elem->Attribute("HP");
+			attr3 = elem->Attribute("SampleRate");
+			if(attr1 != NULL && attr2 != NULL && attr3 != NULL)
+			{
+				DSPData dsp;
+				dsp.LPFFre = atoi(attr1);
+				dsp.HPFFre = atoi(attr2);
+				dsp.SampleRate = atoi(attr3);
+				this->mDSP = dsp;
+			}
+		}
+	}
 }
 
 CAmekaDoc::~CAmekaDoc()
