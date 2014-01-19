@@ -73,6 +73,7 @@ BOOL CAmekaDoc::OnNewDocument()
 	if(!doc.LoadFile())
 	{
 //		LOG(ERROR) << doc.ErrorDesc();
+		return TRUE;
 	}
 
 	TiXmlElement* root = doc.FirstChildElement();

@@ -95,6 +95,7 @@
 #define opt_cancel                      1032
 #define IDC_LIST3                       1041
 #define IDC_BUTTON1                     1042
+#define mon_save                        1042
 #define view_sp                         1045
 #define view_hp                         1045
 #define view_btdef                      1046
@@ -111,6 +112,8 @@
 #define mon_2                           1055
 #define monctrl_list                    1057
 #define mon_pic                         1058
+#define IDC_BUTTON3                     1059
+#define mon_load                        1059
 #define ID_WRITE_PASTEASHYPERLINK       32770
 #define MN_Open                         32771
 #define MN_Close                        32772
@@ -137,10 +140,9 @@
 #define MN_New                          32795
 #define MN_StopDemo                     32796
 #define MN_ScaleRate                    32797
-#define ID_COMBO3                       32798
 #define MN_SpeedRate                    32798
-#define MN_HP                           32798
-#define MN_LP                           32799
+#define MN_HP                           32799
+#define MN_LP                           32800
 
 // Next default values for new objects
 // 
@@ -148,7 +150,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        326
 #define _APS_NEXT_COMMAND_VALUE         32806
-#define _APS_NEXT_CONTROL_VALUE         1059
+#define _APS_NEXT_CONTROL_VALUE         1060
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

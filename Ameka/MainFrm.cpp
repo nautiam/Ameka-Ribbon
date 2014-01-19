@@ -122,6 +122,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			pSen->AddItem((*it).c_str(),count++);
 		}
 	}
+	pSen->SetEditText("30");
 	//Set items for LowPassFilter
 	count = 0;
 	CMFCRibbonComboBox* pSpeed = DYNAMIC_DOWNCAST(
@@ -134,6 +135,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			pSpeed->AddItem((*it).c_str(),count++);
 		}
 	}
+	pSpeed->SetEditText("75");
 	//Set items for LowPassFilter
 	count = 0;
 	CMFCRibbonComboBox* pLP = DYNAMIC_DOWNCAST(
@@ -146,6 +148,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			pLP->AddItem((*it).c_str(),count++);
 		}
 	}
+	pLP->SetEditText("15");
 	//Set items for HighPassFilter
 	count = 0;
 	CMFCRibbonComboBox* pHP = DYNAMIC_DOWNCAST(
@@ -158,7 +161,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			pHP->AddItem((*it).c_str(),count++);
 		}
 	}
-
+	pHP->SetEditText("3");
 	return 0;
 }
 

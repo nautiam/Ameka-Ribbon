@@ -29,6 +29,8 @@
 #include "DSPModule.h"
 #include <vector>
 #include "afxwin.h"
+#include "tinystr.h"
+#include "tinyxml.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -975,6 +977,8 @@ public:
 	CComboBox mon_l2;
 	CListBox mon_list;
 	CComboBox mon_lName;
+	afx_msg void OnBnClickedMonsave();
+	afx_msg void OnBnClickedload();
 };
 
 CMontageDlg::CMontageDlg() : CDialogEx(CMontageDlg::IDD)
@@ -1016,7 +1020,7 @@ int CMontageDlg::OnInitDialog()
 		CString tmp;
 		tmp = itoS(lead->lFirstID) + " -> " + itoS(lead->lSecondID);
 		mon_list.AddString(tmp);
-	}  
+	}
 	return 0;
 }
 
@@ -1033,6 +1037,8 @@ BEGIN_MESSAGE_MAP(CMontageDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CMontageDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDCANCEL, &CMontageDlg::OnBnClickedCancel)
 	ON_BN_CLICKED(mon_add, &CMontageDlg::OnBnClickedadd)
+	ON_BN_CLICKED(mon_save, &CMontageDlg::OnBnClickedMonsave)
+	ON_BN_CLICKED(mon_load, &CMontageDlg::OnBnClickedload)
 END_MESSAGE_MAP()
 //Show Montage Dialog
 void CAmekaApp::OnMontage()
@@ -1273,4 +1279,87 @@ CString itoS ( int x)
 	sout.Format("%i", x);
 
 	return sout;
+}
+
+void CMontageDlg::OnBnClickedMonsave()
+{
+	// TODO: Add your control notification handler code here
+	CFileDialog dlgFolder(FALSE, CString(".xml"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, CString("XML Files (*.xml)|*.xml|"));
+	CAmekaDoc* crtdoc = CAmekaDoc::GetDoc();
+	if ( dlgFolder.DoModal() == IDOK )
+	{
+		TiXmlDocument doc;
+		TiXmlElement* root = new TiXmlElement("root");
+		doc.LinkEndChild(root);
+		POSITION pos = crtdoc->mMontage.mList.GetHeadPosition();
+		for (int i = 0; i < crtdoc->mMontage.mList.GetCount(); i++)
+		{
+			LPAlead lead = crtdoc->mMontage.mList.GetNext( pos );
+			TiXmlElement* element = new TiXmlElement("Montage");
+			root->LinkEndChild(element);
+			element->SetAttribute("channel1", lead->lFirstID);
+			element->SetAttribute("channel2", lead->lSecondID);
+
+		}
+		bool success = doc.SaveFile(dlgFolder.GetPathName());
+		doc.Clear();
+	}
+}
+
+
+void CMontageDlg::OnBnClickedload()
+{
+	// TODO: Add your control notification handler code here
+	CFileDialog dlgFolder(TRUE, CString(".xml"), NULL, OFN_HIDEREADONLY|OFN_FILEMUSTEXIST, CString("XML Files (*.xml)|*.xml|"));
+	CAmekaDoc* crtdoc = CAmekaDoc::GetDoc();
+	if ( dlgFolder.DoModal() == IDOK )
+	{
+		TiXmlDocument doc(dlgFolder.GetFileName());
+		uint16_t count = 0;
+
+		if(!doc.LoadFile())
+		{
+	//		LOG(ERROR) << doc.ErrorDesc();
+			return;
+		}
+
+		TiXmlElement* root = doc.FirstChildElement();
+		crtdoc->mMontage.mList.RemoveAll();
+		if(root == NULL)
+		{
+	//		LOG(ERROR) << "Failed to load file: No root element.";
+			doc.Clear();
+		}
+
+		for(TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
+		{
+			CString elemName = elem->Value();
+			const char* attr1;
+			const char* attr2;
+		
+			if(elemName == "Montage")
+			{
+				attr1 = elem->Attribute("channel1");
+				attr2 = elem->Attribute("channel2");
+				if(attr1 != NULL && attr2 != NULL)
+				{
+					count++;
+					LPAlead node = new Alead;
+					node->lFirstID = atoi(attr1);
+					node->lSecondID = atoi(attr2);
+					crtdoc->mMontage.mList.AddTail(node);
+					crtdoc->mMontage.leadNum++;
+				}
+			}
+		}
+	}
+	mon_list.ResetContent();
+	POSITION pos = crtdoc->mMontage.mList.GetHeadPosition();
+	for (int i = 0; i < crtdoc->mMontage.mList.GetCount(); i++)
+	{
+	    LPAlead lead = crtdoc->mMontage.mList.GetNext( pos );
+		CString tmp;
+		tmp = itoS(lead->lFirstID) + " -> " + itoS(lead->lSecondID);
+		mon_list.AddString(tmp);
+	}  
 }
