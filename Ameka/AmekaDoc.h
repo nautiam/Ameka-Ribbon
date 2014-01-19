@@ -27,7 +27,10 @@ protected: // create from serialization only
 
 // Attributes
 public:
-
+	Amontage mMontage;
+	DSPData mDSP;
+	CList<LPAelectrode, LPAelectrode> mElec;
+	amekaData<RawDataType>* dataBuffer;
 // Operations
 public:
 
@@ -45,10 +48,6 @@ public:
 	virtual ~CAmekaDoc();
 	static CAmekaDoc* GetDoc();
 
-	Amontage mMontage;
-	DSPData mDSP;
-	CList<LPAelectrode, LPAelectrode> mElec;
-	amekaData<RawDataType>* dataBuffer;
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;

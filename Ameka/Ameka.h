@@ -47,6 +47,7 @@ public:
 	CString m_LP;
 	CString m_HP;
 	CList<CAmekaDoc*, CAmekaDoc*> docList;
+	amekaData<RawDataType>* dataBuffer;
 
 // Overrides
 public:

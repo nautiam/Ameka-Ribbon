@@ -46,6 +46,24 @@ CAmekaDoc::CAmekaDoc()
 {
 
 	// TODO: add one-time construction code here
+	
+}
+
+CAmekaDoc::~CAmekaDoc()
+{
+	delete dataBuffer;
+	dataBuffer = NULL;
+	POSITION pos = theApp.docList.Find(this);
+	theApp.docList.RemoveAt(pos);
+}
+
+BOOL CAmekaDoc::OnNewDocument()
+{
+	if (!CDocument::OnNewDocument())
+		return FALSE;
+
+	// TODO: add reinitialization code here
+	// (SDI documents will reuse this document)
 	dataBuffer = new amekaData<RawDataType>(arrLen);
 	theApp.docList.AddTail(this);
 
@@ -114,23 +132,6 @@ CAmekaDoc::CAmekaDoc()
 			}
 		}
 	}
-}
-
-CAmekaDoc::~CAmekaDoc()
-{
-	delete dataBuffer;
-	dataBuffer = NULL;
-	POSITION pos = theApp.docList.Find(this);
-	theApp.docList.RemoveAt(pos);
-}
-
-BOOL CAmekaDoc::OnNewDocument()
-{
-	if (!CDocument::OnNewDocument())
-		return FALSE;
-
-	// TODO: add reinitialization code here
-	// (SDI documents will reuse this document)
 
 	return TRUE;
 }

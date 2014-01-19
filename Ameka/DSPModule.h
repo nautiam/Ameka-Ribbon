@@ -4,6 +4,7 @@
 #define SAMPLE_RATE 256
 #define LEAD_NUMBER 16
 #define ARRAY_LENGTH 10
+#define BACKUP_ARRAY 5
 
 class DSPModule : public CWinThread
 {
@@ -16,9 +17,9 @@ private:
 	float BandWidth;
 	int Type_design;
 	int numSamples;
-	float* audioData[LEAD_NUMBER];
+	
 	RawDataType* dataBuffer;
-
+	RawDataType backupData[BACKUP_ARRAY];
 	//uint16_t* audioData[LEAD_NUMBER];
 public:
 	//declare variables here

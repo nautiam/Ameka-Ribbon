@@ -225,8 +225,10 @@ int CAmekaView::amekaDrawPos(CDC* pDC, CBitmap* bitmap)
 	if (pDC == NULL)
 		return -1;
 
-	data = theApp.pIO->RawData->popData(dataNum);
-	uint16_t buflen = theApp.pIO->RawData->rLen;
+	//data = theApp.pIO->RawData->popData(dataNum);
+	//CAmekaDoc *doc = CAmekaDoc::GetDoc();
+	data = theApp.dataBuffer->popData(dataNum);
+	uint16_t buflen = theApp.dataBuffer->rLen;
 	if ((buflen == 0) || (data == NULL))
 		return -1;
 

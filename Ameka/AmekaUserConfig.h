@@ -99,7 +99,7 @@ public:
 	int crtWPos;
 	int LRPos;
 	int rLen;
-	//LPCRITICAL_SECTION csess;
+	CRITICAL_SECTION csess;
 
 	amekaData(uint16_t len);
 	~amekaData(void);
@@ -125,7 +125,7 @@ amekaData<T>::amekaData(uint16_t len)
 	crtWPos = 0;
 	LRPos = 0;
 	rLen = 0;
-	//InitializeCriticalSection(csess);
+	InitializeCriticalSection(&csess);
 };
 
 //amekaData<RawDataType> RawData(3);
@@ -150,7 +150,7 @@ template<class T>
 int amekaData<T>::pushData(T data)
 {
 	uint16_t pos = crtWPos%dataLen;
-	//EnterCriticalSection(csess);
+	EnterCriticalSection(&csess);
 	if (isFull())
 	{
 		arrData[pos] = data;
@@ -160,7 +160,7 @@ int amekaData<T>::pushData(T data)
 	}
 	arrData[pos] = data;
 	crtWPos = (crtWPos+1)%dataLen;
-	//LeaveCriticalSection(csess);
+	LeaveCriticalSection(&csess);
 	return 0;
 };
 
@@ -170,10 +170,10 @@ T* amekaData<T>::popData()
 	//
 	if (isEmpty())
 		return NULL;
-	//EnterCriticalSection(csess);
+	EnterCriticalSection(&csess);
 	T* tmp = &arrData[LRPos%dataLen];
 	LRPos = (LRPos+1)%dataLen;
-	//LeaveCriticalSection(csess);
+	LeaveCriticalSection(&csess);
 	return tmp;
 };
 
@@ -182,15 +182,20 @@ T* amekaData<T>::popAll()
 {
 	//
 	if (isEmpty())
-		return 0;
+	{
+		rLen = 0;
+		return NULL;
+	}
 	T* data;
-	//EnterCriticalSection(csess);
+	EnterCriticalSection(&csess);
 	uint16_t len = (crtWPos+dataLen-LRPos)%dataLen;
 	data = (T*)malloc(len*sizeof(T));
 	for (int i = 0; i < len; i++)
-		data[i] = arrData[(LRPos+i)%dataLen];
-	LRPos = (LRPos+len)%dataLen;
-	//LeaveCriticalSection(csess);
+	{
+		data[i] = arrData[LRPos%dataLen];
+		LRPos = (LRPos+1)%dataLen;
+	}
+	LeaveCriticalSection(&csess);
 	rLen = len;
 	return data;
 };
@@ -199,7 +204,7 @@ template<class T>
 T* amekaData<T>::popData(uint16_t num)
 {
 	//
-	//EnterCriticalSection(csess);
+	EnterCriticalSection(&csess);
 	T* data = (T*)malloc(num*sizeof(T));
 	for (int i = 0; i < num; i++)
 	{
@@ -213,7 +218,7 @@ T* amekaData<T>::popData(uint16_t num)
 	}
 	//LRPos = (LRPos+num)%dataLen;
 	rLen = num;
-	//LeaveCriticalSection(csess);
+	LeaveCriticalSection(&csess);
 	return data;
 };
 
@@ -234,7 +239,7 @@ amekaData<T>::~amekaData(void)
 	//
 	delete[] arrData;
 	arrData = NULL;
-	//DeleteCriticalSection(&csess);
+	DeleteCriticalSection(&csess);
 };
 
 

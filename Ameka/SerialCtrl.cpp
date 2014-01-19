@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "SerialCtrl.h"
 #include "easylogging++.h"
-
+#include "DSPModule.h"
 
 
 // Set cau hinh mac dinh cua cong com
@@ -321,8 +321,8 @@ int ReadThread::Run()
 					
 					if (lenMessage > 0)
 					{
-						LOG(INFO) << "DataRead: ";
-						LOG(INFO) << lenMessage;
+						//LOG(INFO) << "DataRead: ";
+						//LOG(INFO) << lenMessage;
 						for (unsigned int i=0; i<lenMessage; i++)
 						{
 							char temp_buff = buf[i];
@@ -656,6 +656,10 @@ BOOL CSerialIO::Init()
 	}
 	m_readProcess->ResumeThread();
     m_writeProcess->ResumeThread();
+
+	DSPModule*  m_dspProcess;
+	m_dspProcess = (DSPModule*)AfxBeginThread(RUNTIME_CLASS(DSPModule), THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
+	m_dspProcess->ResumeThread();
 
 	return retVal;
 }

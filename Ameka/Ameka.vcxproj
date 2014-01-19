@@ -129,6 +129,7 @@
     <ClCompile Include="AmekaView.cpp" />
     <ClCompile Include="ChildFrm.cpp" />
     <ClCompile Include="DSPModule.cpp" />
+    <ClCompile Include="dsp_filters.cpp" />
     <ClCompile Include="GraphModule.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="SerialCtrl.cpp" />

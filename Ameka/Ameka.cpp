@@ -26,7 +26,7 @@
 #include "AmekaUserConfig.h"
 #include "afxcmn.h"
 #include "easylogging++.h"
-
+#include "DSPModule.h"
 #include <vector>
 #include "afxwin.h"
 
@@ -271,6 +271,7 @@ END_MESSAGE_MAP()
 
 CAmekaApp::CAmekaApp()
 {
+	dataBuffer = new amekaData<RawDataType>(4096);
 	el::Configurations defaultConf;
 	defaultConf.setToDefault();
 	//defaultConf.setGlobally(el::ConfigurationType::Filename, "logs\\Log.txt");
@@ -914,6 +915,8 @@ void CAmekaApp::OnPortOpen()
 	CString portFullName = "\\\.\\" + m_portNo;
 	//MessageBox("Opening Port " + portFullName,"Info",0);
 	pIO = new CSerialIO(portFullName, m_baudRate);
+
+	//m_dspProcess->setOwner(this);
 }
 
 //------------------------------------------------------------------//
