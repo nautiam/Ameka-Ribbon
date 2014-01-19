@@ -1,11 +1,34 @@
-#include <stdint.h>
-#include <Windows.h>
+#include "AmekaUserConfig.h"
+#include "dsp_filters.h"
 
-class DSPModule
+#define SAMPLE_RATE 256
+#define LEAD_NUMBER 16
+#define ARRAY_LENGTH 10
+
+class DSPModule : public CWinThread
 {
+private:
+	
+	int sampleRate;
+	float HighFre;
+	float LowFre;
+	float CenterFre;
+	float BandWidth;
+	int Type_design;
+	int numSamples;
+	float* audioData[LEAD_NUMBER];
+	RawDataType* dataBuffer;
+
+	//uint16_t* audioData[LEAD_NUMBER];
 public:
 	//declare variables here
+	DECLARE_DYNCREATE(DSPModule)
 	
+	DSPModule(void);
+	~DSPModule(void);
+	
+	virtual BOOL InitInstance();   // virtual function that derive from base-class.
+	virtual int Run();
 	//declare functions here
 	int amekaDSPEngine();						//handle DSP module
 	int amekaHPassFilter(uint8_t channel, uint8_t frequency);	//High Pass filter
