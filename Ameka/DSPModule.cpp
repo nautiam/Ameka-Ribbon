@@ -4,8 +4,6 @@
 #include "Ameka.h"
 #include "AmekaDoc.h"
 
-
-
 IMPLEMENT_DYNCREATE(DSPModule,CWinThread)
 DSPModule::DSPModule()
 {
@@ -110,8 +108,9 @@ int DSPModule::Run()
 				for (int i=0; i<LEAD_NUMBER; i++)				
 				{
 					output[j].value[i] = (uint16_t)audioData[i][j];
-					output[j].time = 0;				
+					output[j].time = data[j].time;				
 				}
+				LOG(INFO) << output[j].time;
 			}
 
 			for (int i=0; i<size; i++)

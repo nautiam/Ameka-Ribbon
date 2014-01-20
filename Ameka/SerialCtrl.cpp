@@ -2,6 +2,7 @@
 #include "SerialCtrl.h"
 #include "easylogging++.h"
 #include "DSPModule.h"
+#include <atltime.h>
 
 
 // Set cau hinh mac dinh cua cong com
@@ -489,6 +490,8 @@ int ReadThread::packetProcessing()
 			//AfxMessageBox("Packet Data received");
 			RawDataType temp;
 			temp.time = 0;
+			CTime t = GetCurrentTime();
+			temp.time = t.GetTime();
 			for (int i=0; i<16; i++)
 			{
 				uint16_t tempBuffer=0;
