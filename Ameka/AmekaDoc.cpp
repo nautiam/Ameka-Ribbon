@@ -65,6 +65,10 @@ BOOL CAmekaDoc::OnNewDocument()
 	dataBuffer = new amekaData<RawDataType>(arrLen);
 	theApp.docList.AddTail(this);
 
+	POSITION pos =  theApp.monList.GetHeadPosition();
+	LPAmontage mon =  theApp.monList.GetNext( pos );
+	mMon = mon;
+
 	return TRUE;
 }
 

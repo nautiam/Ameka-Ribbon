@@ -56,6 +56,7 @@
 #define DLG_Opt_View                    323
 #define DLG_Opt_Rec                     324
 #define DLG_Opt_Event                   325
+#define DLG_Print                       326
 #define IDC_COMBO1                      1000
 #define IDC_CHECK1                      1001
 #define IDC_CHECK2                      1002
@@ -113,7 +114,7 @@
 #define monctrl_list                    1057
 #define mon_pic                         1058
 #define IDC_BUTTON3                     1059
-#define mon_load                        1059
+#define mon_name                        1060
 #define ID_WRITE_PASTEASHYPERLINK       32770
 #define MN_Open                         32771
 #define MN_Close                        32772
@@ -154,9 +155,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        326
+#define _APS_NEXT_RESOURCE_VALUE        327
 #define _APS_NEXT_COMMAND_VALUE         32820
-#define _APS_NEXT_CONTROL_VALUE         1060
+#define _APS_NEXT_CONTROL_VALUE         1061
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

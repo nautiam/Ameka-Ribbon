@@ -1,8 +1,14 @@
 <root>
-    <Montage channel1="1" channel2="2" />
-    <Montage channel1="1" channel2="3" />
-    <Montage channel1="3" channel2="7" />
-    <Montage channel1="7" channel2="9" />
-    <Montage channel1="11" channel2="13" />
-    <Montage channel1="6" channel2="14" />
+    <Montage1>
+        <Montage1 channel1="1" channel2="3" />
+        <Montage1 channel1="3" channel2="7" />
+        <Montage1 channel1="7" channel2="9" />
+        <Montage1 channel1="11" channel2="13" />
+    </Montage1>
+    <Montage2>
+        <Montage2 channel1="1" channel2="3" />
+        <Montage2 channel1="4" channel2="7" />
+        <Montage2 channel1="8" channel2="9" />
+        <Montage2 channel1="2" channel2="8" />
+    </Montage2>
 </root>

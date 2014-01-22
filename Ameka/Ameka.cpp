@@ -93,8 +93,40 @@ CAmekaApp::CAmekaApp()
 	LOG(INFO) << "Log using default file";
 
 	//initialize montage list
-	
-	
+
+	TiXmlDocument doc;
+	if(!doc.LoadFile(xmlName))
+	{
+		LOG(ERROR) << doc.ErrorDesc();
+		return;
+	}
+	TiXmlElement* root = doc.FirstChildElement();
+	if(root == NULL)
+	{
+		LOG(ERROR) << "Failed to load file: No root element.";
+		doc.Clear();
+		return;
+	}
+	for(TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
+	{
+		LPAmontage mon = new Amontage();
+		mon->mName = elem->Value();
+		for(TiXmlElement* e = elem->FirstChildElement(); e != NULL; e = e->NextSiblingElement())
+		{
+			CString attr1, attr2;
+			attr1 = e->Attribute("channel1");
+			attr2 = e->Attribute("channel2");
+			if (attr1 != "" && attr2 != "")
+			{
+				LPAlead lead = new Alead();
+				lead->lFirstID = atoi(attr1);
+				lead->lSecondID = atoi(attr2);
+				mon->mList.AddTail(lead);
+			}
+		}
+		monList.AddTail(mon);
+	}
+	doc.Clear();
 	//init ribbon
 	m_sensitivity = strSen;
 	m_speed = strSpeed;
@@ -546,8 +578,11 @@ END_MESSAGE_MAP()
 //Show Setting Dialog
 void CAmekaApp::OnWave()
 {
+	MessageBoxA(NULL,"This function still is not support","Warning",0);
+	/*
 	CWaveDlg waveDlg;
 	waveDlg.DoModal();
+	*/
 }
 
 //------------------------------------------------------------------//
@@ -730,8 +765,9 @@ public:
 	CComboBox mon_l2;
 	CListBox mon_list;
 	CComboBox mon_lName;
+	LPAmontage crtMon;
 	afx_msg void OnBnClickedMonsave();
-	afx_msg void OnBnClickedload();
+	afx_msg void OnMonListSelChange();
 };
 
 CMontageDlg::CMontageDlg() : CDialogEx(CMontageDlg::IDD)
@@ -761,20 +797,77 @@ int CMontageDlg::OnPaint()
 int CMontageDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+	
 	mon_l1.SetCurSel(0);
 	mon_l2.SetCurSel(0);
 	mon_lName.SetCurSel(0);
 	CAmekaDoc* doc = CAmekaDoc::GetDoc();
 	mon_list.ResetContent();
-	POSITION pos = doc->mMontage.mList.GetHeadPosition();
-	for (int i = 0; i < doc->mMontage.mList.GetCount(); i++)
+	mon_lName.ResetContent();
+	int count = 0;
+	POSITION pos =  theApp.monList.GetHeadPosition();
+	for (int i = 0; i < theApp.monList.GetCount(); i++)
 	{
-	    LPAlead lead = doc->mMontage.mList.GetNext( pos );
-		CString tmp;
-		tmp = itoS(lead->lFirstID) + " -> " + itoS(lead->lSecondID);
-		mon_list.AddString(tmp);
+		LPAmontage mon =  theApp.monList.GetNext( pos );
+		
+		POSITION pos1 =  mon->mList.GetHeadPosition();
+		if (doc->mMon != NULL)
+		{
+			for (int j = 0; j < mon->mList.GetCount(); j++)
+			{
+				if (doc->mMon->mName == mon->mName)
+				{
+					LPAlead lead = mon->mList.GetNext( pos1 );
+					CString tmp;
+					tmp = itoS(lead->lFirstID) + " -> " + itoS(lead->lSecondID);
+					mon_list.AddString(tmp);
+					mon_lName.SetWindowTextA(mon->mName);
+					crtMon = mon;
+				}
+			}
+		}
+		else
+		{
+			mon_list.ResetContent();
+			for (int j = 0; j < mon->mList.GetCount(); j++)
+			{
+				LPAlead lead = mon->mList.GetNext( pos1 );
+				CString tmp;
+				tmp = itoS(lead->lFirstID) + " -> " + itoS(lead->lSecondID);
+				mon_list.AddString(tmp);
+				mon_lName.SetWindowTextA(mon->mName);
+				crtMon = mon;
+			}
+		}
+		mon_lName.AddString(mon->mName);
+		count++;
 	}
 	return 0;
+}
+
+void CMontageDlg::OnMonListSelChange()
+{
+	// TODO: Add your control notification handler code here
+	mon_list.ResetContent();
+	CString tmp;
+	mon_lName.GetLBText(mon_lName.GetCurSel(), tmp);
+	POSITION pos =  theApp.monList.GetHeadPosition();
+	for (int i = 0; i < theApp.monList.GetCount(); i++)
+	{
+		LPAmontage mon =  theApp.monList.GetNext( pos );
+		if (tmp == mon->mName)
+		{
+			POSITION pos1 =  mon->mList.GetHeadPosition();
+			for (int j = 0; j < mon->mList.GetCount(); j++)
+			{
+				LPAlead lead = mon->mList.GetNext( pos1 );
+				CString tmp;
+				tmp = itoS(lead->lFirstID) + " -> " + itoS(lead->lSecondID);
+				mon_list.AddString(tmp);
+			}
+			return;
+		}
+	}
 }
 
 void CMontageDlg::DoDataExchange(CDataExchange* pDX)
@@ -783,7 +876,7 @@ void CMontageDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, mon_1, mon_l1);
 	DDX_Control(pDX, mon_2, mon_l2);
 	DDX_Control(pDX, IDC_LIST3, mon_list);
-	DDX_Control(pDX, IDC_COMBO1, mon_lName);
+	DDX_Control(pDX, mon_name, mon_lName);
 }
 
 BEGIN_MESSAGE_MAP(CMontageDlg, CDialogEx)
@@ -791,7 +884,7 @@ BEGIN_MESSAGE_MAP(CMontageDlg, CDialogEx)
 	ON_BN_CLICKED(IDCANCEL, &CMontageDlg::OnBnClickedCancel)
 	ON_BN_CLICKED(mon_add, &CMontageDlg::OnBnClickedadd)
 	ON_BN_CLICKED(mon_save, &CMontageDlg::OnBnClickedMonsave)
-	ON_BN_CLICKED(mon_load, &CMontageDlg::OnBnClickedload)
+	ON_CBN_SELCHANGE(mon_name, &CMontageDlg::OnMonListSelChange)
 END_MESSAGE_MAP()
 //Show Montage Dialog
 void CAmekaApp::OnMontage()
@@ -1066,8 +1159,8 @@ void COptionDlg::DoDataExchange(CDataExchange* pDX)
 int COptionDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-    tab_ctrl.InsertItem(0,"View");
-	tab_ctrl.InsertItem(1,"Event");
+    tab_ctrl.InsertItem(0,"Tables");
+	tab_ctrl.InsertItem(1,"Events");
 	tab_ctrl.InsertItem(2,"Recording");
 
 	mDlg[0] = new CTabViewDlg;
@@ -1129,6 +1222,33 @@ void COptionDlg::OnBnClickedcancel()
 void CMontageDlg::OnBnClickedOk()
 {
 	// TODO: Add your control notification handler code here
+
+	CAmekaDoc* crtdoc = CAmekaDoc::GetDoc();
+	crtdoc->mMon = crtMon;
+		
+	TiXmlDocument doc;
+	TiXmlElement* root = new TiXmlElement("root");
+	doc.LinkEndChild(root);
+
+	POSITION pos =  theApp.monList.GetHeadPosition();
+	for (int i = 0; i < theApp.monList.GetCount(); i++)
+	{
+		LPAmontage mon =  theApp.monList.GetNext( pos );
+		TiXmlElement* element = new TiXmlElement(mon->mName);
+		root->LinkEndChild(element);
+		POSITION pos1 =  mon->mList.GetHeadPosition();
+		for (int j = 0; j < mon->mList.GetCount(); j++)
+		{
+			LPAlead lead = mon->mList.GetNext( pos1 );
+			TiXmlElement* element1 = new TiXmlElement(mon->mName);
+			element->LinkEndChild(element1);
+			element1->SetAttribute("channel1", lead->lFirstID);
+			element1->SetAttribute("channel2", lead->lSecondID);
+		}
+	}
+
+	bool success = doc.SaveFile(xmlName);
+	doc.Clear();
 	CDialogEx::OnOK();
 }
 
@@ -1322,91 +1442,56 @@ void CMontageDlg::OnBnClickedadd()
 	LPAlead node = new Alead;
 	node->lFirstID = pos1 + 1;
 	node->lSecondID = pos2 + 1;
-	CAmekaDoc* doc = CAmekaDoc::GetDoc();
-	doc->mMontage.mList.AddTail(node);
+
+	LPAmontage mon;
+	CString tmp;
+	mon_lName.GetWindowText(tmp);
+
+	if (crtMon->mName != tmp)
+	{
+		mon = crtMon;
+		mon->mName = tmp;
+		mon->mList.AddTail(node);
+		theApp.monList.AddTail(mon);
+		mon_lName.AddString(tmp);
+		crtMon = mon;
+	}
+	else
+	{
+		POSITION pos =  theApp.monList.GetHeadPosition();
+		for (int i = 0; i < theApp.monList.GetCount(); i++)
+		{
+			CString tmp;
+			mon =  theApp.monList.GetNext( pos );
+			if (tmp == mon->mName)
+			{
+				mon->mList.AddTail(node);
+				return;
+			}
+		}
+	}
 }
 
 void CMontageDlg::OnBnClickedMonsave()
 {
 	// TODO: Add your control notification handler code here
-	CFileDialog dlgFolder(FALSE, CString(".xml"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, CString("XML Files (*.xml)|*.xml|"));
-	CAmekaDoc* crtdoc = CAmekaDoc::GetDoc();
-	if ( dlgFolder.DoModal() == IDOK )
+	CString tmp;
+	mon_lName.GetWindowText(tmp);
+	POSITION pos =  theApp.monList.GetHeadPosition();
+	for (int i = 0; i < theApp.monList.GetCount(); i++)
 	{
-		TiXmlDocument doc;
-		TiXmlElement* root = new TiXmlElement("root");
-		doc.LinkEndChild(root);
-		POSITION pos = crtdoc->mMontage.mList.GetHeadPosition();
-		for (int i = 0; i < crtdoc->mMontage.mList.GetCount(); i++)
+		LPAmontage mon =  theApp.monList.GetNext( pos );
+		POSITION pos1 =  mon->mList.GetHeadPosition();
+		TiXmlElement* element = new TiXmlElement(mon->mName);
+		for (int j = 0; j < mon->mList.GetCount(); j++)
 		{
-			LPAlead lead = crtdoc->mMontage.mList.GetNext( pos );
-			TiXmlElement* element = new TiXmlElement("Montage");
-			root->LinkEndChild(element);
-			element->SetAttribute("channel1", lead->lFirstID);
-			element->SetAttribute("channel2", lead->lSecondID);
-
-		}
-		bool success = doc.SaveFile(dlgFolder.GetPathName());
-		doc.Clear();
-	}
-}
-
-
-void CMontageDlg::OnBnClickedload()
-{
-	// TODO: Add your control notification handler code here
-	CFileDialog dlgFolder(TRUE, CString(".xml"), NULL, OFN_HIDEREADONLY|OFN_FILEMUSTEXIST, CString("XML Files (*.xml)|*.xml|"));
-	CAmekaDoc* crtdoc = CAmekaDoc::GetDoc();
-	if ( dlgFolder.DoModal() == IDOK )
-	{
-		TiXmlDocument doc(dlgFolder.GetFileName());
-		uint16_t count = 0;
-
-		if(!doc.LoadFile())
-		{
-	//		LOG(ERROR) << doc.ErrorDesc();
-			return;
-		}
-
-		TiXmlElement* root = doc.FirstChildElement();
-		crtdoc->mMontage.mList.RemoveAll();
-		if(root == NULL)
-		{
-	//		LOG(ERROR) << "Failed to load file: No root element.";
-			doc.Clear();
-		}
-
-		for(TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
-		{
-			CString elemName = elem->Value();
-			const char* attr1;
-			const char* attr2;
-		
-			if(elemName == "Montage")
-			{
-				attr1 = elem->Attribute("channel1");
-				attr2 = elem->Attribute("channel2");
-				if(attr1 != NULL && attr2 != NULL)
-				{
-					count++;
-					LPAlead node = new Alead;
-					node->lFirstID = atoi(attr1);
-					node->lSecondID = atoi(attr2);
-					crtdoc->mMontage.mList.AddTail(node);
-					crtdoc->mMontage.leadNum++;
-				}
-			}
+			LPAlead lead = mon->mList.GetNext( pos1 );
+			TiXmlElement* element1 = new TiXmlElement("node");
+			element->LinkEndChild(element1);
+			element1->SetAttribute("channel1", lead->lFirstID);
+			element1->SetAttribute("channel2", lead->lSecondID);
 		}
 	}
-	mon_list.ResetContent();
-	POSITION pos = crtdoc->mMontage.mList.GetHeadPosition();
-	for (int i = 0; i < crtdoc->mMontage.mList.GetCount(); i++)
-	{
-	    LPAlead lead = crtdoc->mMontage.mList.GetNext( pos );
-		CString tmp;
-		tmp = itoS(lead->lFirstID) + " -> " + itoS(lead->lSecondID);
-		mon_list.AddString(tmp);
-	}  
 }
 
 
