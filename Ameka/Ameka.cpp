@@ -42,6 +42,7 @@
 #define strHP "1 2 3 5 8"
 #define strCOM "COM1 COM2 COM3 COM4 COM5 COM6 COM7 COM8 COM9 COM10"
 #define strBaud "9600 14400 19200 38400 56000 115200 "
+#define xmlName "abc.xml"
 
 _INITIALIZE_EASYLOGGINGPP
 
@@ -57,6 +58,8 @@ BEGIN_MESSAGE_MAP(CAmekaApp, CWinAppEx)
 	// Standard file based document commands
 	ON_COMMAND(MN_New, &CWinAppEx::OnFileNew)
 	ON_COMMAND(MN_Open, &CWinAppEx::OnFileOpen)
+	ON_COMMAND(MN_Close, &CAmekaApp::OnFileClose)
+	ON_COMMAND(MN_Print, &CWinAppEx::OnFilePrintSetup)
 	ON_COMMAND(MN_Setting, &CAmekaApp::OnSetting)
 	ON_COMMAND(MN_Info, &CAmekaApp::OnInfo)
 	ON_COMMAND(MN_Option, &CAmekaApp::OnOption)
@@ -66,206 +69,10 @@ BEGIN_MESSAGE_MAP(CAmekaApp, CWinAppEx)
 	ON_COMMAND(MN_Event, &CAmekaApp::OnEvent)
 	ON_COMMAND(MN_StartDemo, &CAmekaApp::OnDemo)
 	ON_COMMAND(MN_StopDemo, &CAmekaApp::OnStop)
-	ON_COMMAND(MN_OpenPort, &CAmekaApp::OnPortOpen)
 	ON_COMMAND(MN_Montage, &CAmekaApp::OnMontage)
+	ON_COMMAND(MN_PortOpen, &CAmekaApp::OnPortOpen)
+	ON_COMMAND(MN_Scan, &CAmekaApp::OnScan)
 END_MESSAGE_MAP()
-
-//--------------------------//
-//Tab Dialog
-
-//------------------------------------------------------------------//
-// COM
-
-vector<string> Tokenize(CString str, string delimiters);
-CString itoS ( int x );
-
-class CTabCOMDlg : public CDialogEx
-{
-public:
-	CTabCOMDlg();
-// Dialog Data
-	enum { IDD = DLG_Opt_COM };
-
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-// Implementation
-protected:
-	virtual BOOL OnInitDialog();
-	DECLARE_MESSAGE_MAP()
-public:
-	CComboBox port_name;
-	CComboBox port_baud;
-};
-
-CTabCOMDlg::CTabCOMDlg() : CDialogEx(CTabCOMDlg::IDD)
-{
-	
-}
-
-int CTabCOMDlg::OnInitDialog()
-{
-	CDialog::OnInitDialog();
-	port_name.SetCurSel(0);
-	port_baud.SetCurSel(0);
-	return 0;
-}
-
-void CTabCOMDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialogEx::DoDataExchange(pDX);
-	DDX_Text(pDX, opt_com_portNo, theApp.m_portNo);
-	DDX_Text(pDX, opt_com_baud, theApp.m_baudRate);
-	DDX_Control(pDX, opt_com_portNo, port_name);
-	DDX_Control(pDX, opt_com_baud, port_baud);
-}
-
-BEGIN_MESSAGE_MAP(CTabCOMDlg, CDialogEx)
-END_MESSAGE_MAP()
-
-//------------------------------------------------------------------//
-// Rec
-
-class CTabRecDlg : public CDialogEx
-{
-public:
-	CTabRecDlg();
-// Dialog Data
-	enum { IDD = DLG_Opt_Rec };
-
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-// Implementation
-protected:
-	virtual BOOL OnInitDialog();
-	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg void OnBnClickedeeg();
-	CEdit rec_ed_eeg;
-	CEdit rec_ed_video;
-	afx_msg void OnBnClickedvideo();
-};
-
-CTabRecDlg::CTabRecDlg() : CDialogEx(CTabRecDlg::IDD)
-{
-	
-}
-
-int CTabRecDlg::OnInitDialog()
-{
-	CDialog::OnInitDialog();
-	return 0;
-}
-
-void CTabRecDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_EDIT1, rec_ed_eeg);
-	DDX_Control(pDX, IDC_EDIT2, rec_ed_video);
-}
-
-BEGIN_MESSAGE_MAP(CTabRecDlg, CDialogEx)
-	ON_BN_CLICKED(rec_eeg, &CTabRecDlg::OnBnClickedeeg)
-	ON_BN_CLICKED(rec_video, &CTabRecDlg::OnBnClickedvideo)
-END_MESSAGE_MAP()
-
-//------------------------------------------------------------------//
-// Event
-
-class CTabEventDlg : public CDialogEx
-{
-public:
-	CTabEventDlg();
-// Dialog Data
-	enum { IDD = DLG_Opt_Event };
-
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-// Implementation
-protected:
-	virtual BOOL OnInitDialog();
-	DECLARE_MESSAGE_MAP()
-public:
-};
-
-CTabEventDlg::CTabEventDlg() : CDialogEx(CTabEventDlg::IDD)
-{
-	
-}
-
-int CTabEventDlg::OnInitDialog()
-{
-	CDialog::OnInitDialog();
-	return 0;
-}
-
-void CTabEventDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialogEx::DoDataExchange(pDX);
-}
-
-BEGIN_MESSAGE_MAP(CTabEventDlg, CDialogEx)
-END_MESSAGE_MAP()
-
-//------------------------------------------------------------------//
-// View
-
-class CTabViewDlg : public CDialogEx
-{
-public:
-	CTabViewDlg();
-// Dialog Data
-	enum { IDD = DLG_Opt_View };
-
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-// Implementation
-protected:
-	virtual BOOL OnInitDialog();
-	DECLARE_MESSAGE_MAP()
-public:
-	CEdit m_view_speed;
-	CEdit m_view_sen;
-	CEdit m_view_lp;
-	CEdit m_view_hp;
-	afx_msg void OnBnClickedbtdef();
-};
-
-CTabViewDlg::CTabViewDlg() : CDialogEx(CTabViewDlg::IDD)
-{
-	
-}
-
-int CTabViewDlg::OnInitDialog()
-{
-	CDialog::OnInitDialog();
-	m_view_sen.SetWindowTextA(theApp.m_sensitivity);
-	m_view_speed.SetWindowTextA(theApp.m_speed);
-	m_view_lp.SetWindowTextA(theApp.m_LP);
-	m_view_hp.SetWindowTextA(theApp.m_HP);
-	return 0;
-}
-
-void CTabViewDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialogEx::DoDataExchange(pDX);
-	DDX_Text(pDX, view_lp, theApp.m_LP);
-	DDX_Text(pDX, view_hp, theApp.m_HP);
-	DDX_Text(pDX, view_sensitivity, theApp.m_sensitivity);
-	DDX_Text(pDX, view_speed, theApp.m_speed);
-	DDX_Control(pDX, view_sensitivity, m_view_sen);
-	DDX_Control(pDX, view_speed, m_view_speed);
-	DDX_Control(pDX, view_lp, m_view_lp);
-	DDX_Control(pDX, view_hp, m_view_hp);
-}
-
-BEGIN_MESSAGE_MAP(CTabViewDlg, CDialogEx)
-	ON_BN_CLICKED(view_btdef, &CTabViewDlg::OnBnClickedbtdef)
-END_MESSAGE_MAP()
-
 
 //-------------------------------------------------------//
 
@@ -273,16 +80,22 @@ END_MESSAGE_MAP()
 
 CAmekaApp::CAmekaApp()
 {
+	//init buffer
 	dataBuffer = new amekaData<RawDataType>(4096);
+
+	//initialize log
 	el::Configurations defaultConf;
 	defaultConf.setToDefault();
 	//defaultConf.setGlobally(el::ConfigurationType::Filename, "logs\\Log.txt");
 	defaultConf.setGlobally(el::ConfigurationType::LogFlushThreshold, "1000");
 	defaultConf.setGlobally(el::ConfigurationType::Format, "%datetime %level %msg");
 	el::Loggers::reconfigureLogger("default", defaultConf);
-
 	LOG(INFO) << "Log using default file";
 
+	//initialize montage list
+	
+	
+	//init ribbon
 	m_sensitivity = strSen;
 	m_speed = strSpeed;
 	m_LP = strLP;
@@ -438,8 +251,9 @@ int CAmekaApp::ExitInstance()
 
 // CAmekaApp message handlers
 
-
+//------------------------------------------------------------------//
 // CAboutDlg dialog used for App About
+//------------------------------------------------------------------//
 
 class CAboutDlg : public CDialogEx
 {
@@ -455,6 +269,7 @@ protected:
 // Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
@@ -467,6 +282,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
+
 END_MESSAGE_MAP()
 
 // App command to run the dialog
@@ -499,6 +315,7 @@ void CAmekaApp::SaveCustomState()
 
 //------------------------------------------------------------------//
 // CSettingDlg
+//------------------------------------------------------------------//
 
 class CSettingDlg : public CDialogEx
 {
@@ -544,6 +361,7 @@ void CAmekaApp::OnSetting()
 
 //------------------------------------------------------------------//
 // CInfoDlg
+//------------------------------------------------------------------//
 
 class CInfoDlg : public CDialogEx
 {
@@ -597,105 +415,11 @@ void CAmekaApp::OnInfo()
 	infoDlg.DoModal();
 }
 
-//------------------------------------------------------------------//
-// COptionDlg
-
-class COptionDlg : public CDialogEx
-{
-public:
-	COptionDlg();
-	CString m_baudRate;
-	CString m_portNo;
-	CString m_LP;
-	CString m_HP;
-	CString m_sensitivity;
-	CString m_speed;
-
-	CDialog* mDlg[4];
-
-	int mPrePos;
-
-// Dialog Data
-	enum { IDD = DLG_Option };
-	CTabCtrl tab_ctrl;
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-// Implementation
-protected:
-	virtual BOOL OnInitDialog();
-	DECLARE_MESSAGE_MAP()
-public:
-	//afx_msg void OnOK();
-	afx_msg void OnTabSel(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnBnClickedcancel();
-	afx_msg void OnBnClickedok();
-};
-
-COptionDlg::COptionDlg() : CDialogEx(COptionDlg::IDD)
-{
-	
-}
-
-void COptionDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialogEx::DoDataExchange(pDX);
-	/*
-	DDX_Text(pDX, opt_com_portNo, m_portNo);
-	DDX_Text(pDX, opt_com_baud, m_baudRate);
-	DDX_Text(pDX, view_lp, m_LP);
-	DDX_Text(pDX, view_hp, m_HP);
-	DDX_Text(pDX, view_sensitivity, m_sensitivity);
-	DDX_Text(pDX, view_speed, m_speed);
-	*/
-	DDX_Control(pDX, opt_tab, tab_ctrl);
-}
-
-int COptionDlg::OnInitDialog()
-{
-	CDialog::OnInitDialog();
-	tab_ctrl.InsertItem(0,"Serial COM");
-    tab_ctrl.InsertItem(1,"View");
-	tab_ctrl.InsertItem(2,"Event");
-	tab_ctrl.InsertItem(3,"Recording");
-
-	mDlg[0] = new CTabCOMDlg;
-	mDlg[1] = new CTabViewDlg;
-	mDlg[2] = new CTabEventDlg;
-	mDlg[3] = new CTabRecDlg;
-
-	mDlg[0]->Create(DLG_Opt_COM,this);
-	mDlg[1]->Create(DLG_Opt_View, this);
-	mDlg[2]->Create(DLG_Opt_Event, this);
-	mDlg[3]->Create(DLG_Opt_Rec, this);
-
-    mDlg[0]->ShowWindow(true);
-    mDlg[1]->ShowWindow(false);
-	mDlg[2]->ShowWindow(false);
-	mDlg[3]->ShowWindow(false);
-    tab_ctrl.SetCurSel(0);
-	mPrePos = 0;
-
-	return 0;
-}
-
-BEGIN_MESSAGE_MAP(COptionDlg, CDialogEx)
-	ON_BN_CLICKED(IDOK, &COptionDlg::OnOK)
-	ON_NOTIFY(TCN_SELCHANGE, opt_tab, &COptionDlg::OnTabSel)
-	ON_BN_CLICKED(opt_cancel, &COptionDlg::OnBnClickedcancel)
-	ON_BN_CLICKED(opt_ok, &COptionDlg::OnBnClickedok)
-END_MESSAGE_MAP()
-
-//Show Setting Dialog
-void CAmekaApp::OnOption()
-{
-	COptionDlg optionDlg;
-	optionDlg.DoModal();
-}
-
 
 //------------------------------------------------------------------//
 // CPhoticDlg
+//------------------------------------------------------------------//
+
 class CPhoticDlg : public CDialogEx
 {
 public:
@@ -732,12 +456,16 @@ END_MESSAGE_MAP()
 //Show Setting Dialog
 void CAmekaApp::OnPhotic()
 {
+	/*
 	CPhoticDlg photicDlg;
 	photicDlg.DoModal();
+	*/
 }
 
 //------------------------------------------------------------------//
 // CLogDlg
+//------------------------------------------------------------------//
+
 class CLogDlg : public CDialogEx
 {
 public:
@@ -780,6 +508,8 @@ void CAmekaApp::OnLog()
 
 //------------------------------------------------------------------//
 // CWaveDlg
+//------------------------------------------------------------------//
+
 class CWaveDlg : public CDialogEx
 {
 public:
@@ -821,7 +551,30 @@ void CAmekaApp::OnWave()
 }
 
 //------------------------------------------------------------------//
+void CAmekaApp::OnFileClose()
+{
+	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
+	if (pDoc != NULL)
+	{
+		POSITION pos = pDoc->GetFirstViewPosition(); 
+		if (pos != NULL) 
+		{ 
+			CView* pView = pDoc->GetNextView(pos); 
+			if (pView) 
+			{ 
+				CFrameWnd* pFrame = pView->GetParentFrame(); 
+				if (pFrame) 
+				{ 
+				pFrame->SendMessage(WM_CLOSE); 
+				} 
+			} 
+		}
+	}
+}
+//------------------------------------------------------------------//
 // CEventDlg
+//------------------------------------------------------------------//
+
 class CEventDlg : public CDialogEx
 {
 public:
@@ -909,18 +662,6 @@ void CAmekaApp::OnStop()
 //------------------------------------------------------------------//
 
 
-//Show Setting Dialog
-void CAmekaApp::OnPortOpen()
-{
-	//PortOpen portDlg;
-	//portDlg.DoModal();
-	CString portFullName = "\\\.\\" + m_portNo;
-	//MessageBox("Opening Port " + portFullName,"Info",0);
-	pIO = new CSerialIO(portFullName, m_baudRate);
-
-	//m_dspProcess->setOwner(this);
-}
-
 //------------------------------------------------------------------//
 
 
@@ -952,7 +693,19 @@ void CSettingDlg::OnSetup()
 }
 
 //------------------------------------------------------------------//
+CString itoS ( int x)
+{
+	CString sout;
+	sout.Format("%i", x);
+
+	return sout;
+}
+//------------------------------------------------------------------//
+
+//------------------------------------------------------------------//
 // CMontageDlg
+//------------------------------------------------------------------//
+
 class CMontageDlg : public CDialogEx
 {
 public:
@@ -1047,6 +800,313 @@ void CAmekaApp::OnMontage()
 	montageDlg.DoModal();
 }
 
+
+//------------------------------------------------------------------//
+//Tab Dialog
+
+//------------------------------------------------------------------//
+// COM Tab Dialog
+
+vector<string> Tokenize(CString str, string delimiters);
+CString itoS ( int x );
+
+class CTabCOMDlg : public CDialogEx
+{
+public:
+	CTabCOMDlg();
+// Dialog Data
+	enum { IDD = DLG_Opt_COM };
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+// Implementation
+protected:
+	virtual BOOL OnInitDialog();
+	DECLARE_MESSAGE_MAP()
+public:
+	CComboBox port_name;
+	CComboBox port_baud;
+};
+
+CTabCOMDlg::CTabCOMDlg() : CDialogEx(CTabCOMDlg::IDD)
+{
+	
+}
+
+int CTabCOMDlg::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+	port_name.SetCurSel(0);
+	port_baud.SetCurSel(0);
+	return 0;
+}
+
+void CTabCOMDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+	DDX_Text(pDX, opt_com_portNo, theApp.m_portNo);
+	DDX_Text(pDX, opt_com_baud, theApp.m_baudRate);
+	DDX_Control(pDX, opt_com_portNo, port_name);
+	DDX_Control(pDX, opt_com_baud, port_baud);
+}
+
+BEGIN_MESSAGE_MAP(CTabCOMDlg, CDialogEx)
+END_MESSAGE_MAP()
+
+//------------------------------------------------------------------//
+// Rec tab Dialog
+//------------------------------------------------------------------//
+
+class CTabRecDlg : public CDialogEx
+{
+public:
+	CTabRecDlg();
+// Dialog Data
+	enum { IDD = DLG_Opt_Rec };
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+// Implementation
+protected:
+	virtual BOOL OnInitDialog();
+	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedeeg();
+	CEdit rec_ed_eeg;
+	CEdit rec_ed_video;
+	afx_msg void OnBnClickedvideo();
+};
+
+CTabRecDlg::CTabRecDlg() : CDialogEx(CTabRecDlg::IDD)
+{
+	
+}
+
+int CTabRecDlg::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+	TCHAR szDirectory[MAX_PATH] = "";
+	::GetCurrentDirectory(sizeof(szDirectory) - 1, szDirectory);
+
+	rec_ed_eeg.SetWindowTextA(szDirectory);
+	rec_ed_video.SetWindowTextA(szDirectory);
+
+	return 0;
+}
+
+void CTabRecDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_EDIT1, rec_ed_eeg);
+	DDX_Control(pDX, IDC_EDIT2, rec_ed_video);
+}
+
+BEGIN_MESSAGE_MAP(CTabRecDlg, CDialogEx)
+	ON_BN_CLICKED(rec_eeg, &CTabRecDlg::OnBnClickedeeg)
+	ON_BN_CLICKED(rec_video, &CTabRecDlg::OnBnClickedvideo)
+END_MESSAGE_MAP()
+
+//------------------------------------------------------------------//
+// Event tab dialog
+//------------------------------------------------------------------//
+
+class CTabEventDlg : public CDialogEx
+{
+public:
+	CTabEventDlg();
+// Dialog Data
+	enum { IDD = DLG_Opt_Event };
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+// Implementation
+protected:
+	virtual BOOL OnInitDialog();
+	DECLARE_MESSAGE_MAP()
+public:
+
+};
+
+CTabEventDlg::CTabEventDlg() : CDialogEx(CTabEventDlg::IDD)
+{
+	
+}
+
+int CTabEventDlg::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+	return 0;
+}
+
+void CTabEventDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+}
+
+BEGIN_MESSAGE_MAP(CTabEventDlg, CDialogEx)
+
+END_MESSAGE_MAP()
+
+//------------------------------------------------------------------//
+// View tab dialog
+//------------------------------------------------------------------//
+
+class CTabViewDlg : public CDialogEx
+{
+public:
+	CTabViewDlg();
+// Dialog Data
+	enum { IDD = DLG_Opt_View };
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+// Implementation
+protected:
+	virtual BOOL OnInitDialog();
+	DECLARE_MESSAGE_MAP()
+public:
+	CEdit m_view_speed;
+	CEdit m_view_sen;
+	CEdit m_view_lp;
+	CEdit m_view_hp;
+	afx_msg void OnBnClickedbtdef();
+};
+
+CTabViewDlg::CTabViewDlg() : CDialogEx(CTabViewDlg::IDD)
+{
+	
+}
+
+int CTabViewDlg::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+	m_view_sen.SetWindowTextA(theApp.m_sensitivity);
+	m_view_speed.SetWindowTextA(theApp.m_speed);
+	m_view_lp.SetWindowTextA(theApp.m_LP);
+	m_view_hp.SetWindowTextA(theApp.m_HP);
+	return 0;
+}
+
+void CTabViewDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+	DDX_Text(pDX, view_lp, theApp.m_LP);
+	DDX_Text(pDX, view_hp, theApp.m_HP);
+	DDX_Text(pDX, view_sensitivity, theApp.m_sensitivity);
+	DDX_Text(pDX, view_speed, theApp.m_speed);
+	DDX_Control(pDX, view_sensitivity, m_view_sen);
+	DDX_Control(pDX, view_speed, m_view_speed);
+	DDX_Control(pDX, view_lp, m_view_lp);
+	DDX_Control(pDX, view_hp, m_view_hp);
+}
+
+BEGIN_MESSAGE_MAP(CTabViewDlg, CDialogEx)
+	ON_BN_CLICKED(view_btdef, &CTabViewDlg::OnBnClickedbtdef)
+END_MESSAGE_MAP()
+
+//------------------------------------------------------------------//
+// COptionDlg
+//------------------------------------------------------------------//
+
+class COptionDlg : public CDialogEx
+{
+public:
+	COptionDlg();
+	CString m_baudRate;
+	CString m_portNo;
+	CString m_LP;
+	CString m_HP;
+	CString m_sensitivity;
+	CString m_speed;
+
+	CDialog* mDlg[4];
+
+	int mPrePos;
+
+// Dialog Data
+	enum { IDD = DLG_Option };
+	CTabCtrl tab_ctrl;
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+// Implementation
+protected:
+	virtual BOOL OnInitDialog();
+	DECLARE_MESSAGE_MAP()
+public:
+	//afx_msg void OnOK();
+	afx_msg void OnTabSel(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedcancel();
+	afx_msg void OnBnClickedok();
+};
+
+COptionDlg::COptionDlg() : CDialogEx(COptionDlg::IDD)
+{
+	
+}
+
+void COptionDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+	/*
+	DDX_Text(pDX, opt_com_portNo, m_portNo);
+	DDX_Text(pDX, opt_com_baud, m_baudRate);
+	DDX_Text(pDX, view_lp, m_LP);
+	DDX_Text(pDX, view_hp, m_HP);
+	DDX_Text(pDX, view_sensitivity, m_sensitivity);
+	DDX_Text(pDX, view_speed, m_speed);
+	*/
+	DDX_Control(pDX, opt_tab, tab_ctrl);
+}
+
+int COptionDlg::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+    tab_ctrl.InsertItem(0,"View");
+	tab_ctrl.InsertItem(1,"Event");
+	tab_ctrl.InsertItem(2,"Recording");
+
+	mDlg[0] = new CTabViewDlg;
+	mDlg[1] = new CTabEventDlg;
+	mDlg[2] = new CTabRecDlg;
+
+	mDlg[0]->Create(DLG_Opt_View, &tab_ctrl);
+	mDlg[1]->Create(DLG_Opt_Event, &tab_ctrl);
+	mDlg[2]->Create(DLG_Opt_Rec, &tab_ctrl);
+
+	CRect TabRect; 
+	tab_ctrl.GetClientRect(&TabRect);
+	tab_ctrl.AdjustRect(FALSE, &TabRect);
+	mDlg[0]->MoveWindow(TabRect);
+	mDlg[1]->MoveWindow(TabRect);
+	mDlg[2]->MoveWindow(TabRect);
+
+    mDlg[0]->ShowWindow(true);
+	mDlg[1]->ShowWindow(false);
+	mDlg[2]->ShowWindow(false);
+    tab_ctrl.SetCurSel(0);
+	mPrePos = 0;
+
+	return 0;
+}
+
+BEGIN_MESSAGE_MAP(COptionDlg, CDialogEx)
+	ON_BN_CLICKED(IDOK, &COptionDlg::OnOK)
+	ON_NOTIFY(TCN_SELCHANGE, opt_tab, &COptionDlg::OnTabSel)
+	ON_BN_CLICKED(opt_cancel, &COptionDlg::OnBnClickedcancel)
+	ON_BN_CLICKED(opt_ok, &COptionDlg::OnBnClickedok)
+END_MESSAGE_MAP()
+
+//Show Setting Dialog
+void CAmekaApp::OnOption()
+{
+	COptionDlg optionDlg;
+	optionDlg.DoModal();
+}
 
 
 void COptionDlg::OnTabSel(NMHDR *pNMHDR, LRESULT *pResult)
@@ -1168,20 +1228,11 @@ void CWaveDlg::OnBnClickedCancel()
 void COptionDlg::OnBnClickedok()
 {
 	// TODO: Add your control notification handler code here
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		mDlg[i]->UpdateData();
 	}
-	
-	remove(settingFileName);
-	ofstream file;
-	file.open(settingFileName);
-	file << theApp.m_portNo;
-	file << std::endl;
-	file << theApp.m_baudRate;
-	file << std::endl;
-	file.close();
-
+	CAmekaView* view = CAmekaView::GetView();
 	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
 	int count = 0;
 	//Set items for LowPassFilter
@@ -1192,6 +1243,7 @@ void COptionDlg::OnBnClickedok()
 	for (vector<string>::iterator it = vecSen.begin(); it != vecSen.end(); it++) {
 		pSen->AddItem((*it).c_str(),count++);
 	}
+	pSen->SetEditText(itoS(view->graphData.scaleRate));
 	//Set items for LowPassFilter
 	count = 0;
 	CMFCRibbonComboBox* pSpeed = DYNAMIC_DOWNCAST(
@@ -1201,6 +1253,7 @@ void COptionDlg::OnBnClickedok()
 	for (vector<string>::iterator it = vecSpeed.begin(); it != vecSpeed.end(); it++) {
 		pSpeed->AddItem((*it).c_str(),count++);
 	}
+	pSpeed->SetEditText(itoS(view->graphData.paperSpeed));
 	//Set items for LowPassFilter
 	count = 0;
 	CMFCRibbonComboBox* pLP = DYNAMIC_DOWNCAST(
@@ -1210,6 +1263,7 @@ void COptionDlg::OnBnClickedok()
 	for (vector<string>::iterator it = vecLP.begin(); it != vecLP.end(); it++) {
 		pLP->AddItem((*it).c_str(),count++);
 	}
+	//pLP->SetEditText(itoS(view->graphData.));
 	//Set items for LowPassFilter
 	count = 0;
 	CMFCRibbonComboBox* pHP = DYNAMIC_DOWNCAST(
@@ -1259,7 +1313,6 @@ void CTabViewDlg::OnBnClickedbtdef()
 	m_view_hp.SetWindowTextA(strHP);
 }
 
-
 void CMontageDlg::OnBnClickedadd()
 {
 	// TODO: Add your control notification handler code here
@@ -1271,14 +1324,6 @@ void CMontageDlg::OnBnClickedadd()
 	node->lSecondID = pos2 + 1;
 	CAmekaDoc* doc = CAmekaDoc::GetDoc();
 	doc->mMontage.mList.AddTail(node);
-}
-
-CString itoS ( int x)
-{
-	CString sout;
-	sout.Format("%i", x);
-
-	return sout;
 }
 
 void CMontageDlg::OnBnClickedMonsave()
@@ -1363,3 +1408,85 @@ void CMontageDlg::OnBnClickedload()
 		mon_list.AddString(tmp);
 	}  
 }
+
+
+void CAmekaApp::OnPortOpen()
+{
+	// TODO: Add your command handler code here
+	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
+	CString tmp;
+	CMFCRibbonComboBox* pPort = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_PortName));
+	if (pPort != NULL)
+	{
+		tmp = pPort->GetItem(pPort->GetCurSel());
+		if (!tmp)
+			return;
+		else
+			m_portNo = tmp;
+	}
+
+	CMFCRibbonComboBox* pBaud = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_Baud));
+	if (pBaud != NULL)
+	{
+		tmp = pBaud->GetItem(pBaud->GetCurSel());
+		if (!tmp)
+			return;
+		else
+			m_baudRate = tmp;
+	}
+
+	//PortOpen portDlg;
+	//portDlg.DoModal();
+	CString portFullName = "\\\.\\" + m_portNo;
+	//MessageBox("Opening Port " + portFullName,"Info",0);
+	pIO = new CSerialIO(portFullName, m_baudRate);
+
+	//m_dspProcess->setOwner(this);
+}
+
+
+void CAmekaApp::OnScan()
+{
+	// TODO: Add your command handler code here
+	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
+	//show port list
+    TCHAR lpTargetPath[5000]; // buffer to store the path of the COMPORTS
+    DWORD test;
+    bool gotPort=0; // in case the port is not found
+    CMFCRibbonComboBox* pPort = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_PortName));
+	if (pPort != NULL)
+	{
+		for(int i=0; i<255; i++) // checking ports from COM0 to COM255
+		{
+			CString str;
+			str.Format(_T("%d"),i);
+			CString ComName=CString("COM") + CString(str); // converting to COM0, COM1, COM2
+        
+			test = QueryDosDevice(ComName, (LPSTR)lpTargetPath, 5000);
+
+				// Test the return value and error if any
+			if(test!=0) //QueryDosDevice returns zero if it didn't find an object
+			{
+				pPort->AddItem((CString)ComName); // add to the ComboBox
+				gotPort=1; // found port
+			}
+
+			if(::GetLastError()==ERROR_INSUFFICIENT_BUFFER) //in case buffer got filled
+			{
+				lpTargetPath[10000]; // in case the buffer got filled, increase size of the buffer.
+				continue;
+			}
+		}
+		if(!gotPort) // if not port
+			pPort->SetEditText("N.A"); // to display error message incase no ports 
+		else
+		{
+			//pPort->SetEditText(pPort->GetItem(0));
+			pPort->SelectItem(0);
+		}
+    }
+}
+

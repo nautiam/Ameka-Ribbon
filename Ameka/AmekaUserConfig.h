@@ -30,13 +30,13 @@ typedef struct _Alead {
 	//Color color;
 } *LPAlead, Alead;
 // Montage struct
-struct Amontage {
+typedef struct _Amontage {
 public:
 	uint16_t leadNum;
 	CList<LPAlead, LPAlead> mList;
 	uint16_t mID;
 	CString mName;
-};
+} *LPAmontage, Amontage;
 
 // DSP Engine
 struct DSPData

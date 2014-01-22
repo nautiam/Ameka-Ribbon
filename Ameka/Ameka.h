@@ -46,6 +46,7 @@ public:
 	CString m_sensitivity;
 	CString m_LP;
 	CString m_HP;
+	CList<LPAmontage, LPAmontage> monList;
 	CList<CAmekaDoc*, CAmekaDoc*> docList;
 	amekaData<RawDataType>* dataBuffer;
 
@@ -70,10 +71,12 @@ public:
 	afx_msg void OnWave();			//Wave Generator
 	afx_msg void OnDemo();			//Graph demo
 	afx_msg void OnStop();			//Graph demo
-	afx_msg void OnPortOpen();		//Open Serial COM Port
 	afx_msg void OnMontage();		//Montage
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnScalerate();
+	afx_msg void OnPortOpen();
+	afx_msg void OnScan();
+	afx_msg void OnFileClose();
 };
 
 extern CAmekaApp theApp;

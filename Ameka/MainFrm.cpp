@@ -162,6 +162,58 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		}
 	}
 	pHP->SetEditText("3");
+
+	//show port list
+    TCHAR lpTargetPath[5000]; // buffer to store the path of the COMPORTS
+    DWORD test;
+    bool gotPort=0; // in case the port is not found
+    CMFCRibbonComboBox* pPort = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, m_wndRibbonBar.FindByID(MN_PortName));
+	if (pPort != NULL)
+	{
+		for(int i=0; i<255; i++) // checking ports from COM0 to COM255
+		{
+			CString str;
+			str.Format(_T("%d"),i);
+			CString ComName=CString("COM") + CString(str); // converting to COM0, COM1, COM2
+        
+			test = QueryDosDevice(ComName, (LPSTR)lpTargetPath, 5000);
+
+				// Test the return value and error if any
+			if(test!=0) //QueryDosDevice returns zero if it didn't find an object
+			{
+				pPort->AddItem((CString)ComName); // add to the ComboBox
+				gotPort=1; // found port
+			}
+
+			if(::GetLastError()==ERROR_INSUFFICIENT_BUFFER) //in case buffer got filled
+			{
+				lpTargetPath[10000]; // in case the buffer got filled, increase size of the buffer.
+				continue;
+			}
+		}
+		if(!gotPort) // if not port
+			pPort->SetEditText("N.A"); // to display error message incase no ports 
+		else
+		{
+			//pPort->SetEditText(pPort->GetItem(0));
+			pPort->SelectItem(0);
+		}
+    }
+
+	CMFCRibbonComboBox* pBaud = DYNAMIC_DOWNCAST(
+	CMFCRibbonComboBox, m_wndRibbonBar.FindByID(MN_Baud));
+	if (pBaud != NULL)
+	{
+		pBaud->AddItem("9600");
+		pBaud->AddItem("19200");
+		pBaud->AddItem("38400");
+		pBaud->AddItem("56000");
+		pBaud->AddItem("115200");
+		//pBaud->SetEditText("115200");
+		pBaud->SelectItem(4);
+	}
+
 	return 0;
 }
 

@@ -143,13 +143,19 @@
 #define MN_SpeedRate                    32798
 #define MN_HP                           32799
 #define MN_LP                           32800
+#define MN_MonList                      32809
+#define ID_BUTTON2                      32810
+#define MN_PortName                     32816
+#define MN_Baud                         32817
+#define MN_PortOpen                     32818
+#define MN_Scan                         32819
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        326
-#define _APS_NEXT_COMMAND_VALUE         32806
+#define _APS_NEXT_COMMAND_VALUE         32820
 #define _APS_NEXT_CONTROL_VALUE         1060
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
