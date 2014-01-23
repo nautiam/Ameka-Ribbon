@@ -797,7 +797,8 @@ int CMontageDlg::OnPaint()
 int CMontageDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	
+	BOOL flag = FALSE;
+
 	mon_l1.SetCurSel(0);
 	mon_l2.SetCurSel(0);
 	mon_lName.SetCurSel(0);
@@ -811,37 +812,22 @@ int CMontageDlg::OnInitDialog()
 		LPAmontage mon =  theApp.monList.GetNext( pos );
 		
 		POSITION pos1 =  mon->mList.GetHeadPosition();
-		if (doc->mMon != NULL)
-		{
-			for (int j = 0; j < mon->mList.GetCount(); j++)
-			{
-				if (doc->mMon->mName == mon->mName)
-				{
-					LPAlead lead = mon->mList.GetNext( pos1 );
-					CString tmp;
-					tmp = itoS(lead->lFirstID) + " -> " + itoS(lead->lSecondID);
-					mon_list.AddString(tmp);
-					mon_lName.SetWindowTextA(mon->mName);
-					crtMon = mon;
-				}
-			}
-		}
-		else
-		{
-			mon_list.ResetContent();
-			for (int j = 0; j < mon->mList.GetCount(); j++)
-			{
-				LPAlead lead = mon->mList.GetNext( pos1 );
-				CString tmp;
-				tmp = itoS(lead->lFirstID) + " -> " + itoS(lead->lSecondID);
-				mon_list.AddString(tmp);
-				mon_lName.SetWindowTextA(mon->mName);
-				crtMon = mon;
-			}
-		}
 		mon_lName.AddString(mon->mName);
-		count++;
+		if (flag != TRUE)
+			crtMon = mon;
+		if (doc != NULL && mon->mName == doc->mMon->mName)
+			flag = TRUE;
 	}
+	mon_lName.SetWindowTextA(crtMon->mName);
+	pos =  crtMon->mList.GetHeadPosition();
+	for (int i = 0; i < crtMon->mList.GetCount(); i++)
+	{
+		LPAlead lead = crtMon->mList.GetNext( pos );
+		CString tmp;
+		tmp = itoS(lead->lFirstID) + " -> " + itoS(lead->lSecondID);
+		mon_list.AddString(tmp);
+	}
+
 	return 0;
 }
 
@@ -1443,18 +1429,16 @@ void CMontageDlg::OnBnClickedadd()
 	node->lFirstID = pos1 + 1;
 	node->lSecondID = pos2 + 1;
 
-	LPAmontage mon;
+	LPAmontage mon = NULL;
 	CString tmp;
 	mon_lName.GetWindowText(tmp);
 
 	if (crtMon->mName != tmp)
 	{
-		mon = crtMon;
-		mon->mName = tmp;
-		mon->mList.AddTail(node);
-		theApp.monList.AddTail(mon);
+		crtMon->mName = tmp;
+		crtMon->mList.AddTail(node);
+		theApp.monList.AddTail(crtMon);
 		mon_lName.AddString(tmp);
-		crtMon = mon;
 	}
 	else
 	{
