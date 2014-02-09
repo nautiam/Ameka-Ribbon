@@ -146,6 +146,7 @@
 #define MN_LP                           32800
 #define MN_MonList                      32809
 #define ID_BUTTON2                      32810
+#define MN_Lan                          32810
 #define MN_PortName                     32816
 #define MN_Baud                         32817
 #define MN_PortOpen                     32818

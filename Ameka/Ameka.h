@@ -49,6 +49,7 @@ public:
 	CList<LPAmontage, LPAmontage> monList;
 	CList<CAmekaDoc*, CAmekaDoc*> docList;
 	amekaData<RawDataType>* dataBuffer;
+	amekaLan* mnLan;
 
 // Overrides
 public:
@@ -77,6 +78,7 @@ public:
 	afx_msg void OnPortOpen();
 	afx_msg void OnScan();
 	afx_msg void OnFileClose();
+	afx_msg void OnLan();
 };
 
 extern CAmekaApp theApp;

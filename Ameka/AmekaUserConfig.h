@@ -242,5 +242,111 @@ amekaData<T>::~amekaData(void)
 	//DeleteCriticalSection(&csess);
 };
 
+struct lan_File {
+	CString strMenuName;
+	CString strMenuFile;
+	CString strMenuSetup;
+	CString strMenuPort;
+	CString strNew;
+	CString strOpen;
+	CString strClose;
+	CString strSave;
+	CString strPrint;
+	CString strOption;
+	CString strPortName;
+	CString strBaudRate;
+	CString strScanPort;
+	CString strOpenPort;
+};
+
+struct lan_Option {
+	CString strMenuName;
+	CString strMenuOption;
+	CString strMenuInfo;
+	CString strMenuOther;
+	CString strAnl;
+	CString strMon;
+	CString strEvent;
+	CString strLog;
+	CString strWave;
+	CString strInfo;
+	CString strLan;
+};
+
+struct lan_Wave {
+	CString strMenuName;
+	CString strMenuWave;
+	CString strMenuSetup;
+	CString strMenuFilter;
+	CString strStart;
+	CString strStop;
+	CString strRecord;
+	CString strPhotic;
+	CString strSensi;
+	CString strPaperSpeed;
+	CString strListMon;
+	CString strLPF;
+	CString strHPF;
+};
+
+struct lan_Help {
+	CString strMenuName;
+	CString strMenuAbout;
+	CString strAbout;
+};
+
+struct amekaLan {
+	struct lan_File mnFile;
+	struct lan_Option mnOpt;
+	struct lan_Wave mnWave;
+	struct lan_Help mnHelp;
+	amekaLan()
+	{
+		mnFile.strMenuName = "File";
+		mnFile.strMenuFile = "File";
+		mnFile.strMenuPort = "Port";
+		mnFile.strMenuSetup = "Setup";
+		mnFile.strNew = "New";
+		mnFile.strOpen = "Open";
+		mnFile.strClose = "Close";
+		mnFile.strSave = "Save";
+		mnFile.strPrint = "Print";
+		mnFile.strOption = "Option";
+		mnFile.strPortName = "Port Name";
+		mnFile.strBaudRate = "Baud Rate";
+		mnFile.strScanPort = "Scan Port";
+		mnFile.strOpenPort = "Open Port";
+
+		mnOpt.strMenuName = "Option";
+		mnOpt.strMenuOption = "Option";
+		mnOpt.strMenuOther = "Other";
+		mnOpt.strMenuInfo = "Info";
+		mnOpt.strAnl = "Analysis";
+		mnOpt.strMon = "Montage";
+		mnOpt.strEvent = "Event";
+		mnOpt.strLog = "Log";
+		mnOpt.strWave = "Wave Generator";
+		mnOpt.strInfo = "Patient Information";
+		mnOpt.strLan = "Language";
+
+		mnWave.strMenuName = "Wave";
+		mnWave.strMenuSetup = "Setup";
+		mnWave.strMenuFilter = "Filter";
+		mnWave.strMenuWave = "Wave";
+		mnWave.strStart = "Start";
+		mnWave.strStop = "Stop";
+		mnWave.strRecord = "Recording";
+		mnWave.strPhotic = "Photic";
+		mnWave.strSensi = "Sensitivity";
+		mnWave.strPaperSpeed = "Paper Speed";
+		mnWave.strLPF = "LowPass Filter";
+		mnWave.strHPF = "HighPass Filter";
+
+		mnHelp.strAbout = "About";
+		mnHelp.strMenuAbout = "About";
+		mnHelp.strMenuName = "Help";
+	};
+};
+
 
 #endif

@@ -72,6 +72,7 @@ BEGIN_MESSAGE_MAP(CAmekaApp, CWinAppEx)
 	ON_COMMAND(MN_Montage, &CAmekaApp::OnMontage)
 	ON_COMMAND(MN_PortOpen, &CAmekaApp::OnPortOpen)
 	ON_COMMAND(MN_Scan, &CAmekaApp::OnScan)
+	ON_COMMAND(MN_Lan, &CAmekaApp::OnLan)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------//
@@ -80,6 +81,8 @@ END_MESSAGE_MAP()
 
 CAmekaApp::CAmekaApp()
 {
+	//init Language
+	mnLan = new amekaLan();
 	//init buffer
 	dataBuffer = new amekaData<RawDataType>(4096);
 
@@ -1559,3 +1562,153 @@ void CAmekaApp::OnScan()
     }
 }
 
+
+
+void CAmekaApp::OnLan()
+{
+	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
+
+	//Menu File
+	CMFCRibbonButton* pNew = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_New));
+	if (pNew != NULL)
+		pNew->SetText(mnLan->mnFile.strNew);
+
+	CMFCRibbonButton* pOpen = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_Open));
+	if (pOpen != NULL)
+		pOpen->SetText(mnLan->mnFile.strOpen);
+
+	CMFCRibbonButton* pClose = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_Close));
+	if (pClose != NULL)
+		pClose->SetText(mnLan->mnFile.strClose);
+
+	CMFCRibbonButton* pSave = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_Save));
+	if (pSave != NULL)
+		pSave->SetText(mnLan->mnFile.strSave);
+
+	CMFCRibbonButton* pPrint = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_Print));
+	if (pPrint != NULL)
+		pPrint->SetText(mnLan->mnFile.strPrint);
+
+	CMFCRibbonComboBox* pPortName = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_PortName));
+	if (pPortName != NULL)
+		pPortName->SetText(mnLan->mnFile.strPortName);
+
+	CMFCRibbonComboBox* pBaud = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_Baud));
+	if (pBaud != NULL)
+		pBaud->SetText(mnLan->mnFile.strBaudRate);
+
+	CMFCRibbonButton* pScan = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_Scan));
+	if (pScan != NULL)
+		pScan->SetText(mnLan->mnFile.strScanPort);
+
+	CMFCRibbonButton* pPortOpen = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_PortOpen));
+	if (pPortOpen != NULL)
+		pPortOpen->SetText(mnLan->mnFile.strOpenPort);
+
+	pPortOpen->GetParentCategory()->SetName(mnLan->mnFile.strMenuName);
+
+	//Menu Option
+	CMFCRibbonButton* pAnl = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_Analyze));
+	if (pAnl != NULL)
+		pAnl->SetText(mnLan->mnOpt.strAnl);
+
+	CMFCRibbonButton* pMon = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_Montage));
+	if (pMon != NULL)
+		pMon->SetText(mnLan->mnOpt.strMon);
+
+	CMFCRibbonButton* pEvent = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_Event));
+	if (pEvent != NULL)
+		pEvent->SetText(mnLan->mnOpt.strEvent);
+
+	CMFCRibbonButton* pLog = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_Log));
+	if (pLog != NULL)
+		pLog->SetText(mnLan->mnOpt.strLog);
+
+	CMFCRibbonButton* pWave = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_Wave));
+	if (pWave != NULL)
+		pWave->SetText(mnLan->mnOpt.strWave);
+
+	CMFCRibbonButton* pInfo = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_Info));
+	if (pInfo != NULL)
+		pInfo->SetText(mnLan->mnOpt.strInfo);
+
+	CMFCRibbonButton* pLan = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_Lan));
+	if (pLan != NULL)
+		pLan->SetText(mnLan->mnOpt.strLan);
+
+	pLan->GetParentCategory()->SetName(mnLan->mnOpt.strMenuName);
+
+	//Menu Wave
+	CMFCRibbonButton* pStart = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_StartDemo));
+	if (pStart != NULL)
+		pStart->SetText(mnLan->mnWave.strStart);
+
+	CMFCRibbonButton* pStop = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_StopDemo));
+	if (pStop != NULL)
+		pStop->SetText(mnLan->mnWave.strStop);
+
+	CMFCRibbonButton* pRec = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_Recording));
+	if (pRec != NULL)
+		pRec->SetText(mnLan->mnWave.strRecord);
+
+	CMFCRibbonButton* pPhotic = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_Photic));
+	if (pPhotic != NULL)
+		pPhotic->SetText(mnLan->mnWave.strPhotic);
+
+	CMFCRibbonComboBox* pSen = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_ScaleRate));
+	if (pSen != NULL)
+		pSen->SetText(mnLan->mnWave.strSensi);
+
+	CMFCRibbonComboBox* pSpeed = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_SpeedRate));
+	if (pSpeed != NULL)
+		pSpeed->SetText(mnLan->mnWave.strPaperSpeed);
+
+	CMFCRibbonComboBox* pListMon = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_MonList));
+	if (pListMon != NULL)
+		pListMon->SetText(mnLan->mnWave.strListMon);
+
+	CMFCRibbonComboBox* pLP = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_LP));
+	if (pLP != NULL)
+		pLP->SetText(mnLan->mnWave.strLPF);
+
+	CMFCRibbonComboBox* pHP = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_HP));
+	if (pHP != NULL)
+		pHP->SetText(mnLan->mnWave.strHPF);
+
+	pHP->GetParentCategory()->SetName(mnLan->mnWave.strMenuName);
+
+	//Menu Help
+
+	CMFCRibbonButton* pAbout = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_About));
+	if (pAbout != NULL)
+		pAbout->SetText(mnLan->mnHelp.strAbout);
+
+	pAbout->GetParentCategory()->SetName(mnLan->mnHelp.strMenuName);
+
+}
