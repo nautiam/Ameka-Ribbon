@@ -1,5 +1,6 @@
 //Ameka Varibale Definition
 #include <stdint.h>
+#include "stdafx.h"
 #include <winnt.h>
 #include <time.h>
 #include <mmc.h>
@@ -244,9 +245,6 @@ amekaData<T>::~amekaData(void)
 
 struct lan_File {
 	CString strMenuName;
-	CString strMenuFile;
-	CString strMenuSetup;
-	CString strMenuPort;
 	CString strNew;
 	CString strOpen;
 	CString strClose;
@@ -261,9 +259,6 @@ struct lan_File {
 
 struct lan_Option {
 	CString strMenuName;
-	CString strMenuOption;
-	CString strMenuInfo;
-	CString strMenuOther;
 	CString strAnl;
 	CString strMon;
 	CString strEvent;
@@ -275,9 +270,6 @@ struct lan_Option {
 
 struct lan_Wave {
 	CString strMenuName;
-	CString strMenuWave;
-	CString strMenuSetup;
-	CString strMenuFilter;
 	CString strStart;
 	CString strStop;
 	CString strRecord;
@@ -291,7 +283,6 @@ struct lan_Wave {
 
 struct lan_Help {
 	CString strMenuName;
-	CString strMenuAbout;
 	CString strAbout;
 };
 
@@ -303,9 +294,6 @@ struct amekaLan {
 	amekaLan()
 	{
 		mnFile.strMenuName = "File";
-		mnFile.strMenuFile = "File";
-		mnFile.strMenuPort = "Port";
-		mnFile.strMenuSetup = "Setup";
 		mnFile.strNew = "New";
 		mnFile.strOpen = "Open";
 		mnFile.strClose = "Close";
@@ -318,9 +306,6 @@ struct amekaLan {
 		mnFile.strOpenPort = "Open Port";
 
 		mnOpt.strMenuName = "Option";
-		mnOpt.strMenuOption = "Option";
-		mnOpt.strMenuOther = "Other";
-		mnOpt.strMenuInfo = "Info";
 		mnOpt.strAnl = "Analysis";
 		mnOpt.strMon = "Montage";
 		mnOpt.strEvent = "Event";
@@ -330,9 +315,6 @@ struct amekaLan {
 		mnOpt.strLan = "Language";
 
 		mnWave.strMenuName = "Wave";
-		mnWave.strMenuSetup = "Setup";
-		mnWave.strMenuFilter = "Filter";
-		mnWave.strMenuWave = "Wave";
 		mnWave.strStart = "Start";
 		mnWave.strStop = "Stop";
 		mnWave.strRecord = "Recording";
@@ -343,7 +325,6 @@ struct amekaLan {
 		mnWave.strHPF = "HighPass Filter";
 
 		mnHelp.strAbout = "About";
-		mnHelp.strMenuAbout = "About";
 		mnHelp.strMenuName = "Help";
 	};
 };

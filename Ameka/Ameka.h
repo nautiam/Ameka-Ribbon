@@ -50,7 +50,8 @@ public:
 	CList<CAmekaDoc*, CAmekaDoc*> docList;
 	amekaData<RawDataType>* dataBuffer;
 	amekaLan* mnLan;
-
+	Aelectrode* mElec;
+	uint16_t elecNum;
 // Overrides
 public:
 	virtual BOOL InitInstance();

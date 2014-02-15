@@ -32,6 +32,8 @@
 #include "tinystr.h"
 #include "tinyxml.h"
 
+#include "AmekaLan.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -43,6 +45,7 @@
 #define strCOM "COM1 COM2 COM3 COM4 COM5 COM6 COM7 COM8 COM9 COM10"
 #define strBaud "9600 14400 19200 38400 56000 115200 "
 #define xmlName "abc.xml"
+#define settingName "config.xml"
 
 _INITIALIZE_EASYLOGGINGPP
 
@@ -81,6 +84,8 @@ END_MESSAGE_MAP()
 
 CAmekaApp::CAmekaApp()
 {
+	//init electrode name
+	loadSetting(settingName);
 	//init Language
 	mnLan = new amekaLan();
 	//init buffer
@@ -827,7 +832,7 @@ int CMontageDlg::OnInitDialog()
 	{
 		LPAlead lead = crtMon->mList.GetNext( pos );
 		CString tmp;
-		tmp = itoS(lead->lFirstID) + " -> " + itoS(lead->lSecondID);
+		tmp = getElecName(lead->lFirstID) + " -> " + getElecName(lead->lSecondID);
 		mon_list.AddString(tmp);
 	}
 
@@ -851,7 +856,7 @@ void CMontageDlg::OnMonListSelChange()
 			{
 				LPAlead lead = mon->mList.GetNext( pos1 );
 				CString tmp;
-				tmp = itoS(lead->lFirstID) + " -> " + itoS(lead->lSecondID);
+				tmp = getElecName(lead->lFirstID) + " -> " + getElecName(lead->lSecondID);
 				mon_list.AddString(tmp);
 			}
 			return;
@@ -1211,7 +1216,6 @@ void COptionDlg::OnBnClickedcancel()
 void CMontageDlg::OnBnClickedOk()
 {
 	// TODO: Add your control notification handler code here
-
 	CAmekaDoc* crtdoc = CAmekaDoc::GetDoc();
 	crtdoc->mMon = crtMon;
 		
@@ -1220,13 +1224,13 @@ void CMontageDlg::OnBnClickedOk()
 	doc.LinkEndChild(root);
 
 	POSITION pos =  theApp.monList.GetHeadPosition();
-	for (int i = 0; i < theApp.monList.GetCount(); i++)
+	while (pos)
 	{
 		LPAmontage mon =  theApp.monList.GetNext( pos );
 		TiXmlElement* element = new TiXmlElement(mon->mName);
 		root->LinkEndChild(element);
 		POSITION pos1 =  mon->mList.GetHeadPosition();
-		for (int j = 0; j < mon->mList.GetCount(); j++)
+		while (pos1)
 		{
 			LPAlead lead = mon->mList.GetNext( pos1 );
 			TiXmlElement* element1 = new TiXmlElement(mon->mName);
@@ -1427,36 +1431,19 @@ void CMontageDlg::OnBnClickedadd()
 	// TODO: Add your control notification handler code here
 	int pos1 = mon_l1.GetCurSel();
 	int pos2 = mon_l2.GetCurSel();
-	mon_list.AddString(itoS(pos1+1) + " -> " + itoS(pos2+1));
+	mon_list.AddString(getElecName(pos1+1) + " -> " + getElecName(pos2+1));
 	LPAlead node = new Alead;
 	node->lFirstID = pos1 + 1;
 	node->lSecondID = pos2 + 1;
 
-	LPAmontage mon = NULL;
 	CString tmp;
-	mon_lName.GetWindowText(tmp);
+	//mon_lName.GetWindowText(tmp);
 
-	if (crtMon->mName != tmp)
-	{
-		crtMon->mName = tmp;
-		crtMon->mList.AddTail(node);
-		theApp.monList.AddTail(crtMon);
-		mon_lName.AddString(tmp);
-	}
-	else
-	{
-		POSITION pos =  theApp.monList.GetHeadPosition();
-		for (int i = 0; i < theApp.monList.GetCount(); i++)
-		{
-			CString tmp;
-			mon =  theApp.monList.GetNext( pos );
-			if (tmp == mon->mName)
-			{
-				mon->mList.AddTail(node);
-				return;
-			}
-		}
-	}
+	//crtMon->mName = tmp;
+	crtMon->mList.AddTail(node);
+	//theApp.monList.AddTail(crtMon);
+	//mon_lName.AddString(tmp);
+
 }
 
 void CMontageDlg::OnBnClickedMonsave()
@@ -1464,21 +1451,22 @@ void CMontageDlg::OnBnClickedMonsave()
 	// TODO: Add your control notification handler code here
 	CString tmp;
 	mon_lName.GetWindowText(tmp);
+
+	crtMon->mName = tmp;
+
 	POSITION pos =  theApp.monList.GetHeadPosition();
-	for (int i = 0; i < theApp.monList.GetCount(); i++)
-	{
-		LPAmontage mon =  theApp.monList.GetNext( pos );
-		POSITION pos1 =  mon->mList.GetHeadPosition();
-		TiXmlElement* element = new TiXmlElement(mon->mName);
-		for (int j = 0; j < mon->mList.GetCount(); j++)
+	POSITION savePos;
+	while(pos) 
+	{ 
+		savePos = pos; 
+		LPAmontage curr = theApp.monList.GetNext(pos); 
+		if (curr->mName == tmp)
 		{
-			LPAlead lead = mon->mList.GetNext( pos1 );
-			TiXmlElement* element1 = new TiXmlElement("node");
-			element->LinkEndChild(element1);
-			element1->SetAttribute("channel1", lead->lFirstID);
-			element1->SetAttribute("channel2", lead->lSecondID);
+			theApp.monList.SetAt(savePos, crtMon); 
+			return;
 		}
 	}
+	theApp.monList.AddTail(crtMon);
 }
 
 
@@ -1566,6 +1554,21 @@ void CAmekaApp::OnScan()
 
 void CAmekaApp::OnLan()
 {
+	// Create an instance First
+	CFileDialog fOpenDlg(TRUE, ".txt", NULL, OFN_HIDEREADONLY|OFN_FILEMUSTEXIST, "Ameka Language Files (*.xml)|*.xml||");
+
+	// Initializes m_pOFN structure
+	fOpenDlg.m_pOFN->lpstrTitle="Ameka Language File";
+
+	// Call DoModal
+
+	if(fOpenDlg.DoModal()==IDOK)
+	{
+		CString fileName = fOpenDlg.GetPathName();
+		loadLanguage(fileName);
+		// Do something useful here
+	}
+
 	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
 
 	//Menu File

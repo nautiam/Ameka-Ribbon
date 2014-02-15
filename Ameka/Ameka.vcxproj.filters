@@ -78,6 +78,9 @@
     <ClInclude Include="xmlParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AmekaLan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Ameka.cpp">
@@ -123,6 +126,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dsp_filters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AmekaLan.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

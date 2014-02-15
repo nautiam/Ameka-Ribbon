@@ -103,6 +103,7 @@
   <ItemGroup>
     <ClInclude Include="Ameka.h" />
     <ClInclude Include="AmekaDoc.h" />
+    <ClInclude Include="AmekaLan.h" />
     <ClInclude Include="AmekaUserConfig.h" />
     <ClInclude Include="AmekaView.h" />
     <ClInclude Include="ChildFrm.h" />
@@ -125,6 +126,7 @@
   <ItemGroup>
     <ClCompile Include="Ameka.cpp" />
     <ClCompile Include="AmekaDoc.cpp" />
+    <ClCompile Include="AmekaLan.cpp" />
     <ClCompile Include="AmekaUserConfig.cpp" />
     <ClCompile Include="AmekaView.cpp" />
     <ClCompile Include="ChildFrm.cpp" />
