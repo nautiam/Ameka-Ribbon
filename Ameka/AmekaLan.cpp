@@ -4,6 +4,18 @@
 #include "tinyxml.h"
 #include "easylogging++.h"
 
+#ifndef settingName
+#define settingName "config.xml"
+#endif
+
+CString itoS ( int x)
+{
+	CString sout;
+	sout.Format("%i", x);
+
+	return sout;
+}
+
 void loadLanguage(CString fileName)
 {
 	TiXmlDocument doc;
@@ -166,4 +178,25 @@ CString getElecName(uint16_t num)
 		if (theApp.mElec[i].eID == num)
 			return theApp.mElec[i].eName;
 	return "";
+}
+
+void writeSetting(CString fileName)
+{		
+	CString tempElecName[16] = {"ml", "cd1", "cd2", "tf1", "f2", "tf2", "tf3", "ld", "ss", "ss2", "se3", "af", "af1", "af2", "af3", "af4"};
+	TiXmlDocument doc;
+	TiXmlElement* root = new TiXmlElement("root");
+	doc.LinkEndChild(root);
+
+	TiXmlElement* element = new TiXmlElement("Lead");
+	element->SetAttribute("Name", "lead");
+	root->LinkEndChild(element);
+	for (int i = 0; i < 16; i++)
+	{
+		TiXmlElement* element1 = new TiXmlElement(itoS(i+1));
+		element->LinkEndChild(element1);
+		element1->SetAttribute("Name", tempElecName[i]);
+	}
+
+	bool success = doc.SaveFile(fileName);
+	doc.Clear();
 }

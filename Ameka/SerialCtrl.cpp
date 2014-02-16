@@ -248,7 +248,7 @@ int ReadThread::Run()
 {
     /* A. Viet add new */
     //DWORD	EventMask;
-	char buf[MAX_MESSAGE] = {0};
+	char buf[MAX_MESSAGE+100] = {0};
 	unsigned long lenMessage;
 	int counter = 0;
 

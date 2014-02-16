@@ -190,6 +190,11 @@ T* amekaData<T>::popAll()
 	T* data;
 	//EnterCriticalSection(&csess);
 	uint16_t len = (crtWPos+dataLen-LRPos)%dataLen;
+	if (len <= 0)
+	{
+		rLen = 0;
+		return NULL;
+	}
 	data = (T*)malloc(len*sizeof(T));
 	for (int i = 0; i < len; i++)
 	{

@@ -33,6 +33,7 @@ int DSPModule::Run()
 	params[2] = CenterFre; // center frequency
 	params[3] = BandWidth; // band width
 	f.setParams (params);
+	//float* audioData[LEAD_NUMBER];
 	while (1)
 	{
 
@@ -110,7 +111,7 @@ int DSPModule::Run()
 					output[j].value[i] = (uint16_t)audioData[i][j];
 					output[j].time = data[j].time;				
 				}
-				LOG(INFO) << output[j].time;
+				//LOG(INFO) << output[j].time;
 			}
 
 			for (int i=0; i<size; i++)
@@ -122,7 +123,8 @@ int DSPModule::Run()
 			{
 				delete [] audioData[i];
 			}
-			delete [] output;
+			//delete [] audioData;
+			delete output;
 		}
 	}
 	return 0;

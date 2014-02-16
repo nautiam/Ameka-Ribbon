@@ -85,6 +85,7 @@ END_MESSAGE_MAP()
 CAmekaApp::CAmekaApp()
 {
 	//init electrode name
+	writeSetting(settingName);
 	loadSetting(settingName);
 	//init Language
 	mnLan = new amekaLan();
@@ -670,10 +671,35 @@ void CAmekaApp::OnEvent()
 
 //------------------------------------------------------------------//
 
+UINT genData(LPVOID pParam)
+{
+	while(1)
+	{
+		RawDataType data;
+		data.time = 0;
+		for (int i = 0; i < 15; i++)
+		{
+			data.value[i] = rand()%100;
+		}
+		theApp.dataBuffer->pushData(data);
+		Sleep(3);
+	}
+	return 0;
+}
+
 //Demo Graph
 void CAmekaApp::OnDemo()
 {
-	if (theApp.pIO != NULL && (theApp.pIO->m_bState == S_CONNECTED || theApp.pIO->m_bState == S_NOCONNECTED))
+
+	CAmekaView *pView = CAmekaView::GetView();
+	if (!pView->isRunning)
+	{
+		pView->pThread = AfxBeginThread(pView->graphHandle, (LPVOID)pView);
+	}	pView->isRunning = true;
+	
+	AfxBeginThread(genData, NULL);
+	/*
+	if ((theApp.pIO != NULL) && (theApp.pIO->m_bState == S_CONNECTED))
 	{
 		CAmekaView *pView = CAmekaView::GetView();
 		if (!pView->isRunning)
@@ -681,6 +707,7 @@ void CAmekaApp::OnDemo()
 			pView->pThread = AfxBeginThread(pView->graphHandle, (LPVOID)pView);
 		}	pView->isRunning = true;
 	}
+	*/
 }
 
 void CAmekaApp::OnStop()
@@ -735,15 +762,6 @@ void CSettingDlg::OnSetup()
 	// TODO: Add your command handler code here
 }
 
-//------------------------------------------------------------------//
-CString itoS ( int x)
-{
-	CString sout;
-	sout.Format("%i", x);
-
-	return sout;
-}
-//------------------------------------------------------------------//
 
 //------------------------------------------------------------------//
 // CMontageDlg

@@ -39,7 +39,7 @@ class CAmekaApp : public CWinAppEx
 {
 public:
 	CAmekaApp();
-	CSerialIO* pIO;
+	volatile CSerialIO* pIO;
 	CString m_baudRate;
 	CString m_portNo;
 	CString m_speed;
