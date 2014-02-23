@@ -11,7 +11,8 @@
 
 // AmekaView.h : interface of the CAmekaView class
 //
-
+#ifndef _AMEKA_VIEW_
+#define _AMEKA_VIEW_
 #pragma once
 
 #include "AmekaDoc.h"
@@ -32,6 +33,7 @@ public:
 	bool isRunning;
 	CWinThread* pThread;
 	GraphData graphData;
+	CBitmap bmp;
 // Operations
 public:
 	
@@ -49,7 +51,8 @@ public:
 	virtual ~CAmekaView();
 	static CAmekaView* GetView();
 	static UINT graphHandle(LPVOID pParam);			//handle thread
-	int amekaDrawPos(CDC* pDC);			//for draw current position only	
+	int amekaDrawPos(CDC* pDC, CBitmap* bitmap);			//for draw current position only	
+	void setParentDoc(CAmekaDoc* doc);
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
@@ -69,6 +72,7 @@ private:
 	static const uint16_t m_BaseLine = baseLine;
 	static const uint16_t m_Amp = amp;
 	CRITICAL_SECTION csess;
+	CAmekaDoc* mDoc;
 protected:
 
 // Generated message map functions
@@ -86,3 +90,4 @@ inline CAmekaDoc* CAmekaView::GetDocument() const
    { return reinterpret_cast<CAmekaDoc*>(m_pDocument); }
 #endif
 
+#endif

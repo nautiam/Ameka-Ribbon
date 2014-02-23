@@ -11,8 +11,10 @@
 
 // AmekaDoc.h : interface of the CAmekaDoc class
 //
-
+#ifndef _AMEKADOC_H_
+#define _AMEKADOC_H_
 #include "AmekaUserConfig.h"
+#include "DSPModule.h"
 
 #define arrLen 4096
 
@@ -30,8 +32,12 @@ public:
 	LPAmontage mMon;
 	DSPData mDSP;
 	CList<LPAelectrode, LPAelectrode> mElec;
+	CWinThread*  m_dspProcess;
 	amekaData<RawDataType>* dataBuffer;
+	amekaData<RawDataType>* PrimaryData;
+	//AmekaData<RawDataType>* dataBuffer;
 // Operations
+
 public:
 
 // Overrides
@@ -64,3 +70,5 @@ protected:
 	void SetSearchContent(const CString& value);
 #endif // SHARED_HANDLERS
 };
+
+#endif

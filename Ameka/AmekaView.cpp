@@ -207,7 +207,7 @@ void CAmekaView::OnDraw(CDC* pDC)
 	
 	MemDC.DeleteDC();
 	//DeleteObject(brush);
-	//DeleteObject(Wbmp);
+	DeleteObject(Wbmp);
 	//DeleteObject(pOldBmp);
 	// TODO: add draw code for native data here
 	
@@ -220,12 +220,13 @@ void CAmekaView::OnDraw(CDC* pDC)
 UINT CAmekaView::graphHandle(LPVOID pParam)
 {
 	CAmekaView* pnt = (CAmekaView *)pParam;
+	pnt->setParentDoc(pnt->GetDocument());
 	CDC *pdc = pnt->GetDC();
 	pnt->dataBuffer = (RawDataType*)malloc(pnt->bufLen*sizeof(RawDataType));
 	int ret;
 	while(1)
 	{
-		ret = pnt->amekaDrawPos(pdc);
+		ret = pnt->amekaDrawPos(pdc, &pnt->bmp);
 		/*
 		if(ret == -1)
 			return -1;
@@ -235,12 +236,17 @@ UINT CAmekaView::graphHandle(LPVOID pParam)
 	return 0;
 }
 
-int CAmekaView::amekaDrawPos(CDC* pDC)
+void CAmekaView::setParentDoc(CAmekaDoc* doc)
+{
+	this->mDoc = doc;
+}
+
+int CAmekaView::amekaDrawPos(CDC* pDC,CBitmap* bitmap)
 {
 	//TBD
-	CBitmap bitmap;
+	//CBitmap bitmap;
 	CDC MemDC;
-	RawDataType* data = new RawDataType[dataNum];
+	//RawDataType* data = new RawDataType[dataNum];
 	uint16_t buflen = 0;
 	
 	if (pDC == NULL)
@@ -249,7 +255,8 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	//data = theApp.pIO->RawData->popData(dataNum);
 	//CAmekaDoc *doc = CAmekaDoc::GetDoc();
 	
-	buflen = theApp.dataBuf->popData(data, dataNum);
+	RawDataType* data = this->mDoc->PrimaryData->popData(dataNum);
+	buflen = this->mDoc->PrimaryData->rLen;
 	if ((buflen <= 0) || (data == NULL))
 		return -2;
 	
@@ -281,12 +288,15 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	CRect rect;
     GetClientRect(&rect);
 
-	if(NULL == bitmap.CreateCompatibleBitmap(&MemDC, distance * buflen + scanBarW, rect.Height()))
+	if(bitmap != NULL)
+	{
+	if(NULL == bitmap->CreateCompatibleBitmap(pDC, distance * buflen + scanBarW, rect.Height()))
 	{
 		DWORD tmp = GetLastError();
 		LOG(ERROR) << static_cast <int>(tmp);
 
 		return -1;
+	}
 	}
 
 	MemDC.SelectObject(bitmap);
@@ -364,6 +374,8 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	//DeleteObject(bitmap);
 	delete[] data;
 	DeleteObject(bitmap);
+	bitmap = NULL;
+	//delete bitmap;
 	return 0;
 	
 }

@@ -1,49 +1,41 @@
 #include "stdafx.h"
-#include "DSPModule.h"
 #include "easylogging++.h"
-#include "Ameka.h"
 #include "AmekaDoc.h"
+#include "dsp_filters.h"
+#include "DSPModule.h"
 
-IMPLEMENT_DYNCREATE(DSPModule,CWinThread)
-DSPModule::DSPModule()
-{
-	numSamples = 2000;
-	sampleRate = SAMPLE_RATE;
-	HighFre = 0.5;
-	LowFre = 35;
-	CenterFre = sqrt(HighFre*LowFre);
-	BandWidth = LowFre - HighFre;
-}
-DSPModule::~DSPModule()
-{
-	
-}
 
-BOOL DSPModule::InitInstance()
+UINT DSP::DSPThread(LPVOID pParam)
 {
-	return TRUE;
-}
-
-int DSPModule::Run()
-{
+	CAmekaDoc* mDoc = (CAmekaDoc*)(pParam);
+	uint16_t numSamples = 2000;
 	Dsp::SmoothedFilterDesign <Dsp::Butterworth::Design::BandPass <4>, LEAD_NUMBER, Dsp::DirectFormII> f (1024);
 	Dsp::Params params;
-	params[0] = sampleRate; // sample rate
-	params[1] = 4; // order
-	params[2] = CenterFre; // center frequency
-	params[3] = BandWidth; // band width
-	f.setParams (params);
+	//params[0] = sampleRate; // sample rate
+	//params[1] = 4; // order
+	//params[2] = CenterFre; // center frequency
+	//params[3] = BandWidth; // band width
+	//f.setParams (params);
 	//float* audioData[LEAD_NUMBER];
 	while (1)
 	{
-
 		Sleep(50);
+		float HighFre = mDoc->mDSP.HPFFre;
+		float LowFre = mDoc->mDSP.LPFFre;
+		float sampleRate = mDoc->mDSP.SampleRate;
+		float CenterFre = sqrt(HighFre*LowFre);
+		float BandWidth = LowFre - HighFre;
+		params[0] = sampleRate; // sample rate
+		params[1] = 4; // order
+		params[2] = CenterFre; // center frequency
+		params[3] = BandWidth; // band width
+		f.setParams (params);
 		static int count = 0;
 		count++;
 
 		float* audioData[LEAD_NUMBER];
-		RawDataType* data = theApp.pIO->RawData->popAll();
-		int size = theApp.pIO->RawData->rLen;
+		RawDataType* data = mDoc->dataBuffer->popAll();
+		int size =  mDoc->dataBuffer->rLen;
 		RawDataType* output = new RawDataType[size];
 		if (size != 0 && data != NULL)
 		{
@@ -113,10 +105,11 @@ int DSPModule::Run()
 				}
 				//LOG(INFO) << output[j].time;
 			}
-
+			//int count = theApp.dataBuffer->pushData(output, size);
+			
 			for (int i=0; i<size; i++)
 			{
-				theApp.dataBuffer->pushData(output[i]);
+				mDoc->PrimaryData->pushData(output[i]);
 			}
 			
 			for (int i=0; i<LEAD_NUMBER; i++)
@@ -125,6 +118,7 @@ int DSPModule::Run()
 			}
 			//delete [] audioData;
 			delete output;
+			delete [] data;
 		}
 	}
 	return 0;

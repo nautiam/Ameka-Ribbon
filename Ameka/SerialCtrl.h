@@ -118,6 +118,7 @@ public:
     //char m_recvBuffer[MAX_RECV_BUFFER];	// Buffer nhan
 	char m_sendBuffer[MAX_SEND_BUFFER];	// Buffer ghi
 	amekaData<char>* m_recvBuffer;
+	//AmekaData<char>* m_recvBuffer;
 	unsigned int m_sendSize;	// Kich thuoc goi truyen di
 
 	CString	m_strPortName;	// Ten cong serial com
@@ -130,6 +131,7 @@ public:
 	CString	m_strBaudRate;	// Doc baudrate tu user
     SerialCtrl m_serialCtrl;	// Goi class serialctrl voi tung serialio
 	amekaData<RawDataType>* RawData;
+	//AmekaData<RawDataType>* RawData;
 
 private:
 	BOOL Init();	// Khoi tao Serial Com

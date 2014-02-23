@@ -3,7 +3,7 @@
 #include "easylogging++.h"
 #include "DSPModule.h"
 #include <atltime.h>
-
+#include "Ameka.h"
 
 // Set cau hinh mac dinh cua cong com
 SerialCtrl::SerialCtrl(void):m_portStatus(FALSE),m_portHandle(NULL)
@@ -503,11 +503,21 @@ int ReadThread::packetProcessing()
 			if (m_serialIO->m_bState == S_CONNECTED)
 			{
 				//LOG(INFO) << temp.value[0];
-				if (m_serialIO->RawData->pushData(temp) != 0)
-				{
-					//AfxMessageBox("Error");
-					LOG(WARNING) << "Raw data buffer is full";
+				//RawDataType* data = new RawDataType[1];
+				//memcpy(data, &temp, 1*sizeof(RawDataType));
+				POSITION pos =  theApp.docList.GetHeadPosition();
+				while(pos) 
+				{ 
+					CAmekaDoc* curr = theApp.docList.GetNext(pos);
+					int count = curr->dataBuffer->pushData(temp);
 				}
+				//int count = m_serialIO->RawData->pushData(temp);
+				//delete [] data;
+				//if (count != 0)
+				//{
+				//	//AfxMessageBox("Error");
+				//	LOG(WARNING) << "Raw data buffer is full";
+				//}
 			}
 			break;
 		}
@@ -660,9 +670,9 @@ BOOL CSerialIO::Init()
 	m_readProcess->ResumeThread();
     m_writeProcess->ResumeThread();
 
-	DSPModule*  m_dspProcess;
+	/*DSPModule*  m_dspProcess;
 	m_dspProcess = (DSPModule*)AfxBeginThread(RUNTIME_CLASS(DSPModule), THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
-	m_dspProcess->ResumeThread();
+	m_dspProcess->ResumeThread();*/
 
 	return retVal;
 }

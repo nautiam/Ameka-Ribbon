@@ -11,6 +11,8 @@
 
 // Ameka.h : main header file for the Ameka application
 //
+#ifndef _AMEKA_
+#define _AMEKA_
 #pragma once
 
 #ifndef __AFXWIN_H__
@@ -25,7 +27,7 @@
 #include "AmekaDoc.h"
 
 #define portNo "COM2"
-#define baudRate "115200"
+#define BAUD_RATE "115200"
 #define settingFileName "AmekaSetting.amek"
 
 using namespace std;
@@ -49,7 +51,7 @@ public:
 	CList<LPAmontage, LPAmontage> monList;
 	CList<CAmekaDoc*, CAmekaDoc*> docList;
 	amekaData<RawDataType>* dataBuffer;
-	AmekaData<RawDataType>* dataBuf;
+	//AmekaData<RawDataType>* dataBuffer;
 	amekaLan* mnLan;
 	Aelectrode* mElec;
 	uint16_t elecNum;
@@ -84,3 +86,4 @@ public:
 };
 
 extern CAmekaApp theApp;
+#endif

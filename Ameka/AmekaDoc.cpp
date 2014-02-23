@@ -21,12 +21,15 @@
 
 #include "AmekaDoc.h"
 #include "xmlParser.h"
+#include "DSPModule.h"
 
 #include <propkey.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+#define BUFFER_LEN 1024
 
 // CAmekaDoc
 
@@ -44,11 +47,28 @@ CAmekaDoc::CAmekaDoc()
 {
 
 	// TODO: add one-time construction code here
-	
+	dataBuffer = new amekaData<RawDataType>(BUFFER_LEN);
+	PrimaryData = new amekaData<RawDataType>(BUFFER_LEN);
+	mDSP.HPFFre = 0.5;
+	mDSP.LPFFre = 30;
+	mDSP.SampleRate = 256;
+	this->m_dspProcess = AfxBeginThread(DSP::DSPThread, (LPVOID)this);
+
 }
 
 CAmekaDoc::~CAmekaDoc()
 {
+	DWORD exit_code = NULL;
+	GetExitCodeThread(this->m_dspProcess->m_hThread, &exit_code);
+
+	if(exit_code == STILL_ACTIVE)
+	{
+		::TerminateThread(this->m_dspProcess->m_hThread, 0);
+		CloseHandle(this->m_dspProcess->m_hThread);
+	}
+	m_dspProcess = NULL;
+	
+	delete PrimaryData;
 	delete dataBuffer;
 	dataBuffer = NULL;
 	POSITION pos = theApp.docList.Find(this);

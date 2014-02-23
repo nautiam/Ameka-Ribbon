@@ -30,8 +30,11 @@ public:
 	int GetCapacity();
 
 	int popData(T * pBuf, UINT nCnt);	
-	void pushData(const T * pBuf, UINT nCnt);
+	int popAll(T * pBuf);
+	int pushData(const T * pBuf, UINT nCnt);
+	int pushData(const T pBuf);
 	void Drain(const UINT nCnt);
+	T get(UINT nPos);
 	DWORD WaitForNewData(DWORD dwMilliseconds = INFINITE);
 	HANDLE GetNewDataEventHandle() const {return m_eNewData.m_hObject;}
 private:
@@ -148,6 +151,14 @@ inline int AmekaData<T>::popData(T * pBuf, UINT nCnt)
 	return _popData(pBuf, nCnt);
 }
 
+template <typename T> 
+inline int AmekaData<T>::popAll(T * pBuf)
+{	
+	CSingleLock lock(&m_cs, TRUE);
+	const int maxSize = (UINT) (m_pEnd - m_pR);
+	return _popData(pBuf, maxSize);
+}
+
 template <typename T>
 int AmekaData<T>::_popData( T * pBuf, UINT nCnt )
 {
@@ -170,14 +181,15 @@ int AmekaData<T>::_popData( T * pBuf, UINT nCnt )
 }
 
 template <typename T> 
-void AmekaData<T>::pushData(const T * pBuf, UINT nCnt)
+int AmekaData<T>::pushData(const T * pBuf, UINT nCnt)
 {
 	CSingleLock lock(&m_cs, TRUE);
 
 	const UINT nCurSize = _GetCount();
 	const UINT nMaxSize = m_pEnd - m_pBuf;
+	int ret = 0;
 	if (nCurSize >= nMaxSize ) // Do not allow new data if fifo is full
-		return;
+		ret = -1;
 	do 
 	{
 		const UINT nLen = min((UINT) (m_pEnd - m_pW), nCnt);
@@ -193,6 +205,37 @@ void AmekaData<T>::pushData(const T * pBuf, UINT nCnt)
 	} while (nCnt > 0);
 
 	m_eNewData.PulseEvent();
+	return ret;
+}
+
+template <typename T> 
+int AmekaData<T>::pushData(const T pBuf)
+{
+	CSingleLock lock(&m_cs, TRUE);
+
+	const UINT nCurSize = _GetCount();
+	const UINT nMaxSize = m_pEnd - m_pBuf;
+	int ret = 0;
+	if (nCurSize >= nMaxSize ) // Do not allow new data if fifo is full
+		ret = -1;
+
+	const UINT nLen = min((UINT) (m_pEnd - m_pW), 1);
+
+	memcpy(m_pW, &pBuf, 1*sizeof(T));
+	m_pW += nLen;
+
+	if (m_pW >= m_pEnd)
+		m_pW = m_pBuf;
+
+	m_eNewData.PulseEvent();
+	return ret;
+}
+
+template <typename T> 
+T AmekaData<T>::get(UINT nPos)
+{
+	const UINT nMaxSize = m_pEnd - m_pBuf;
+	return m_pW[nPos%nMaxSize];
 }
 
 template <typename T> 
