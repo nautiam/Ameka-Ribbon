@@ -7,6 +7,7 @@
 #include <math.h>
 #include <Windows.h>
 #include <vector>
+#include "TypedFifo.h"
 
 #ifndef _USERCONFIG_H_
 #define _USERCONFIG_H_

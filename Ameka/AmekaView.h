@@ -49,15 +49,13 @@ public:
 	virtual ~CAmekaView();
 	static CAmekaView* GetView();
 	static UINT graphHandle(LPVOID pParam);			//handle thread
-	int amekaDrawPos(CDC* pDC, CBitmap* bitmap);			//for draw current position only	
+	int amekaDrawPos(CDC* pDC);			//for draw current position only	
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
 private:
-	CBitmap bmp;
-	CBitmap Wbmp;
 	float crtPos;
 	float distance;
 	RawDataType* dataBuffer;

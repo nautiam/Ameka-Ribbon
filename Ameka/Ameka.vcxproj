@@ -120,6 +120,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="tinystr.h" />
     <ClInclude Include="tinyxml.h" />
+    <ClInclude Include="TypedFifo.h" />
     <ClInclude Include="UIModule.h" />
     <ClInclude Include="xmlParser.h" />
   </ItemGroup>

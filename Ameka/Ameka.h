@@ -49,6 +49,7 @@ public:
 	CList<LPAmontage, LPAmontage> monList;
 	CList<CAmekaDoc*, CAmekaDoc*> docList;
 	amekaData<RawDataType>* dataBuffer;
+	AmekaData<RawDataType>* dataBuf;
 	amekaLan* mnLan;
 	Aelectrode* mElec;
 	uint16_t elecNum;

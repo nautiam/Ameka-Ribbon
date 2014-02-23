@@ -91,6 +91,7 @@ CAmekaApp::CAmekaApp()
 	mnLan = new amekaLan();
 	//init buffer
 	dataBuffer = new amekaData<RawDataType>(4096);
+	dataBuf = new AmekaData<RawDataType>(4096);
 
 	//initialize log
 	el::Configurations defaultConf;
@@ -675,14 +676,15 @@ UINT genData(LPVOID pParam)
 {
 	while(1)
 	{
-		RawDataType data;
-		data.time = 0;
+		RawDataType* data = new RawDataType[1];
+		data->time = 0;
 		for (int i = 0; i < 15; i++)
 		{
-			data.value[i] = rand()%100;
+			data->value[i] = rand()%100;
 		}
-		theApp.dataBuffer->pushData(data);
+		theApp.dataBuf->pushData(data, 1);
 		Sleep(3);
+		delete[] data;
 	}
 	return 0;
 }
@@ -690,6 +692,7 @@ UINT genData(LPVOID pParam)
 //Demo Graph
 void CAmekaApp::OnDemo()
 {
+	AfxBeginThread(genData, NULL);
 
 	CAmekaView *pView = CAmekaView::GetView();
 	if (!pView->isRunning)
@@ -697,7 +700,6 @@ void CAmekaApp::OnDemo()
 		pView->pThread = AfxBeginThread(pView->graphHandle, (LPVOID)pView);
 	}	pView->isRunning = true;
 	
-	AfxBeginThread(genData, NULL);
 	/*
 	if ((theApp.pIO != NULL) && (theApp.pIO->m_bState == S_CONNECTED))
 	{

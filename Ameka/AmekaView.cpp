@@ -22,6 +22,7 @@
 #include "AmekaDoc.h"
 #include "AmekaView.h"
 #include <stdint.h>
+#include "easylogging++.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -103,13 +104,14 @@ BOOL CAmekaView::PreCreateWindow(CREATESTRUCT& cs)
 
 void CAmekaView::OnDraw(CDC* pDC)
 {
+	CBitmap Wbmp;
 	CAmekaDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return;
 
 	CView::OnDraw(pDC);
-	/*
+	
 	CDC MemDC;
 	MemDC.CreateCompatibleDC(pDC);
 
@@ -208,7 +210,7 @@ void CAmekaView::OnDraw(CDC* pDC)
 	//DeleteObject(Wbmp);
 	//DeleteObject(pOldBmp);
 	// TODO: add draw code for native data here
-	*/
+	
 }
 
 
@@ -223,34 +225,35 @@ UINT CAmekaView::graphHandle(LPVOID pParam)
 	int ret;
 	while(1)
 	{
-		ret = pnt->amekaDrawPos(pdc, &pnt->bmp);
+		ret = pnt->amekaDrawPos(pdc);
+		/*
 		if(ret == -1)
 			return -1;
+			*/
 		::Sleep(timeSleep);
 	}
 	return 0;
 }
 
-int CAmekaView::amekaDrawPos(CDC* pDC, CBitmap* bitmap)
+int CAmekaView::amekaDrawPos(CDC* pDC)
 {
 	//TBD
-	
+	CBitmap bitmap;
 	CDC MemDC;
-	RawDataType* data;
+	RawDataType* data = new RawDataType[dataNum];
 	uint16_t buflen = 0;
-	/*
+	
 	if (pDC == NULL)
 		return -1;
-	*/
+	
 	//data = theApp.pIO->RawData->popData(dataNum);
 	//CAmekaDoc *doc = CAmekaDoc::GetDoc();
 	
-	data = theApp.dataBuffer->popData(dataNum);
-	if (data != NULL)
-		 buflen = theApp.dataBuffer->rLen;
+	buflen = theApp.dataBuf->popData(data, dataNum);
 	if ((buflen <= 0) || (data == NULL))
 		return -2;
-	/*
+	
+	
 	if (isNull)
 	{
 		prePos = data[buflen - 1];
@@ -278,8 +281,13 @@ int CAmekaView::amekaDrawPos(CDC* pDC, CBitmap* bitmap)
 	CRect rect;
     GetClientRect(&rect);
 
-	if(NULL == bitmap->CreateCompatibleBitmap(pDC, distance * buflen + scanBarW, rect.Height()))
+	if(NULL == bitmap.CreateCompatibleBitmap(&MemDC, distance * buflen + scanBarW, rect.Height()))
+	{
+		DWORD tmp = GetLastError();
+		LOG(ERROR) << static_cast <int>(tmp);
+
 		return -1;
+	}
 
 	MemDC.SelectObject(bitmap);
 	
@@ -343,7 +351,7 @@ int CAmekaView::amekaDrawPos(CDC* pDC, CBitmap* bitmap)
 	//CBrush* pOldBrush1 = MemDC.SelectObject(&brushS);
 	MemDC.FillRect(CRect(distance * buflen, 0, distance * buflen + scanBarW, rect.Height()),&brushS);
 	
-	pDC->BitBlt(0, 0, distance * buflen + scanBarW, rect.Height(), &MemDC, 0, 0, SRCCOPY);
+	pDC->BitBlt(crtPos, 0, distance * buflen + scanBarW, rect.Height(), &MemDC, 0, 0, SRCCOPY);
 	
 	prePos = data[buflen-1];
 	
@@ -354,9 +362,10 @@ int CAmekaView::amekaDrawPos(CDC* pDC, CBitmap* bitmap)
 	//DeleteObject(brushS);
 	//DeleteObject(brush);
 	//DeleteObject(bitmap);
-	
+	delete[] data;
+	DeleteObject(bitmap);
 	return 0;
-	*/
+	
 }
 
 CAmekaView * CAmekaView::GetView()
