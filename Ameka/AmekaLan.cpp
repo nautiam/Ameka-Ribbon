@@ -12,15 +12,15 @@
 CString itoS ( int x)
 {
 	CString sout;
-	sout.Format("%i", x);
+	sout.Format(L"%i", x);
 
 	return sout;
 }
 
-void loadLanguage(CString fileName)
+void loadLanguage(const char* fileName)
 {
 	TiXmlDocument doc;
-	if(!doc.LoadFile(fileName))
+	if(!doc.LoadFile((LPCSTR)(CStringA)fileName))
 	{
 		LOG(ERROR) << doc.ErrorDesc();
 		return;
@@ -122,7 +122,7 @@ void loadLanguage(CString fileName)
 	doc.Clear();
 };
 
-void loadSetting(CString fileName)
+void loadSetting(const char* fileName)
 {
 	TiXmlDocument doc;
 	if(!doc.LoadFile(fileName))
@@ -142,8 +142,8 @@ void loadSetting(CString fileName)
 
 	for(TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
 	{
-		CString tmp = elem->Attribute("Name");
-		if (tmp == "lead")
+		const char* tmp = elem->Attribute("Name");
+		if (strcmp(tmp,"lead") == 0)
 		{
 			for(TiXmlElement* e = elem->FirstChildElement(); e != NULL; e = e->NextSiblingElement())
 			{
@@ -159,8 +159,8 @@ void loadSetting(CString fileName)
 	iCount = 0;
 	for(TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
 	{		
-		CString tmp = elem->Attribute("Name");
-		if (tmp == "lead")
+		const char* tmp = elem->Attribute("Name");
+		if (strcmp(tmp, "lead") == 0)
 		{
 			for(TiXmlElement* e = elem->FirstChildElement(); e != NULL; e = e->NextSiblingElement())
 			{
@@ -178,12 +178,12 @@ CString getElecName(uint16_t num)
 	for (int i = 0; i < theApp.elecNum; i++)
 		if (theApp.mElec[i].eID == num)
 			return theApp.mElec[i].eName;
-	return "";
+	return L"";
 }
 
-void writeSetting(CString fileName)
+void writeSetting(const char* fileName)
 {		
-	CString tempElecName[16] = {"ml", "cd1", "cd2", "tf1", "f2", "tf2", "tf3", "ld", "ss", "ss2", "se3", "af", "af1", "af2", "af3", "af4"};
+	CString tempElecName[16] = {L"ml", L"cd1", L"cd2", L"tf1", L"f2", L"tf2", L"tf3", L"ld", L"ss", L"ss2", L"se3", L"af", L"af1", L"af2", L"af3", L"af4"};
 	TiXmlDocument doc;
 	TiXmlElement* root = new TiXmlElement("root");
 	doc.LinkEndChild(root);
@@ -193,9 +193,9 @@ void writeSetting(CString fileName)
 	root->LinkEndChild(element);
 	for (int i = 0; i < 16; i++)
 	{
-		TiXmlElement* element1 = new TiXmlElement(itoS(i+1));
+		TiXmlElement* element1 = new TiXmlElement((LPCSTR)(CStringA)itoS(i+1));
 		element->LinkEndChild(element1);
-		element1->SetAttribute("Name", tempElecName[i]);
+		element1->SetAttribute("Name", (LPCSTR)(CStringA)tempElecName[i]);
 	}
 
 	bool success = doc.SaveFile(fileName);

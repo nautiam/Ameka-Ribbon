@@ -85,8 +85,9 @@ END_MESSAGE_MAP()
 CAmekaApp::CAmekaApp()
 {
 	//init electrode name
-	writeSetting(settingName);
-	loadSetting(settingName);
+	const char* setFileName = settingName;
+	writeSetting(setFileName);
+	loadSetting(setFileName);
 	//init Language
 	mnLan = new amekaLan();
 	//init buffer
@@ -129,8 +130,8 @@ CAmekaApp::CAmekaApp()
 			if (attr1 != "" && attr2 != "")
 			{
 				LPAlead lead = new Alead();
-				lead->lFirstID = atoi(attr1);
-				lead->lSecondID = atoi(attr2);
+				lead->lFirstID = atoi((LPCSTR)(CStringA)attr1);
+				lead->lSecondID = atoi((LPCSTR)(CStringA)attr2);
 				mon->mList.AddTail(lead);
 			}
 		}
@@ -741,7 +742,7 @@ void CAmekaApp::OnStop()
 vector<string> Tokenize(CString buf, string delimiters = " ")
 {   
     vector<string> tokens;
-	std::string str = buf.GetBuffer(buf.GetLength());
+	std::string str = (LPCSTR)buf.GetBuffer(buf.GetLength());
     string::size_type nwpos; //position of first non white space, which means it is     first real char
     nwpos = str.find_first_not_of(delimiters, 0); //ignore the whitespace before the first word
 
@@ -847,7 +848,7 @@ int CMontageDlg::OnInitDialog()
 		if (doc != NULL && mon->mName == doc->mMon->mName)
 			flag = TRUE;
 	}
-	mon_lName.SetWindowTextA(crtMon->mName);
+	mon_lName.SetWindowTextW(crtMon->mName);
 	pos =  crtMon->mList.GetHeadPosition();
 	for (int i = 0; i < crtMon->mList.GetCount(); i++)
 	{
@@ -995,11 +996,11 @@ CTabRecDlg::CTabRecDlg() : CDialogEx(CTabRecDlg::IDD)
 int CTabRecDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	TCHAR szDirectory[MAX_PATH] = "";
+	TCHAR szDirectory[MAX_PATH] = L"";
 	::GetCurrentDirectory(sizeof(szDirectory) - 1, szDirectory);
 
-	rec_ed_eeg.SetWindowTextA(szDirectory);
-	rec_ed_video.SetWindowTextA(szDirectory);
+	rec_ed_eeg.SetWindowTextW(szDirectory);
+	rec_ed_video.SetWindowTextW(szDirectory);
 
 	return 0;
 }
@@ -1092,10 +1093,10 @@ CTabViewDlg::CTabViewDlg() : CDialogEx(CTabViewDlg::IDD)
 int CTabViewDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	m_view_sen.SetWindowTextA(theApp.m_sensitivity);
-	m_view_speed.SetWindowTextA(theApp.m_speed);
-	m_view_lp.SetWindowTextA(theApp.m_LP);
-	m_view_hp.SetWindowTextA(theApp.m_HP);
+	m_view_sen.SetWindowTextW(theApp.m_sensitivity);
+	m_view_speed.SetWindowTextW(theApp.m_speed);
+	m_view_lp.SetWindowTextW(theApp.m_LP);
+	m_view_hp.SetWindowTextW(theApp.m_HP);
 	return 0;
 }
 
@@ -1174,9 +1175,9 @@ void COptionDlg::DoDataExchange(CDataExchange* pDX)
 int COptionDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-    tab_ctrl.InsertItem(0,"Tables");
-	tab_ctrl.InsertItem(1,"Events");
-	tab_ctrl.InsertItem(2,"Recording");
+    tab_ctrl.InsertItem(0,L"Tables");
+	tab_ctrl.InsertItem(1,L"Events");
+	tab_ctrl.InsertItem(2,L"Recording");
 
 	mDlg[0] = new CTabViewDlg;
 	mDlg[1] = new CTabEventDlg;
@@ -1248,13 +1249,13 @@ void CMontageDlg::OnBnClickedOk()
 	while (pos)
 	{
 		LPAmontage mon =  theApp.monList.GetNext( pos );
-		TiXmlElement* element = new TiXmlElement(mon->mName);
+		TiXmlElement* element = new TiXmlElement((LPCSTR)(CStringA)mon->mName);
 		root->LinkEndChild(element);
 		POSITION pos1 =  mon->mList.GetHeadPosition();
 		while (pos1)
 		{
 			LPAlead lead = mon->mList.GetNext( pos1 );
-			TiXmlElement* element1 = new TiXmlElement(mon->mName);
+			TiXmlElement* element1 = new TiXmlElement((LPCSTR)(CStringA)mon->mName);
 			element->LinkEndChild(element1);
 			element1->SetAttribute("channel1", lead->lFirstID);
 			element1->SetAttribute("channel2", lead->lSecondID);
@@ -1375,7 +1376,7 @@ void COptionDlg::OnBnClickedok()
 	pSen->RemoveAllItems();
 	vector<string> vecSen = Tokenize(theApp.m_sensitivity," ");
 	for (vector<string>::iterator it = vecSen.begin(); it != vecSen.end(); it++) {
-		pSen->AddItem((*it).c_str(),count++);
+		pSen->AddItem((LPCTSTR)(*it).c_str(),count++);
 	}
 	pSen->SetEditText(itoS(view->graphData.scaleRate));
 	//Set items for LowPassFilter
@@ -1385,7 +1386,7 @@ void COptionDlg::OnBnClickedok()
 	pSpeed->RemoveAllItems();
 	vector<string> vecSpeed = Tokenize(theApp.m_speed," ");
 	for (vector<string>::iterator it = vecSpeed.begin(); it != vecSpeed.end(); it++) {
-		pSpeed->AddItem((*it).c_str(),count++);
+		pSpeed->AddItem((LPCTSTR)(*it).c_str(),count++);
 	}
 	pSpeed->SetEditText(itoS(view->graphData.paperSpeed));
 	//Set items for LowPassFilter
@@ -1395,7 +1396,7 @@ void COptionDlg::OnBnClickedok()
 	pLP->RemoveAllItems();
 	vector<string> vecLP = Tokenize(theApp.m_LP," ");
 	for (vector<string>::iterator it = vecLP.begin(); it != vecLP.end(); it++) {
-		pLP->AddItem((*it).c_str(),count++);
+		pLP->AddItem((LPCTSTR)(*it).c_str(),count++);
 	}
 	//pLP->SetEditText(itoS(view->graphData.));
 	//Set items for LowPassFilter
@@ -1405,7 +1406,7 @@ void COptionDlg::OnBnClickedok()
 	pHP->RemoveAllItems();
 	vector<string> vecHP = Tokenize(theApp.m_HP," ");
 	for (vector<string>::iterator it = vecHP.begin(); it != vecHP.end(); it++) {
-		pHP->AddItem((*it).c_str(),count++);
+		pHP->AddItem((LPCTSTR)(*it).c_str(),count++);
 	}
 
 	EndDialog(0);
@@ -1420,7 +1421,7 @@ void CTabRecDlg::OnBnClickedeeg()
 	if ( dlgFolder.DoModal() == IDOK )
 	{
 		CString tmp = dlgFolder.GetFolderPath();
-		rec_ed_eeg.SetWindowTextA(tmp);
+		rec_ed_eeg.SetWindowTextW(tmp);
 	}
 }
 
@@ -1433,7 +1434,7 @@ void CTabRecDlg::OnBnClickedvideo()
 	if ( dlgFolder.DoModal() == IDOK )
 	{
 		CString tmp = dlgFolder.GetFolderPath();
-		rec_ed_video.SetWindowTextA(tmp);
+		rec_ed_video.SetWindowTextW(tmp);
 	}
 }
 
@@ -1441,10 +1442,10 @@ void CTabRecDlg::OnBnClickedvideo()
 void CTabViewDlg::OnBnClickedbtdef()
 {
 	// TODO: Add your control notification handler code here
-	m_view_sen.SetWindowTextA(strSen);
-	m_view_speed.SetWindowTextA(strSpeed);
-	m_view_lp.SetWindowTextA(strLP);
-	m_view_hp.SetWindowTextA(strHP);
+	m_view_sen.SetWindowTextW((LPCTSTR)strSen);
+	m_view_speed.SetWindowTextW((LPCTSTR)strSpeed);
+	m_view_lp.SetWindowTextW((LPCTSTR)strLP);
+	m_view_hp.SetWindowTextW((LPCTSTR)strHP);
 }
 
 void CMontageDlg::OnBnClickedadd()
@@ -1520,7 +1521,7 @@ void CAmekaApp::OnPortOpen()
 
 	//PortOpen portDlg;
 	//portDlg.DoModal();
-	CString portFullName = "\\\.\\" + m_portNo;
+	CString portFullName = L"\\\.\\" + m_portNo;
 	//MessageBox("Opening Port " + portFullName,"Info",0);
 	pIO = new CSerialIO(portFullName, m_baudRate);
 
@@ -1546,7 +1547,7 @@ void CAmekaApp::OnScan()
 			str.Format(_T("%d"),i);
 			CString ComName=CString("COM") + CString(str); // converting to COM0, COM1, COM2
         
-			test = QueryDosDevice(ComName, (LPSTR)lpTargetPath, 5000);
+			test = QueryDosDevice(ComName, (LPWSTR)lpTargetPath, 5000);
 
 				// Test the return value and error if any
 			if(test!=0) //QueryDosDevice returns zero if it didn't find an object
@@ -1562,7 +1563,7 @@ void CAmekaApp::OnScan()
 			}
 		}
 		if(!gotPort) // if not port
-			pPort->SetEditText("N.A"); // to display error message incase no ports 
+			pPort->SetEditText(L"N.A"); // to display error message incase no ports 
 		else
 		{
 			//pPort->SetEditText(pPort->GetItem(0));
@@ -1576,16 +1577,18 @@ void CAmekaApp::OnScan()
 void CAmekaApp::OnLan()
 {
 	// Create an instance First
-	CFileDialog fOpenDlg(TRUE, ".txt", NULL, OFN_HIDEREADONLY|OFN_FILEMUSTEXIST, "Ameka Language Files (*.xml)|*.xml||");
+	CFileDialog fOpenDlg(TRUE, L".txt", NULL, OFN_HIDEREADONLY|OFN_FILEMUSTEXIST, L"Ameka Language Files (*.xml)|*.xml||");
 
 	// Initializes m_pOFN structure
-	fOpenDlg.m_pOFN->lpstrTitle="Ameka Language File";
+	fOpenDlg.m_pOFN->lpstrTitle=L"Ameka Language File";
 
 	// Call DoModal
 
 	if(fOpenDlg.DoModal()==IDOK)
 	{
-		CString fileName = fOpenDlg.GetPathName();
+		CString tmp = fOpenDlg.GetPathName();
+		CStringA tmp1(tmp);
+		const char* fileName = (LPCSTR)tmp1;
 		loadLanguage(fileName);
 		// Do something useful here
 	}

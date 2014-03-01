@@ -39,12 +39,12 @@ HANDLE SerialCtrl::GetPortHandle(void)
 }
 
 // Mo cong voi cau hinh da co
-BOOL SerialCtrl::OpenPort(DCB dcb, const char * portName)
+BOOL SerialCtrl::OpenPort(DCB dcb, CString portName)
 {
 
 	if (m_portStatus == FALSE)  // if port is opened already, not open port again.
 	{
-		m_portHandle = CreateFile(portName,  // Specify port device: default "COM1"
+		m_portHandle = CreateFile((LPCTSTR)portName,  // Specify port device: default "COM1"
 			GENERIC_READ | GENERIC_WRITE,       // Specify mode that open device.
 			0,                                  // the devide isn't shared.
 			NULL,                               // the object gets a default security.
@@ -96,13 +96,13 @@ BOOL SerialCtrl::OpenPort(DCB dcb, const char * portName)
 }
 
 // Doc cau hinh tu user va goi mo cong
-BOOL SerialCtrl::OpenPort(const char * baudRate, const char * portName)
+BOOL SerialCtrl::OpenPort(CString baudRate, CString portName)
 {
 	DCB configSerial;
 	configSerial.ByteSize = 8;
 	configSerial.StopBits = ONESTOPBIT;
 	configSerial.Parity = NOPARITY;
-	switch(atoi(baudRate))
+	switch(atoi((LPCSTR)(CStringA)baudRate))
 	{
 	case 110:
 		configSerial.BaudRate = CBR_110;
@@ -186,7 +186,7 @@ BOOL SerialCtrl::Read(char * inputData, const unsigned int & sizeBuffer, unsigne
 	return TRUE;
 }
 
-BOOL SerialCtrl::Write(const char * outputData, const unsigned int & sizeBuffer, unsigned long & length)
+BOOL SerialCtrl::Write(CString outputData, const unsigned int & sizeBuffer, unsigned long & length)
 {
 	if (length > 0)
 	{
@@ -258,7 +258,7 @@ int ReadThread::Run()
 	{
         if(m_serialIO->m_bState == S_UNINITTIALZED)
         {
-            if(m_serialIO->m_serialCtrl.OpenPort(m_serialIO->m_DCB,m_serialIO->m_strPortName)==TRUE)
+            if(m_serialIO->m_serialCtrl.OpenPort(m_serialIO->m_DCB,(m_serialIO->m_strPortName))==TRUE)
             {
                 /* Chuyen trang thai State */
                 m_serialIO->m_bState = S_NOCONNECTED;
@@ -349,7 +349,7 @@ int ReadThread::Run()
 				{
 					m_serialIO->m_bState = S_UNINITTIALZED;
 					m_serialIO->m_serialCtrl.ClosePort();
-					AfxMessageBox("The program has problem. Please close and reopen the program.");
+					AfxMessageBox(L"The program has problem. Please close and reopen the program.");
 					LOG(INFO) << "Close port and reopen port";
 				}
 
@@ -400,7 +400,7 @@ int ReadThread::Run()
 			{
 				m_serialIO->m_bState = S_UNINITTIALZED;
 				m_serialIO->m_serialCtrl.ClosePort();
-				AfxMessageBox("The program has problem. Please close and reopen the program.");
+				AfxMessageBox(L"The program has problem. Please close and reopen the program.");
 				LOG(INFO) << "Close port and reopen port";
 			}           
         }
@@ -551,7 +551,7 @@ int WriteThread::Run()
 		WaitForSingleObject(m_serialIO->m_WriteEvent, INFINITE);	// Doi su kien Write Event vo han
         if((m_serialIO->m_bState == S_CONNECTED) || (m_serialIO->m_bState == S_NOCONNECTED))
         {
-            if(m_serialIO->m_serialCtrl.Write(m_serialIO->m_sendBuffer,m_serialIO->m_sendSize,nWritten) == FALSE)
+            if(m_serialIO->m_serialCtrl.Write((LPCTSTR)m_serialIO->m_sendBuffer,m_serialIO->m_sendSize,nWritten) == FALSE)
             {
                 // TODO add code here : Ghi log file system error
 				LOG(ERROR) << "System Error: Write data has problem";
@@ -617,7 +617,7 @@ BOOL CSerialIO::Init()
 	m_DCB.ByteSize = 8;
 	m_DCB.StopBits = ONESTOPBIT;
 	m_DCB.Parity = NOPARITY;
-	switch(atoi(m_strBaudRate))
+	switch(atoi((LPCSTR)(CStringA)m_strBaudRate))
 	{
 	case 110:
 		m_DCB.BaudRate = CBR_110;

@@ -29,7 +29,7 @@ int saveXML(CString filename)
 	element2->SetAttribute("channel1", "1");
 	element2->SetAttribute("channel2", "3");
 
-	bool success = doc.SaveFile(filename);
+	bool success = doc.SaveFile((LPCSTR)(CStringA)filename);
 	doc.Clear();
 	if(success)
 		return SUCCESS;

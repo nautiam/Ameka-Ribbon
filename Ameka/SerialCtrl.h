@@ -44,10 +44,10 @@ public:
 	void SetPortStatus(BOOL bOnOff);	// Dat trang thai cong
 	BOOL GetPortStatus(void);			// Lay trang thai cong
 	HANDLE GetPortHandle(void);			// Doc xu ly cong
-	BOOL OpenPort(DCB dcb, const char * portName="COM1");	// Mo cong voi tham so da co
-	BOOL OpenPort(const char * baudRate="115200", const char * portName="COM1");	// Doc cau hinh cong voi tham so truyen tu ngoai va mo cong
+	BOOL OpenPort(DCB dcb, CString portName=L"COM1");	// Mo cong voi tham so da co
+	BOOL OpenPort(CString baudRate=L"115200", CString portName=L"COM1");	// Doc cau hinh cong voi tham so truyen tu ngoai va mo cong
 	BOOL Read(char * inputData, const unsigned int & sizeBuffer, unsigned long & length);	// Khai bao mot vung nho de doc du lieu tu serial com
-	BOOL Write(const char *outputData, const unsigned int & sizeBuffer, unsigned long & length);	// Khai bao mot vung nho de ghi du lieu vao serial com
+	BOOL Write(CString outputData, const unsigned int & sizeBuffer, unsigned long & length);	// Khai bao mot vung nho de ghi du lieu vao serial com
 	BOOL ClosePort(void);	// Dong cong
     BOOL SetPortEvent(DWORD Event);	// Dat su kien cho cong, (EV_RXCHAR: Nhan duoc bat cu du lieu)
 };

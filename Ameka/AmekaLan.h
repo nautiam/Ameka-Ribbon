@@ -5,13 +5,13 @@
 
 CString itoS ( int x);
 
-void loadLanguage(CString fileName);
+void loadLanguage(const char* fileName);
 
-void loadSetting(CString fileName);
+void loadSetting(const char* fileName);
 
 CString getElecName(uint16_t num);
 
-void writeLan(CString fileName);
+void writeLan(const char* fileName);
 
-void writeSetting(CString fileName);
+void writeSetting(const char* fileName);
 #endif

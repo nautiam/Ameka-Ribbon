@@ -119,10 +119,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		pSen->RemoveAllItems();
 		vector<string> vecSen = Tokenize(theApp.m_sensitivity," ");
 		for (vector<string>::iterator it = vecSen.begin(); it != vecSen.end(); it++) {
-			pSen->AddItem((*it).c_str(),count++);
+			pSen->AddItem((LPCTSTR)(*it).c_str(),count++);
 		}
 	}
-	pSen->SetEditText("30");
+	pSen->SetEditText(L"30");
 	//Set items for LowPassFilter
 	count = 0;
 	CMFCRibbonComboBox* pSpeed = DYNAMIC_DOWNCAST(
@@ -132,10 +132,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		pSpeed->RemoveAllItems();
 		vector<string> vecSpeed = Tokenize(theApp.m_speed," ");
 		for (vector<string>::iterator it = vecSpeed.begin(); it != vecSpeed.end(); it++) {
-			pSpeed->AddItem((*it).c_str(),count++);
+			pSpeed->AddItem((LPCTSTR)(*it).c_str(),count++);
 		}
 	}
-	pSpeed->SetEditText("75");
+	pSpeed->SetEditText(L"75");
 	//Set items for LowPassFilter
 	count = 0;
 	CMFCRibbonComboBox* pLP = DYNAMIC_DOWNCAST(
@@ -145,10 +145,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		pLP->RemoveAllItems();
 		vector<string> vecLP = Tokenize(theApp.m_LP," ");
 		for (vector<string>::iterator it = vecLP.begin(); it != vecLP.end(); it++) {
-			pLP->AddItem((*it).c_str(),count++);
+			pLP->AddItem((LPCTSTR)(*it).c_str(),count++);
 		}
 	}
-	pLP->SetEditText("15");
+	pLP->SetEditText(L"15");
 	//Set items for HighPassFilter
 	count = 0;
 	CMFCRibbonComboBox* pHP = DYNAMIC_DOWNCAST(
@@ -158,10 +158,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		pHP->RemoveAllItems();
 		vector<string> vecHP = Tokenize(theApp.m_HP," ");
 		for (vector<string>::iterator it = vecHP.begin(); it != vecHP.end(); it++) {
-			pHP->AddItem((*it).c_str(),count++);
+			pHP->AddItem((LPCTSTR)(*it).c_str(),count++);
 		}
 	}
-	pHP->SetEditText("3");
+	pHP->SetEditText(L"3");
 
 	//show port list
     TCHAR lpTargetPath[5000]; // buffer to store the path of the COMPORTS
@@ -177,7 +177,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			str.Format(_T("%d"),i);
 			CString ComName=CString("COM") + CString(str); // converting to COM0, COM1, COM2
         
-			test = QueryDosDevice(ComName, (LPSTR)lpTargetPath, 5000);
+			test = QueryDosDevice(ComName, (LPWSTR)lpTargetPath, 5000);
 
 				// Test the return value and error if any
 			if(test!=0) //QueryDosDevice returns zero if it didn't find an object
@@ -193,7 +193,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			}
 		}
 		if(!gotPort) // if not port
-			pPort->SetEditText("N.A"); // to display error message incase no ports 
+			pPort->SetEditText(L"N.A"); // to display error message incase no ports 
 		else
 		{
 			//pPort->SetEditText(pPort->GetItem(0));
@@ -205,11 +205,11 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CMFCRibbonComboBox, m_wndRibbonBar.FindByID(MN_Baud));
 	if (pBaud != NULL)
 	{
-		pBaud->AddItem("9600");
-		pBaud->AddItem("19200");
-		pBaud->AddItem("38400");
-		pBaud->AddItem("56000");
-		pBaud->AddItem("115200");
+		pBaud->AddItem(L"9600");
+		pBaud->AddItem(L"19200");
+		pBaud->AddItem(L"38400");
+		pBaud->AddItem(L"56000");
+		pBaud->AddItem(L"115200");
 		//pBaud->SetEditText("115200");
 		pBaud->SelectItem(4);
 	}
@@ -397,7 +397,7 @@ void CMainFrame::OnScalerate()
     {
         CString item=pScale->GetItem(nCurSel);
 		CAmekaView* pView = CAmekaView::GetView();
-		pView->graphData.scaleRate = atoi(item);
+		pView->graphData.scaleRate = atoi((LPCSTR)(CStringA)item);
 		pView->OnDraw(pView->GetDC());
     }
     else
@@ -418,7 +418,7 @@ void CMainFrame::OnSpeedrate()
     {
         CString item=pScale->GetItem(nCurSel);
 		CAmekaView* pView = CAmekaView::GetView();
-		pView->graphData.paperSpeed = atoi(item);
+		pView->graphData.paperSpeed = atoi((LPCSTR)(CStringA)item);
 		pView->OnDraw(pView->GetDC());
     }
     else
