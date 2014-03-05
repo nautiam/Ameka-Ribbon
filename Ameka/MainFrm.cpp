@@ -119,7 +119,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		pSen->RemoveAllItems();
 		vector<string> vecSen = Tokenize(theApp.m_sensitivity," ");
 		for (vector<string>::iterator it = vecSen.begin(); it != vecSen.end(); it++) {
-			pSen->AddItem((LPCTSTR)(*it).c_str(),count++);
+			CString cs((*it).c_str());
+			pSen->AddItem(cs,count++);
 		}
 	}
 	pSen->SetEditText(L"30");
@@ -132,7 +133,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		pSpeed->RemoveAllItems();
 		vector<string> vecSpeed = Tokenize(theApp.m_speed," ");
 		for (vector<string>::iterator it = vecSpeed.begin(); it != vecSpeed.end(); it++) {
-			pSpeed->AddItem((LPCTSTR)(*it).c_str(),count++);
+			CString cs((*it).c_str());
+			pSpeed->AddItem(cs,count++);
 		}
 	}
 	pSpeed->SetEditText(L"75");
@@ -145,7 +147,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		pLP->RemoveAllItems();
 		vector<string> vecLP = Tokenize(theApp.m_LP," ");
 		for (vector<string>::iterator it = vecLP.begin(); it != vecLP.end(); it++) {
-			pLP->AddItem((LPCTSTR)(*it).c_str(),count++);
+			CString cs((*it).c_str());
+			pLP->AddItem(cs,count++);
 		}
 	}
 	pLP->SetEditText(L"15");
@@ -158,7 +161,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		pHP->RemoveAllItems();
 		vector<string> vecHP = Tokenize(theApp.m_HP," ");
 		for (vector<string>::iterator it = vecHP.begin(); it != vecHP.end(); it++) {
-			pHP->AddItem((LPCTSTR)(*it).c_str(),count++);
+			CString cs((*it).c_str());
+			pHP->AddItem(cs,count++);
 		}
 	}
 	pHP->SetEditText(L"3");

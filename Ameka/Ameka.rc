@@ -393,15 +393,15 @@ BEGIN
     DEFPUSHBUTTON   "ÐôÌng yì",IDOK,251,239,50,14
     PUSHBUTTON      "HuÒy",IDCANCEL,310,239,50,14
     CONTROL         "",mon_pic,"Static",SS_BLACKFRAME | WS_BORDER,132,24,217,183
-    LISTBOX         IDC_LIST3,7,22,113,206,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_LIST3,7,22,113,206,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Tên",IDC_STATIC,7,245,13,8
     COMBOBOX        mon_name,28,240,91,58,CBS_DROPDOWN | CBS_SORT | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Lýu laòi ...",mon_save,131,239,50,14
     COMBOBOX        mon_1,163,215,48,79,CBS_DROPDOWN | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        mon_2,253,215,48,77,CBS_DROPDOWN | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Thêm",mon_add,310,214,50,14
-    LTEXT           "Electrode 1",IDC_STATIC,125,216,37,8
-    LTEXT           "Electrode 2",IDC_STATIC,215,216,37,8
+    LTEXT           "Ði?n c?c 1",IDC_STATIC,126,218,35,8
+    LTEXT           "Ði?n c?c 2",IDC_STATIC,215,218,35,8
 END
 
 DLG_Opt_COM DIALOGEX 0, 0, 270, 157
@@ -695,75 +695,6 @@ BEGIN
 0x3635, 0x3030, 0x0030, 
     opt_com_baud, 0x403, 7, 0
 0x3131, 0x3235, 0x3030, "\000" 
-    0
-END
-
-DLG_Montage DLGINIT
-BEGIN
-    mon_1, 0x403, 2, 0
-0x0031, 
-    mon_1, 0x403, 2, 0
-0x0032, 
-    mon_1, 0x403, 2, 0
-0x0033, 
-    mon_1, 0x403, 2, 0
-0x0034, 
-    mon_1, 0x403, 2, 0
-0x0035, 
-    mon_1, 0x403, 2, 0
-0x0036, 
-    mon_1, 0x403, 2, 0
-0x0037, 
-    mon_1, 0x403, 2, 0
-0x0038, 
-    mon_1, 0x403, 2, 0
-0x0039, 
-    mon_1, 0x403, 3, 0
-0x3031, "\000" 
-    mon_1, 0x403, 3, 0
-0x3131, "\000" 
-    mon_1, 0x403, 3, 0
-0x3231, "\000" 
-    mon_1, 0x403, 3, 0
-0x3331, "\000" 
-    mon_1, 0x403, 3, 0
-0x3431, "\000" 
-    mon_1, 0x403, 3, 0
-0x3531, "\000" 
-    mon_1, 0x403, 3, 0
-0x3631, "\000" 
-    mon_2, 0x403, 2, 0
-0x0031, 
-    mon_2, 0x403, 2, 0
-0x0032, 
-    mon_2, 0x403, 2, 0
-0x0033, 
-    mon_2, 0x403, 2, 0
-0x0034, 
-    mon_2, 0x403, 2, 0
-0x0035, 
-    mon_2, 0x403, 2, 0
-0x0036, 
-    mon_2, 0x403, 2, 0
-0x0037, 
-    mon_2, 0x403, 2, 0
-0x0038, 
-    mon_2, 0x403, 2, 0
-0x0039, 
-    mon_2, 0x403, 3, 0
-0x3031, "\000" 
-    mon_2, 0x403, 3, 0
-0x3131, "\000" 
-    mon_2, 0x403, 3, 0
-0x3231, "\000" 
-    mon_2, 0x403, 3, 0
-0x3331, "\000" 
-    mon_2, 0x403, 3, 0
-0x3431, "\000" 
-    mon_2, 0x403, 3, 0
-0x3531, "\000" 
-    mon_2, 0x403, 3, 0
-0x3631, "\000" 
     0
 END
 

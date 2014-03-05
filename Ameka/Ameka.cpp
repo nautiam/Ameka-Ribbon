@@ -86,7 +86,7 @@ CAmekaApp::CAmekaApp()
 {
 	//init electrode name
 	const char* setFileName = settingName;
-	writeSetting(setFileName);
+	//writeSetting(setFileName);
 	loadSetting(setFileName);
 	//init Language
 	mnLan = new amekaLan();
@@ -742,7 +742,8 @@ void CAmekaApp::OnStop()
 vector<string> Tokenize(CString buf, string delimiters = " ")
 {   
     vector<string> tokens;
-	std::string str = (LPCSTR)buf.GetBuffer(buf.GetLength());
+	CT2CA pszConvertedAnsiString (buf);
+	std::string str(pszConvertedAnsiString);
     string::size_type nwpos; //position of first non white space, which means it is     first real char
     nwpos = str.find_first_not_of(delimiters, 0); //ignore the whitespace before the first word
 
@@ -836,6 +837,7 @@ int CMontageDlg::OnInitDialog()
 	mon_list.ResetContent();
 	mon_lName.ResetContent();
 	int count = 0;
+	crtMon = new Amontage();
 	POSITION pos =  theApp.monList.GetHeadPosition();
 	for (int i = 0; i < theApp.monList.GetCount(); i++)
 	{
@@ -844,7 +846,7 @@ int CMontageDlg::OnInitDialog()
 		POSITION pos1 =  mon->mList.GetHeadPosition();
 		mon_lName.AddString(mon->mName);
 		if (flag != TRUE)
-			crtMon = mon;
+			memcpy(crtMon,mon,sizeof(Amontage));
 		if (doc != NULL && mon->mName == doc->mMon->mName)
 			flag = TRUE;
 	}
@@ -854,10 +856,15 @@ int CMontageDlg::OnInitDialog()
 	{
 		LPAlead lead = crtMon->mList.GetNext( pos );
 		CString tmp;
-		tmp = getElecName(lead->lFirstID) + " -> " + getElecName(lead->lSecondID);
+		tmp = getElecName(lead->lFirstID) + "   ->   " + getElecName(lead->lSecondID);
 		mon_list.AddString(tmp);
 	}
 
+	for(int i = 0; i < theApp.elecNum; i++)
+	{
+		mon_l1.AddString(theApp.mElec[i].eName);
+		mon_l2.AddString(theApp.mElec[i].eName);
+	}
 	return 0;
 }
 
@@ -1376,7 +1383,8 @@ void COptionDlg::OnBnClickedok()
 	pSen->RemoveAllItems();
 	vector<string> vecSen = Tokenize(theApp.m_sensitivity," ");
 	for (vector<string>::iterator it = vecSen.begin(); it != vecSen.end(); it++) {
-		pSen->AddItem((LPCTSTR)(*it).c_str(),count++);
+		CString cs((*it).c_str());
+		pSen->AddItem(cs,count++);
 	}
 	pSen->SetEditText(itoS(view->graphData.scaleRate));
 	//Set items for LowPassFilter
@@ -1386,7 +1394,8 @@ void COptionDlg::OnBnClickedok()
 	pSpeed->RemoveAllItems();
 	vector<string> vecSpeed = Tokenize(theApp.m_speed," ");
 	for (vector<string>::iterator it = vecSpeed.begin(); it != vecSpeed.end(); it++) {
-		pSpeed->AddItem((LPCTSTR)(*it).c_str(),count++);
+		CString cs((*it).c_str());
+		pSpeed->AddItem(cs,count++);
 	}
 	pSpeed->SetEditText(itoS(view->graphData.paperSpeed));
 	//Set items for LowPassFilter
@@ -1396,7 +1405,8 @@ void COptionDlg::OnBnClickedok()
 	pLP->RemoveAllItems();
 	vector<string> vecLP = Tokenize(theApp.m_LP," ");
 	for (vector<string>::iterator it = vecLP.begin(); it != vecLP.end(); it++) {
-		pLP->AddItem((LPCTSTR)(*it).c_str(),count++);
+		CString cs((*it).c_str());
+		pLP->AddItem(cs,count++);
 	}
 	//pLP->SetEditText(itoS(view->graphData.));
 	//Set items for LowPassFilter
@@ -1406,7 +1416,8 @@ void COptionDlg::OnBnClickedok()
 	pHP->RemoveAllItems();
 	vector<string> vecHP = Tokenize(theApp.m_HP," ");
 	for (vector<string>::iterator it = vecHP.begin(); it != vecHP.end(); it++) {
-		pHP->AddItem((LPCTSTR)(*it).c_str(),count++);
+		CString cs((*it).c_str());
+		pHP->AddItem(cs,count++);
 	}
 
 	EndDialog(0);
@@ -1458,9 +1469,6 @@ void CMontageDlg::OnBnClickedadd()
 	node->lFirstID = pos1 + 1;
 	node->lSecondID = pos2 + 1;
 
-	CString tmp;
-	//mon_lName.GetWindowText(tmp);
-
 	//crtMon->mName = tmp;
 	crtMon->mList.AddTail(node);
 	//theApp.monList.AddTail(crtMon);
@@ -1489,6 +1497,7 @@ void CMontageDlg::OnBnClickedMonsave()
 		}
 	}
 	theApp.monList.AddTail(crtMon);
+	mon_lName.AddString(crtMon->mName);
 }
 
 

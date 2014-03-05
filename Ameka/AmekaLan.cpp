@@ -164,7 +164,7 @@ void loadSetting(const char* fileName)
 		{
 			for(TiXmlElement* e = elem->FirstChildElement(); e != NULL; e = e->NextSiblingElement())
 			{
-				theApp.mElec[iCount].eID = atoi(e->Value());
+				theApp.mElec[iCount].eID = atoi(e->Attribute("ID"));
 				theApp.mElec[iCount].eName = e->Attribute("Name");
 				iCount++;
 			}
