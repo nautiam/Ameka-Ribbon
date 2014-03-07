@@ -3,7 +3,42 @@
 #include "AmekaDoc.h"
 #include "dsp_filters.h"
 #include "DSPModule.h"
+#include "kiss_fft.h"
 
+static void convert_to_freq(kiss_fft_cpx *cout, int n) {
+	const float NC = n/2.0 + 1;
+	while (n-- > 0) {
+		cout->r /= NC;
+		cout->i /= NC;
+		cout++;
+	}
+}
+
+static void complex_abs(kiss_fft_cpx *cout, int n) {
+	while (n-- > 0) {
+		cout->r = sqrt(cout->r * cout->r + cout->i * cout->i);
+		cout->i = 0;
+		cout++;
+	}
+}
+
+static int get_peak_pos(const kiss_fft_cpx *cout, int nfft, int start_pos) {
+	int pos = 0;
+	float maxdata = 0;
+	int i;
+	for (i = start_pos; i < nfft/2; i++) {
+		if ((cout[i].r - maxdata) > 0.0001) {
+			maxdata = cout[i].r;
+			pos = i;
+		}
+	}
+	return pos;
+}
+
+static float get_peak_frequence(const kiss_fft_cpx *cout, int nfft, float start_hz, float sample_hz) {
+	int start_pos = start_hz * nfft / sample_hz;
+	return get_peak_pos(cout, nfft, start_pos) * sample_hz / nfft;
+}
 
 UINT DSP::DSPThread(LPVOID pParam)
 {
@@ -112,6 +147,59 @@ UINT DSP::DSPThread(LPVOID pParam)
 				mDoc->PrimaryData->pushData(output[i]);
 			}
 			
+			// Convert to frequency domain
+			int nfft = size;
+			int isinverse = 0;
+			kiss_fft_cfg st;
+			kiss_fft_cpx * buf;
+			kiss_fft_cpx * bufout;
+
+			buf = (kiss_fft_cpx*)malloc(sizeof(kiss_fft_cpx) * nfft );
+			bufout = (kiss_fft_cpx*)malloc(sizeof(kiss_fft_cpx) * nfft );
+			st = kiss_fft_alloc( nfft ,isinverse ,0,0);
+
+			// Add value for input buf
+			for (int i=0; i<nfft; i++)
+			{
+				buf[i].r = output[i].value[1];
+				buf[i].i = 0;
+			}
+			kiss_fft( st , buf ,bufout);
+
+			// Convert output to frequency
+			float NC = nfft/2.0 + 1;
+			/*for (int i=0; i<nfft; i++)
+			{
+				bufout[i].r /= NC;
+				bufout[i].i /= NC;
+			}*/
+			convert_to_freq(bufout, nfft);
+
+			// Complex abs
+			/*for (int i=0; i<nfft; i++)
+			{
+				bufout[i].r = sqrt(bufout[i].r * bufout[i].r + bufout[i].i * bufout[i].i);
+				bufout[i].i = 0;
+			}*/
+			complex_abs(bufout, nfft);
+
+			// Print output to file
+			/*for (int i=0; i<NC; i++)
+			{
+				LOG(INFO) << bufout[i].r;
+			}*/
+			for (int i=1; i<NC; i++)
+			{
+				float fre = i * (float)(SAMPLE_RATE / nfft);
+				LOG(INFO) << "------------";
+				LOG(INFO) << fre;
+				LOG(INFO) << bufout[i].r;
+			}
+
+			free(st);
+			free(buf);
+			free(bufout);
+
 			for (int i=0; i<LEAD_NUMBER; i++)
 			{
 				delete [] audioData[i];
