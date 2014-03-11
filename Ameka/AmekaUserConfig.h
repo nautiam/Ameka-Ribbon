@@ -16,6 +16,7 @@
 typedef struct _Aelectrode {
 	uint16_t eID;
 	CString eName;
+	CPoint* ePos;
 } *LPAelectrode, Aelectrode;
 
 typedef struct _Color{

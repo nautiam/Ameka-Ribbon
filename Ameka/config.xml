@@ -1,20 +1,20 @@
 <root>
     <Lead Name="lead">
-        <Lead ID="1" Name="ml" />
-        <Lead ID="2" Name="cd1" />
-        <Lead ID="3" Name="cd2" />
-        <Lead ID="4" Name="tf1" />
-        <Lead ID="5" Name="f2" />
-        <Lead ID="6" Name="tf2" />
-        <Lead ID="7" Name="tf3" />
-        <Lead ID="8" Name="ld" />
-        <Lead ID="9" Name="ss" />
-        <Lead ID="10" Name="ss2" />
-        <Lead ID="11" Name="se3" />
-        <Lead ID="12" Name="af" />
-        <Lead ID="13" Name="af1" />
-        <Lead ID="14" Name="af2" />
-        <Lead ID="15" Name="af3" />
-        <Lead ID="16" Name="af4" />
+        <Lead ID="1" Name="ml" point1="100" point2="250" />
+        <Lead ID="2" Name="cd1" point1="45" point2="72" />
+        <Lead ID="3" Name="cd2" point1="55" point2="230" />
+        <Lead ID="4" Name="tf1" point1="232" point2="28" />
+        <Lead ID="5" Name="f2" point1="55" point2="55" />
+        <Lead ID="6" Name="tf2" point1="27" point2="133" />
+        <Lead ID="7" Name="tf3" point1="156" point2="20" />
+        <Lead ID="8" Name="ld" point1="177" point2="220" />
+        <Lead ID="9" Name="ss" point1="21" point2="82" />
+        <Lead ID="10" Name="ss2" point1="155" point2="155" />
+        <Lead ID="11" Name="se3" point1="233" point2="99" />
+        <Lead ID="12" Name="af" point1="255" point2="97" />
+        <Lead ID="13" Name="af1" point1="77" point2="31" />
+        <Lead ID="14" Name="af2" point1="111" point2="271" />
+        <Lead ID="15" Name="af3" point1="240" point2="240" />
+        <Lead ID="16" Name="af4" point1="200" point2="50"/>
     </Lead>
 </root>

@@ -67,6 +67,7 @@ protected:
 public:
 	afx_msg void OnScalerate();
 	afx_msg void OnSpeedrate();
+	afx_msg void OnMonlist();
 };
 
 

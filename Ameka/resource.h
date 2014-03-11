@@ -114,6 +114,7 @@
 #define monctrl_list                    1057
 #define mon_pic                         1058
 #define IDC_BUTTON3                     1059
+#define mon_del                         1059
 #define mon_name                        1060
 #define ID_WRITE_PASTEASHYPERLINK       32770
 #define MN_Open                         32771

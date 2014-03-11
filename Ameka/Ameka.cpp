@@ -31,7 +31,7 @@
 #include "afxwin.h"
 #include "tinystr.h"
 #include "tinyxml.h"
-
+#include "GraphModule.h"
 #include "AmekaLan.h"
 
 #ifdef _DEBUG
@@ -46,6 +46,10 @@
 #define strBaud "9600 14400 19200 38400 56000 115200 "
 #define xmlName "abc.xml"
 #define settingName "config.xml"
+
+#define monXScale 300
+#define monYScale 300
+#define dotRange 4
 
 _INITIALIZE_EASYLOGGINGPP
 
@@ -787,7 +791,6 @@ protected:
 protected:
 	DECLARE_MESSAGE_MAP()
 	virtual BOOL OnInitDialog();
-	virtual int OnPaint();
 public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedCancel();
@@ -799,31 +802,83 @@ public:
 	LPAmontage crtMon;
 	afx_msg void OnBnClickedMonsave();
 	afx_msg void OnMonListSelChange();
+	void DrawMontage(CDC *dc, LPAmontage mMon);
+	afx_msg void OnPaint();
+	afx_msg void OnBnClickeddel();
 };
 
 CMontageDlg::CMontageDlg() : CDialogEx(CMontageDlg::IDD)
 {
 }
 
-int CMontageDlg::OnPaint()
+void CMontageDlg::DrawMontage(CDC* dc, LPAmontage mMon)
+{
+	CDC memDC;
+	CBitmap bmp;
+	memDC.CreateCompatibleDC(dc);
+	bmp.CreateCompatibleBitmap(dc, monXScale, monYScale);
+	memDC.SelectObject(bmp);
+	//draw general
+	memDC.SelectStockObject(BLACK_PEN);
+	memDC.Rectangle(0, 0, monXScale, monYScale);
+	CPen newPen(PS_SOLID, 2, RGB(0, 0, 0));
+	memDC.SelectObject(newPen);
+	memDC.Ellipse(1, 1, monXScale - 1, monYScale - 1);
+	//create pen and brush
+	CBrush br1, *pbrOld;
+	br1.CreateSolidBrush(RGB(0,0,0));
+	memDC.SelectObject(&br1);
+
+	for (int i = 0; i < theApp.elecNum; i++)
+	{
+		memDC.Ellipse(theApp.mElec[i].ePos->x - dotRange, theApp.mElec[i].ePos->y - dotRange, theApp.mElec[i].ePos->x + dotRange, theApp.mElec[i].ePos->y + dotRange);
+		CRect rect;
+		//GetClientRect(&rect);
+		rect.left = theApp.mElec[i].ePos->x + 1;
+		rect.right = theApp.mElec[i].ePos->x + 30;
+		rect.bottom = theApp.mElec[i].ePos->y - 1;
+		rect.top = theApp.mElec[i].ePos->y - 20;
+
+		memDC.DrawText(theApp.mElec[i].eName, rect, DT_SINGLELINE );
+	}
+
+	POSITION pos =  crtMon->mList.GetHeadPosition();
+	while(pos) 
+	{
+		LPAlead curr = crtMon->mList.GetNext(pos);
+		CPoint* p1 = getElecPoint(curr->lFirstID);
+		CPoint* p2 = getElecPoint(curr->lSecondID);
+		if (p1 != NULL && p2 != NULL)
+		{
+			ARROWSTRUCT a;
+			// setup arrows
+			a.nWidth = 10;
+			a.fTheta = 0.6f;
+			a.bFill = true;
+			
+			//memDC.Ellipse(p1->x - dotRange, p1->y - dotRange, p1->x + dotRange, p1->y + dotRange);
+			//memDC.Ellipse(p2->x - dotRange, p2->y - dotRange, p2->x + dotRange, p2->y + dotRange);
+			if (p1->x != p2->x && p1->y != p2->y)
+			{
+				memDC.MoveTo(*p1);
+				ArrowTo(memDC, p2->x, p2->y, &a);	
+			}
+		}
+	}
+	dc->BitBlt(220, 35, 300, 300, &memDC, 0, 0, SRCCOPY);
+	return;
+}
+
+void CMontageDlg::OnPaint()
 {
 	CPaintDC dc(this);
 
-	CWnd* pImage = GetDlgItem(mon_pic);
-    CRect rc;
-    pImage->GetWindowRect(rc);
-    HRGN hRgn = CreateRoundRectRgn(0, 0, rc.Width(), rc.Height(), 40, 40);
-    HINSTANCE hIns = AfxGetInstanceHandle();
-	HBITMAP hBmp = CreateCompatibleBitmap(dc, rc.Width(), rc.Height());
-    HBRUSH hBr = CreatePatternBrush(hBmp); 
-	dc.Rectangle(0, 0, 4, 4);
-    DeleteObject(hIns);
-    DeleteObject(hBmp);
-    FillRgn(pImage->GetDC()->GetSafeHdc(), hRgn, hBr);
-	CDialog::OnPaint();
+		// TODO: Add your message handler code here
+		// Do not call CDialogEx::OnPaint() for painting messages
 
-	return 0;
+	DrawMontage(&dc, crtMon);
 }
+
 
 int CMontageDlg::OnInitDialog()
 {
@@ -865,6 +920,8 @@ int CMontageDlg::OnInitDialog()
 		mon_l1.AddString(theApp.mElec[i].eName);
 		mon_l2.AddString(theApp.mElec[i].eName);
 	}
+	mon_l1.SetCurSel(0);
+	mon_l2.SetCurSel(0);
 	return 0;
 }
 
@@ -885,12 +942,89 @@ void CMontageDlg::OnMonListSelChange()
 			{
 				LPAlead lead = mon->mList.GetNext( pos1 );
 				CString tmp;
-				tmp = getElecName(lead->lFirstID) + " -> " + getElecName(lead->lSecondID);
+				tmp = getElecName(lead->lFirstID) + "   ->   " + getElecName(lead->lSecondID);
 				mon_list.AddString(tmp);
 			}
+			crtMon = mon;
+			this->OnPaint();
+			this->Invalidate();
+			this->UpdateWindow();
 			return;
 		}
 	}
+}
+
+void CMontageDlg::OnBnClickedadd()
+{
+	// TODO: Add your control notification handler code here
+	int pos1 = mon_l1.GetCurSel();
+	int pos2 = mon_l2.GetCurSel();
+	mon_list.AddString(getElecName(pos1+1) + "   ->   " + getElecName(pos2+1));
+	LPAlead node = new Alead;
+	node->lFirstID = pos1 + 1;
+	node->lSecondID = pos2 + 1;
+
+	//crtMon->mName = tmp;
+	crtMon->mList.AddTail(node);
+	//theApp.monList.AddTail(crtMon);
+	//mon_lName.AddString(tmp);
+	this->OnPaint();
+	this->Invalidate();
+	this->UpdateWindow();
+}
+
+void CMontageDlg::OnBnClickeddel()
+{
+	// TODO: Add your control notification handler code here
+	int crtPos = mon_list.GetCurSel();
+	CString data;
+	mon_list.GetText(crtPos, data);
+	vector<string> vecStr = Tokenize(data,"   ->   ");
+	vector<string>::iterator it = vecStr.begin();
+	CString cs1((*it).c_str());
+	it++;
+	CString cs2((*it).c_str());
+
+	POSITION pos =  crtMon->mList.GetHeadPosition();
+	POSITION savePos;
+	while(pos) 
+	{ 
+		savePos = pos; 
+		LPAlead curr = crtMon->mList.GetNext(pos); 
+		if (curr->lFirstID == getElecID(cs1) && curr->lSecondID == getElecID(cs2))
+		{
+			crtMon->mList.RemoveAt(savePos);
+			mon_list.DeleteString(crtPos);
+			this->OnPaint();
+			this->Invalidate();
+			this->UpdateWindow();
+			return;
+		}
+	}
+}
+
+void CMontageDlg::OnBnClickedMonsave()
+{
+	// TODO: Add your control notification handler code here
+	CString tmp;
+	mon_lName.GetWindowText(tmp);
+
+	crtMon->mName = tmp;
+
+	POSITION pos =  theApp.monList.GetHeadPosition();
+	POSITION savePos;
+	while(pos) 
+	{ 
+		savePos = pos; 
+		LPAmontage curr = theApp.monList.GetNext(pos); 
+		if (curr->mName == tmp)
+		{
+			theApp.monList.SetAt(savePos, crtMon); 
+			return;
+		}
+	}
+	theApp.monList.AddTail(crtMon);
+	mon_lName.AddString(crtMon->mName);
 }
 
 void CMontageDlg::DoDataExchange(CDataExchange* pDX)
@@ -908,6 +1042,8 @@ BEGIN_MESSAGE_MAP(CMontageDlg, CDialogEx)
 	ON_BN_CLICKED(mon_add, &CMontageDlg::OnBnClickedadd)
 	ON_BN_CLICKED(mon_save, &CMontageDlg::OnBnClickedMonsave)
 	ON_CBN_SELCHANGE(mon_name, &CMontageDlg::OnMonListSelChange)
+	ON_WM_PAINT()
+	ON_BN_CLICKED(mon_del, &CMontageDlg::OnBnClickeddel)
 END_MESSAGE_MAP()
 //Show Montage Dialog
 void CAmekaApp::OnMontage()
@@ -1247,6 +1383,11 @@ void CMontageDlg::OnBnClickedOk()
 	// TODO: Add your control notification handler code here
 	CAmekaDoc* crtdoc = CAmekaDoc::GetDoc();
 	crtdoc->mMon = crtMon;
+	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
+	CMFCRibbonComboBox* pMon = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_MonList));
+	if (pMon != NULL)
+		pMon->SetEditText(crtdoc->mMon->mName);
 		
 	TiXmlDocument doc;
 	TiXmlElement* root = new TiXmlElement("root");
@@ -1458,48 +1599,6 @@ void CTabViewDlg::OnBnClickedbtdef()
 	m_view_lp.SetWindowTextW((LPCTSTR)strLP);
 	m_view_hp.SetWindowTextW((LPCTSTR)strHP);
 }
-
-void CMontageDlg::OnBnClickedadd()
-{
-	// TODO: Add your control notification handler code here
-	int pos1 = mon_l1.GetCurSel();
-	int pos2 = mon_l2.GetCurSel();
-	mon_list.AddString(getElecName(pos1+1) + " -> " + getElecName(pos2+1));
-	LPAlead node = new Alead;
-	node->lFirstID = pos1 + 1;
-	node->lSecondID = pos2 + 1;
-
-	//crtMon->mName = tmp;
-	crtMon->mList.AddTail(node);
-	//theApp.monList.AddTail(crtMon);
-	//mon_lName.AddString(tmp);
-
-}
-
-void CMontageDlg::OnBnClickedMonsave()
-{
-	// TODO: Add your control notification handler code here
-	CString tmp;
-	mon_lName.GetWindowText(tmp);
-
-	crtMon->mName = tmp;
-
-	POSITION pos =  theApp.monList.GetHeadPosition();
-	POSITION savePos;
-	while(pos) 
-	{ 
-		savePos = pos; 
-		LPAmontage curr = theApp.monList.GetNext(pos); 
-		if (curr->mName == tmp)
-		{
-			theApp.monList.SetAt(savePos, crtMon); 
-			return;
-		}
-	}
-	theApp.monList.AddTail(crtMon);
-	mon_lName.AddString(crtMon->mName);
-}
-
 
 void CAmekaApp::OnPortOpen()
 {
@@ -1748,3 +1847,5 @@ void CAmekaApp::OnLan()
 	pAbout->GetParentCategory()->SetName(mnLan->mnHelp.strMenuName);
 
 }
+
+

@@ -22,6 +22,7 @@
 #include "AmekaDoc.h"
 #include "xmlParser.h"
 #include "DSPModule.h"
+#include "MainFrm.h"
 
 #include <propkey.h>
 
@@ -53,7 +54,6 @@ CAmekaDoc::CAmekaDoc()
 	mDSP.LPFFre = 30;
 	mDSP.SampleRate = 256;
 	this->m_dspProcess = AfxBeginThread(DSP::DSPThread, (LPVOID)this);
-
 }
 
 CAmekaDoc::~CAmekaDoc()
@@ -86,8 +86,16 @@ BOOL CAmekaDoc::OnNewDocument()
 	theApp.docList.AddTail(this);
 
 	POSITION pos =  theApp.monList.GetHeadPosition();
-	LPAmontage mon =  theApp.monList.GetNext( pos );
-	mMon = mon;
+	if (pos != NULL)
+	{
+		LPAmontage mon =  theApp.monList.GetNext( pos );
+		mMon = mon;
+		CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
+		CMFCRibbonComboBox* pMon = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_MonList));
+		if (pMon != NULL)
+			pMon->SetEditText(mMon->mName);
+	}
 
 	return TRUE;
 }

@@ -39,6 +39,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
 	ON_COMMAND(ID_TOOLS_OPTIONS, &CMainFrame::OnOptions)
 	ON_COMMAND(MN_ScaleRate, &CMainFrame::OnScalerate)
 	ON_COMMAND(MN_SpeedRate, &CMainFrame::OnSpeedrate)
+	ON_COMMAND(MN_MonList, &CMainFrame::OnMonlist)
 END_MESSAGE_MAP()
 
 // CMainFrame construction/destruction
@@ -166,6 +167,20 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		}
 	}
 	pHP->SetEditText(L"3");
+
+	//create montage list
+	count = 0;
+	CMFCRibbonComboBox* pMon = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, m_wndRibbonBar.FindByID(MN_MonList));
+	if (pMon)
+	{
+		POSITION pos =  theApp.monList.GetHeadPosition();
+		for (int i = 0; i < theApp.monList.GetCount(); i++)
+		{
+			LPAmontage tmp = theApp.monList.GetNext( pos );
+			pMon->AddItem(tmp->mName,count++);
+		}
+	}
 
 	//show port list
     TCHAR lpTargetPath[5000]; // buffer to store the path of the COMPORTS
@@ -429,4 +444,26 @@ void CMainFrame::OnSpeedrate()
     {
         MessageBox(_T("Please select one item from droplist of Combo Box."), _T("Combo Box Item"), MB_OK);
     }
+}
+
+
+void CMainFrame::OnMonlist()
+{
+	// TODO: Add your command handler code here
+	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
+		CMFCRibbonComboBox* pMon = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_MonList));
+
+	CAmekaDoc* doc = CAmekaDoc::GetDoc();
+
+	int nCurSel = pMon->GetCurSel();
+	CString data = pMon->GetItem(nCurSel);
+
+	POSITION pos =  theApp.monList.GetHeadPosition();
+	while(pos)
+	{
+		LPAmontage mon =  theApp.monList.GetNext( pos );
+		if (mon->mName == data)
+			doc->mMon = mon;
+	}
 }

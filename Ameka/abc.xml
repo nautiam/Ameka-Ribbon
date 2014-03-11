@@ -1,36 +1,22 @@
 <root>
-    <>
-        < channel1="5" channel2="3" />
-        < channel1="3" channel2="7" />
-        < channel1="12" channel2="9" />
-        < channel1="11" channel2="13" />
-        < channel1="3" channel2="5" />
-    </>
     <Montage3>
         <Montage3 channel1="1" channel2="3" />
         <Montage3 channel1="3" channel2="7" />
         <Montage3 channel1="5" channel2="7" />
+        <Montage3 channel1="15" channel2="16" />
     </Montage3>
-    <cc>
-        <cc channel1="1" channel2="3" />
-        <cc channel1="3" channel2="7" />
-        <cc channel1="7" channel2="9" />
-        <cc channel1="5" channel2="8" />
-        <cc channel1="5" channel2="8" />
-        <cc channel1="2" channel2="4" />
-    </cc>
-    <>
-        < channel1="5" channel2="3" />
-        < channel1="3" channel2="7" />
-        < channel1="12" channel2="9" />
-        < channel1="11" channel2="13" />
-        < channel1="3" channel2="5" />
-    </>
+    <mon1>
+        <mon1 channel1="5" channel2="3" />
+        <mon1 channel1="3" channel2="7" />
+        <mon1 channel1="12" channel2="9" />
+        <mon1 channel1="11" channel2="13" />
+    </mon1>
     <da>
         <da channel1="5" channel2="3" />
         <da channel1="3" channel2="7" />
         <da channel1="12" channel2="9" />
         <da channel1="11" channel2="13" />
         <da channel1="3" channel2="5" />
+        <da channel1="15" channel2="16" />
     </da>
 </root>

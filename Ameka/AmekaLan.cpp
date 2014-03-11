@@ -164,13 +164,18 @@ void loadSetting(const char* fileName)
 		{
 			for(TiXmlElement* e = elem->FirstChildElement(); e != NULL; e = e->NextSiblingElement())
 			{
-				theApp.mElec[iCount].eID = atoi(e->Attribute("ID"));
-				theApp.mElec[iCount].eName = e->Attribute("Name");
+				if (e->Attribute("ID") != NULL)
+					theApp.mElec[iCount].eID = atoi(e->Attribute("ID"));
+				if (e->Attribute("Name") != NULL)
+					theApp.mElec[iCount].eName = e->Attribute("Name");
+				if (e->Attribute("point1") != NULL && e->Attribute("point2") != NULL)
+					theApp.mElec[iCount].ePos = new CPoint(atoi(e->Attribute("point1")),atoi(e->Attribute("point2")));
 				iCount++;
 			}
 			break;
 		}
 	}
+	doc.Clear();
 }
 
 CString getElecName(uint16_t num)
@@ -180,6 +185,22 @@ CString getElecName(uint16_t num)
 			return theApp.mElec[i].eName;
 	return L"";
 }
+
+int getElecID(CString name)
+{
+	for (int i = 0; i < theApp.elecNum; i++)
+		if (theApp.mElec[i].eName == name)
+			return theApp.mElec[i].eID;
+	return -1;
+}
+
+CPoint* getElecPoint(uint16_t num)
+{
+	for (int i = 0; i < theApp.elecNum; i++)
+		if (theApp.mElec[i].eID == num)
+			return theApp.mElec[i].ePos;
+	return NULL;
+};
 
 void writeSetting(const char* fileName)
 {		
