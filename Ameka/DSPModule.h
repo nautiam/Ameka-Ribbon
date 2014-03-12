@@ -1,7 +1,7 @@
 #ifndef _DSPMODULE_H_
 #define _DSPMODULE_H_
 
-#define SAMPLE_RATE 256
+#define SAMPLE_RATE 250
 #define LEAD_NUMBER 16
 #define ARRAY_LENGTH 10
 #define BACKUP_ARRAY 10

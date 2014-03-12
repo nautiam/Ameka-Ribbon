@@ -112,6 +112,7 @@
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="EnvSetupModule.h" />
     <ClInclude Include="GraphModule.h" />
+    <ClInclude Include="kiss_fft.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="RecordingModule.h" />
     <ClInclude Include="Resource.h" />
@@ -134,6 +135,7 @@
     <ClCompile Include="DSPModule.cpp" />
     <ClCompile Include="dsp_filters.cpp" />
     <ClCompile Include="GraphModule.cpp" />
+    <ClCompile Include="kiss_fft.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="SerialCtrl.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -151,7 +153,9 @@
     <None Include="res\ribbon.mfcribbon-ms" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Ameka.rc" />
+    <ResourceCompile Include="Ameka.rc">
+      <Culture Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">0x002a</Culture>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\Ameka.ico" />
