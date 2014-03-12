@@ -35,6 +35,7 @@ public:
 	CWinThread*  m_dspProcess;
 	amekaData<RawDataType>* dataBuffer;
 	amekaData<RawDataType>* PrimaryData;
+	amekaData<SecondaryDataType>* SecondaryData;
 	//AmekaData<RawDataType>* dataBuffer;
 // Operations
 

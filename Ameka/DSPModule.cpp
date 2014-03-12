@@ -182,15 +182,23 @@ UINT DSP::DSPThread(LPVOID pParam)
 			}*/
 
 			// Print output to file
-			for (int j=0; j<LEAD_NUMBER; j++)
-				for (int i=1; i<NC; i++)
+			
+			for (int i=0; i<NC; i++)
+			{
+				SecondaryDataType temp;
+				float fre = i * (float)(SAMPLE_RATE / nfft);
+				temp.fre = fre;
+				for (int j=0; j<LEAD_NUMBER; j++)
 				{
-					float fre = i * (float)(SAMPLE_RATE / nfft);
+					temp.value[j] = bufout[j][i].r;
+					/*float fre = i * (float)(SAMPLE_RATE / nfft);
 					LOG(INFO) << "------------";
 					LOG(INFO) << j;
 					LOG(INFO) << fre;
-					LOG(INFO) << bufout[j][i].r;
+					LOG(INFO) << bufout[j][i].r;*/
 				}
+				mDoc->SecondaryData->pushData(temp);
+			}
 
 			free(st);
 			for (int i=0; i<LEAD_NUMBER; i++)

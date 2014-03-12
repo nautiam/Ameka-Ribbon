@@ -72,6 +72,11 @@ struct PrimaryDataType {
 	time_t time;
 };
 
+struct SecondaryDataType {
+	float value[16];
+	float fre;
+};
+
 class RingBuffer
 {
 public:
