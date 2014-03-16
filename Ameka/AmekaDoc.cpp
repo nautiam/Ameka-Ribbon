@@ -43,10 +43,24 @@ END_MESSAGE_MAP()
 
 
 // CAmekaDoc construction/destruction
-
+UINT genData(LPVOID pParam)
+{
+	CAmekaDoc* pnt = (CAmekaDoc *)pParam;
+	while(1)
+	{
+		RawDataType data;
+		data.time = 0;
+		for (int i = 0; i < 15; i++)
+		{
+			data.value[i] = (13000+rand()%3000);
+		}
+		pnt->PrimaryData->pushData(data);
+		Sleep(3);
+	}
+	return 0;
+}
 CAmekaDoc::CAmekaDoc()
 {
-
 	// TODO: add one-time construction code here
 	dataBuffer = new amekaData<RawDataType>(BUFFER_LEN);
 	PrimaryData = new amekaData<RawDataType>(BUFFER_LEN);
@@ -55,6 +69,7 @@ CAmekaDoc::CAmekaDoc()
 	mDSP.LPFFre = 30;
 	mDSP.SampleRate = 256;
 	this->m_dspProcess = AfxBeginThread(DSP::DSPThread, (LPVOID)this);
+	thrd = AfxBeginThread(genData, (LPVOID)this);
 }
 
 CAmekaDoc::~CAmekaDoc()
@@ -74,6 +89,15 @@ CAmekaDoc::~CAmekaDoc()
 	dataBuffer = NULL;
 	POSITION pos = theApp.docList.Find(this);
 	theApp.docList.RemoveAt(pos);
+
+	GetExitCodeThread(thrd->m_hThread, &exit_code);
+	if(exit_code == STILL_ACTIVE)
+	{
+		::TerminateThread(thrd->m_hThread, 0);
+		CloseHandle(thrd->m_hThread);
+	}
+	thrd->m_hThread = NULL;
+	thrd = NULL;
 }
 
 BOOL CAmekaDoc::OnNewDocument()

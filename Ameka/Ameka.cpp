@@ -292,7 +292,8 @@ int CAmekaApp::ExitInstance()
 {
 	//TODO: handle additional resources you may have added
 	AfxOleTerm(FALSE);
-	theApp.pIO->~CSerialIO();
+	if (theApp.pIO)
+		theApp.pIO->~CSerialIO();
 	return CWinAppEx::ExitInstance();
 }
 
@@ -507,6 +508,12 @@ void CAmekaApp::OnPhotic()
 	CPhoticDlg photicDlg;
 	photicDlg.DoModal();
 	*/
+	CAmekaView* pView = CAmekaView::GetView();
+	if (pView)
+	{
+		//Cameka
+		pView->onPhotic = ~pView->onPhotic;
+	}
 }
 
 //------------------------------------------------------------------//
@@ -676,8 +683,8 @@ void CAmekaApp::OnEvent()
 }
 
 //------------------------------------------------------------------//
-/*
-UINT genData(LPVOID pParam)
+
+/*UINT genData(LPVOID pParam)
 {
 	while(1)
 	{
@@ -692,8 +699,8 @@ UINT genData(LPVOID pParam)
 		delete[] data;
 	}
 	return 0;
-}
-*/
+}*/
+
 //Demo Graph
 void CAmekaApp::OnDemo()
 {
@@ -705,8 +712,9 @@ void CAmekaApp::OnDemo()
 		pView->pThread = AfxBeginThread(pView->graphHandle, (LPVOID)pView);
 	}	pView->isRunning = true;
 	*/
-	
-	if ((theApp.pIO != NULL) && (theApp.pIO->m_bState == S_CONNECTED))
+	if (theApp.docList.IsEmpty())
+		return;
+	//if ((theApp.pIO != NULL) && (theApp.pIO->m_bState == S_CONNECTED))
 	{
 		CAmekaView *pView = CAmekaView::GetView();
 		if (!pView->isRunning)
@@ -721,7 +729,8 @@ void CAmekaApp::OnDemo()
 void CAmekaApp::OnStop()
 {
 	CAmekaView *pView = CAmekaView::GetView();
-
+	if (theApp.docList.IsEmpty())
+		return;
 	DWORD exit_code= NULL;
 	if (pView->pThread != NULL && pView->isRunning)
 	{

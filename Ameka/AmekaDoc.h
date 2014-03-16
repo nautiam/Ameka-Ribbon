@@ -36,6 +36,8 @@ public:
 	amekaData<RawDataType>* dataBuffer;
 	amekaData<RawDataType>* PrimaryData;
 	amekaData<SecondaryDataType>* SecondaryData;
+	CWinThread* thrd;
+	//UINT genData(LPVOID pParam);
 	//AmekaData<RawDataType>* dataBuffer;
 // Operations
 

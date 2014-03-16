@@ -34,6 +34,8 @@ public:
 	CWinThread* pThread;
 	GraphData graphData;
 	CBitmap bmp;
+	boolean onPhotic;
+	float factor;
 // Operations
 public:
 	
@@ -51,15 +53,17 @@ public:
 	virtual ~CAmekaView();
 	static CAmekaView* GetView();
 	static UINT graphHandle(LPVOID pParam);			//handle thread
-	int amekaDrawPos(CDC* pDC, CBitmap* bitmap);			//for draw current position only	
+	//int amekaDrawPos(CBitmap* bitmap);			//for draw current position only	
+	int amekaDrawPos();			//for draw current position only	
 	void setParentDoc(CAmekaDoc* doc);
+	int drawBarGraph( void );
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
 private:
-	float crtPos;
+	uint16_t crtPos;
 	float distance;
 	RawDataType* dataBuffer;
 	RawDataType prePos;
