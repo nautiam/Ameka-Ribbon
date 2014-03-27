@@ -20,7 +20,7 @@ CString itoS ( int x)
 void loadLanguage(const char* fileName)
 {
 	TiXmlDocument doc;
-	if(!doc.LoadFile((LPCSTR)(CStringA)fileName))
+	if(!doc.LoadFile(fileName))
 	{
 		LOG(ERROR) << doc.ErrorDesc();
 		return;

@@ -33,6 +33,7 @@
 #include "tinyxml.h"
 #include "GraphModule.h"
 #include "AmekaLan.h"
+#include "afxcolorbutton.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -77,6 +78,7 @@ BEGIN_MESSAGE_MAP(CAmekaApp, CWinAppEx)
 	ON_COMMAND(MN_StartDemo, &CAmekaApp::OnDemo)
 	ON_COMMAND(MN_StopDemo, &CAmekaApp::OnStop)
 	ON_COMMAND(MN_Montage, &CAmekaApp::OnMontage)
+	ON_COMMAND(MN_Analyze, &CAmekaApp::OnSetupPhotic)
 	ON_COMMAND(MN_PortOpen, &CAmekaApp::OnPortOpen)
 	ON_COMMAND(MN_Scan, &CAmekaApp::OnScan)
 	ON_COMMAND(MN_Lan, &CAmekaApp::OnLan)
@@ -88,6 +90,11 @@ END_MESSAGE_MAP()
 
 CAmekaApp::CAmekaApp()
 {
+	//photic
+	photicMax = 50;
+	photicMin = 0;
+	photicTick = 10;
+	photicBarW = 2;
 	//init electrode name
 	const char* setFileName = settingName;
 	//writeSetting(setFileName);
@@ -472,6 +479,7 @@ class CPhoticDlg : public CDialogEx
 {
 public:
 	CPhoticDlg();
+	virtual BOOL OnInitDialog();
 
 // Dialog Data
 	enum { IDD = DLG_Photic };
@@ -485,7 +493,30 @@ protected:
 public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedCancel();
+	CEdit photicMin;
+	CEdit photicMax;
+	CEdit photicTick;
+	CEdit photicName1;
+	CEdit photicName2;
+	CEdit photicName3;
+	CEdit photicName4;
+	CEdit photicName5;
+	CEdit photicWidth;
+	CMFCColorButton photicColor;
 };
+
+BOOL CPhoticDlg::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+	photicMin.SetWindowTextW(L"0");
+	photicMax.SetWindowTextW(L"50");
+	photicTick.SetWindowTextW(L"10");
+	photicWidth.SetWindowTextW(L"2");
+	photicName1.SetWindowTextW(L"Alpha");
+	photicName2.SetWindowTextW(L"Beta");
+	photicName3.SetWindowTextW(L"Theta");
+	return TRUE;
+}
 
 CPhoticDlg::CPhoticDlg() : CDialogEx(CPhoticDlg::IDD)
 {
@@ -494,6 +525,37 @@ CPhoticDlg::CPhoticDlg() : CDialogEx(CPhoticDlg::IDD)
 void CPhoticDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	CString tmp;
+	DDX_Text(pDX, photic_max, tmp);
+	CStringA tmp1(tmp);
+	const char* data1 = (LPCSTR)tmp1;
+	theApp.photicMax = atoi(data1);
+
+	DDX_Text(pDX, photic_min, tmp);
+	CStringA tmp2(tmp);
+	const char* data2 = (LPCSTR)tmp2;
+	theApp.photicMin = atoi(data2);
+
+	DDX_Text(pDX, photic_tick, tmp);
+	CStringA tmp3(tmp);
+	const char* data3 = (LPCSTR)tmp3;
+	theApp.photicTick = atoi(data3);
+
+	DDX_Text(pDX, photic_Width, tmp);
+	CStringA tmp4(tmp);
+	const char* data4 = (LPCSTR)tmp4;
+	theApp.photicBarW = atoi(data4);
+
+	DDX_Control(pDX, photic_min, photicMin);
+	DDX_Control(pDX, photic_max, photicMax);
+	DDX_Control(pDX, photic_tick, photicTick);
+	DDX_Control(pDX, IDC_EDIT4, photicName1);
+	DDX_Control(pDX, IDC_EDIT11, photicName2);
+	DDX_Control(pDX, IDC_EDIT5, photicName3);
+	DDX_Control(pDX, IDC_EDIT12, photicName4);
+	DDX_Control(pDX, IDC_EDIT13, photicName5);
+	DDX_Control(pDX, photic_Width, photicWidth);
+	DDX_Control(pDX, photic_Color, photicColor);
 }
 
 BEGIN_MESSAGE_MAP(CPhoticDlg, CDialogEx)
@@ -513,9 +575,67 @@ void CAmekaApp::OnPhotic()
 	{
 		//Cameka
 		pView->onPhotic = ~pView->onPhotic;
+		CDC MemDC;
+		CBitmap* bitmap = new CBitmap;
+		CDC* pDC = pView->GetDC();
+
+		float startPos;
+	
+		if (pDC == NULL)
+			return;
+
+		//mDistance = (float)graphData.paperSpeed*(float)graphData.dotPmm/graphData.sampleRate;
+
+		CRect rect;
+		pView->GetClientRect(&rect);
+
+		if (NULL == MemDC.CreateCompatibleDC(pDC))
+		{
+			MemDC.DeleteDC();
+			return;
+		}
+
+		if (pView->onPhotic)
+			startPos = rect.Width()*0.667;
+		else
+			startPos = rect.Width();
+
+		int range = theApp.photicMax - theApp.photicMin;
+		int barNum = range;
+
+		if(bitmap != NULL)
+		{
+			if(NULL == bitmap->CreateCompatibleBitmap(pDC, (rect.Width()-startPos), rect.Height()))
+			{
+				DWORD tmp = GetLastError();
+				LOG(ERROR) << static_cast <int>(tmp);
+
+				return;
+			}
+		}
+
+		CBitmap* pOldBmp = MemDC.SelectObject(bitmap);
+
+		CBrush brush;
+		brush.CreateSolidBrush(RGB(255,255,200));
+		CRect mrect(0,0,rect.Width(),rect.Height());
+		MemDC.FillRect(mrect,&brush);
+
+		pDC->BitBlt(startPos, 0, rect.Width(), rect.Height(), &MemDC, 0, 0, SRCCOPY);
+	
+		MemDC.SelectObject(pOldBmp);
+		MemDC.DeleteDC();
+		DeleteObject(bitmap);
+		//DeleteObject(pen2);
+		DeleteObject(brush);
 	}
 }
 
+void CAmekaApp::OnSetupPhotic()
+{
+	CPhoticDlg photicDlg;
+	photicDlg.DoModal();
+}
 //------------------------------------------------------------------//
 // CLogDlg
 //------------------------------------------------------------------//
@@ -832,7 +952,7 @@ void CMontageDlg::DrawMontage(CDC* dc, LPAmontage mMon)
 	memDC.Rectangle(0, 0, monXScale, monYScale);
 	CPen newPen(PS_SOLID, 2, RGB(0, 0, 0));
 	memDC.SelectObject(newPen);
-	memDC.Ellipse(1, 1, monXScale - 1, monYScale - 1);
+	memDC.Ellipse(2, 2, monXScale - 2, monYScale - 2);
 	//create pen and brush
 	CBrush br1, *pbrOld;
 	br1.CreateSolidBrush(RGB(0,0,0));

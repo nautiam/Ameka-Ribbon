@@ -63,6 +63,7 @@
 #define IDC_CHECK3                      1003
 #define IDC_LIST1                       1004
 #define evt_lv                          1004
+#define IDC_CHECK4                      1004
 #define IDC_EDIT1                       1005
 #define log_view                        1005
 #define view_sensitivity                1005
@@ -73,11 +74,15 @@
 #define view_lp                         1007
 #define IDC_DATETIMEPICKER1             1008
 #define info_birthday                   1008
+#define IDC_CHECK5                      1008
 #define IDC_EDIT4                       1009
 #define IDC_EDIT5                       1010
 #define info_view                       1010
 #define IDC_TAB1                        1011
+#define IDC_EDIT11                      1011
+#define IDC_EDIT12                      1012
 #define opt_com_baud                    1013
+#define IDC_EDIT13                      1013
 #define opt_com_portNo                  1014
 #define evt_add                         1015
 #define evt_rename                      1016
@@ -110,12 +115,23 @@
 #define IDC_EDIT10                      1052
 #define rec_eeg                         1053
 #define mon_1                           1054
+#define IDC_EDIT14                      1054
 #define mon_2                           1055
+#define IDC_EDIT15                      1055
+#define IDC_EDIT16                      1056
 #define monctrl_list                    1057
+#define IDC_EDIT17                      1057
 #define mon_pic                         1058
+#define IDC_EDIT18                      1058
 #define IDC_BUTTON3                     1059
 #define mon_del                         1059
 #define mon_name                        1060
+#define photic_min                      1061
+#define photic_max                      1062
+#define photic_tick                     1063
+#define IDC_MFCCOLORBUTTON1             1064
+#define photic_Color                    1064
+#define photic_Width                    1065
 #define ID_WRITE_PASTEASHYPERLINK       32770
 #define MN_Open                         32771
 #define MN_Close                        32772
@@ -157,9 +173,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        327
+#define _APS_NEXT_RESOURCE_VALUE        328
 #define _APS_NEXT_COMMAND_VALUE         32820
-#define _APS_NEXT_CONTROL_VALUE         1061
+#define _APS_NEXT_CONTROL_VALUE         1066
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

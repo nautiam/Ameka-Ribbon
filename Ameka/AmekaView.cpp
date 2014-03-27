@@ -20,6 +20,7 @@
 #endif
 
 #include "AmekaDoc.h"
+#include "Ameka.h"
 #include "AmekaView.h"
 #include <stdint.h>
 #include "easylogging++.h"
@@ -33,6 +34,10 @@
 
 #define CUSTOM_SCANBAR RGB(92,64,51)
 #define CUSTOM_PEN RGB(72,61,139)
+#define CUSTOM_PEN1 RGB(192,192,192)
+#define CUSTOM_BARCOLOR RGB(41,102,0)
+#define CUSTOM_BARBACK RGB(255,255,200)
+#define MONNAME_BAR 20
 #define SBAR_W 4
 #define SAMPLE_RATE 256
 
@@ -41,7 +46,6 @@
 #define CODE_ERR_OTHER -2
 
 #define FACTOR 0.667
-#define TICKER 5
 
 // CAmekaView
 
@@ -63,7 +67,7 @@ CAmekaView::CAmekaView()
 {
 	// TODO: add construction code here
 	isRunning = false;
-	crtPos = 0;
+	crtPos = MONNAME_BAR;
 	isNull = true;
 	isCountFull = false;
 	pThread = NULL;
@@ -152,13 +156,19 @@ void CAmekaView::OnDraw(CDC* pDC)
 
 		int j,tmp;
 		
-		//CPen thick_pen(PS_SOLID, 1, CUSTOM_PEN);
-		//MemDC.SelectObject(&thick_pen);
+		CPen thick_pen(PS_SOLID, 2, CUSTOM_PEN);
+		CPen* oldPen = MemDC.SelectObject(&thick_pen);
+
+		MemDC.MoveTo(MONNAME_BAR + 1, 0);
+		MemDC.LineTo(MONNAME_BAR + 1, rect.Height());
+
+		MemDC.SelectObject(oldPen);
+		DeleteObject(&thick_pen);
 		
 		for(int i = 0; i < channelNum; i++)
 		{
 			j = 0;
-			while(crtPos - distance*(j+1) > 0)
+			while(crtPos - distance*(j+1) > MONNAME_BAR)
 			{
 				tmp = (rect.Height()*i/channelNum) + (rect.Height()/channelNum)/2 - (((float)dataBuffer[(count-1+bufLen-j)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
 				if (tmp > rect.Height())
@@ -203,21 +213,30 @@ void CAmekaView::OnDraw(CDC* pDC)
 			}
 		}
 
-		CBrush brushS(CUSTOM_SCANBAR);
+		CBrush brushS(CUSTOM_PEN);
 		//CBrush* pOldBrush1 = MemDC.SelectObject(&brushS);
 		MemDC.FillRect(CRect(crtPos, 0, crtPos + SBAR_W, rect.Height()),&brushS);
 		LeaveCriticalSection(&csess);
 
-		//DeleteObject(brushS);
+		DeleteObject(brushS);
 	}
-	
-	pDC->BitBlt(0, 0, maxWidth, rect.Height(), &MemDC, 0, 0, SRCCOPY);
+	if (onPhotic)
+	{
+		CBrush brushBar;
+		brushBar.CreateSolidBrush(CUSTOM_BARBACK);
+		CRect mrectBar(maxWidth,0,rect.Width(),rect.Height());
+		MemDC.FillRect(mrectBar,&brushBar);
+		DeleteObject(&brushBar);
+	}
+
+	pDC->BitBlt(0, 0, rect.Width(), rect.Height(), &MemDC, 0, 0, SRCCOPY);
 	UpdateWindow();
 	MemDC.SelectObject(pOldBmp); 
 	
 	MemDC.DeleteDC();
-	DeleteObject(brush);
-	DeleteObject(Wbmp);
+	DeleteObject(&brush);
+	DeleteObject(&Wbmp);
+
 	//DeleteObject(pOldBmp);
 	// TODO: add draw code for native data here
 	
@@ -230,13 +249,33 @@ void CAmekaView::OnDraw(CDC* pDC)
 UINT CAmekaView::graphHandle(LPVOID pParam)
 {
 	CAmekaView* pnt = (CAmekaView *)pParam;
+	CDC* pDC = pnt->GetDC();
 	pnt->setParentDoc(pnt->GetDocument());
 	pnt->dataBuffer = (RawDataType*)malloc(pnt->bufLen*sizeof(RawDataType));
 	int ret;
+	CPen pen2(PS_SOLID, 1, CUSTOM_PEN1);
 	while(1)
 	{
 		//ret = pnt->amekaDrawPos(&pnt->bmp);
-		pnt->amekaDrawPos();
+		pnt->amekaDrawPos(pDC);
+
+		if (pnt->onPhotic)
+		{
+			int startPos;
+			CRect rect;
+			pnt->GetClientRect(&rect);
+			startPos = rect.Width()*FACTOR;
+			int range = theApp.photicMax - theApp.photicMin;
+			int barNum = range/theApp.photicTick;
+			pDC->SelectObject(&pen2);
+			for (int i = 1; i <= barNum; i++)
+			{
+				pDC->MoveTo((startPos + i*(rect.Width()-startPos)/barNum), rect.Height()-5);
+				pDC->LineTo((startPos + i*(rect.Width()-startPos)/barNum), 0);
+				//MemDC.DrawText(itoa(TICKER*i),
+			}
+		}
+
 		if (pnt->onPhotic)
 			pnt->drawBarGraph();
 		/*
@@ -245,6 +284,8 @@ UINT CAmekaView::graphHandle(LPVOID pParam)
 			*/
 		::Sleep(timeSleep);
 	}
+	DeleteObject(&pen2);
+	DeleteObject(pDC);
 	return 0;
 }
 
@@ -254,24 +295,45 @@ void CAmekaView::setParentDoc(CAmekaDoc* doc)
 }
 
 //int CAmekaView::amekaDrawPos(CBitmap* bitmap)
-int CAmekaView::amekaDrawPos()
+int CAmekaView::amekaDrawPos(CDC* pDC)
 {
 	//TBD
 	//CBitmap bitmap;
 	CDC MemDC;
 	CBitmap* bitmap = new CBitmap;
-	CDC* pDC = GetDC();
 	//RawDataType* data = new RawDataType[dataNum];
 	uint16_t buflen = 0;
 	float maxWidth;
+	RawDataType* data;
 	
 	if (pDC == NULL)
 		return -1;
 	
+	CRect rect;
+    GetClientRect(&rect);
+
 	//data = theApp.pIO->RawData->popData(dataNum);
 	//CAmekaDoc *doc = CAmekaDoc::GetDoc();
-	
-	RawDataType* data = this->mDoc->PrimaryData->popData(dataNum);
+
+	EnterCriticalSection(&csess);
+	distance = (float)graphData.paperSpeed*(float)graphData.dotPmm/graphData.sampleRate;
+	LeaveCriticalSection(&csess);
+
+	if (onPhotic)
+		maxWidth = rect.Width()*FACTOR;
+	else
+		maxWidth = rect.Width();
+	if(crtPos + distance + SBAR_W >= maxWidth)
+		crtPos = MONNAME_BAR;
+
+	if ((rect.Width() - crtPos - SBAR_W)/distance > dataNum)
+	{
+		data = this->mDoc->PrimaryData->popData(dataNum);
+	}
+	else
+	{
+		data = this->mDoc->PrimaryData->popData((rect.Width() - crtPos - SBAR_W)/distance);
+	}
 	buflen = this->mDoc->PrimaryData->rLen;
 	if ((buflen <= 0) || (data == NULL))
 		return -2;
@@ -298,32 +360,34 @@ int CAmekaView::amekaDrawPos()
 		MemDC.DeleteDC();
 		return -1;
 	}
-	EnterCriticalSection(&csess);
-	distance = (float)graphData.paperSpeed*(float)graphData.dotPmm/graphData.sampleRate;
-	LeaveCriticalSection(&csess);
-	CRect rect;
-    GetClientRect(&rect);
 
-	if (onPhotic)
-		maxWidth = rect.Width()*FACTOR;
-	else
-		maxWidth = rect.Width();
+	int drawW = distance * buflen + SBAR_W;
 
 	if(bitmap != NULL)
 	{
-		if(NULL == bitmap->CreateCompatibleBitmap(pDC, distance * buflen + SBAR_W, rect.Height()))
+		if (crtPos + drawW > maxWidth)
 		{
-			DWORD tmp = GetLastError();
-			LOG(ERROR) << static_cast <int>(tmp);
+			if(NULL == bitmap->CreateCompatibleBitmap(pDC, maxWidth - crtPos, rect.Height()))
+			{
+				DWORD tmp = GetLastError();
+				LOG(ERROR) << static_cast <int>(tmp);
 
-			return -1;
+				return -1;
+			}
+		}
+		else
+		{
+			if(NULL == bitmap->CreateCompatibleBitmap(pDC, drawW, rect.Height()))
+			{
+				DWORD tmp = GetLastError();
+				LOG(ERROR) << static_cast <int>(tmp);
+
+				return -1;
+			}
 		}
 	}
 
 	MemDC.SelectObject(bitmap);
-	
-	if(crtPos >= maxWidth)
-		crtPos = 0;
 
 	//memcpy(dataBuffer[count],data,sizeof(RawDataType));
 	//count = (count+1)%bufLen;
@@ -339,6 +403,18 @@ int CAmekaView::amekaDrawPos()
 	
 	int tmp = 0;
 	//draw all point to current bitmap
+
+	if (crtPos == MONNAME_BAR)
+	{
+		CPen thick_pen(PS_SOLID, 2, CUSTOM_PEN);
+		CPen* oldPen = MemDC.SelectObject(&thick_pen);
+
+		MemDC.MoveTo(1, 0);
+		MemDC.LineTo(1, rect.Height());
+
+		MemDC.SelectObject(oldPen);
+		DeleteObject(&thick_pen);
+	}
 	
 	for(int i = 0; i < channelNum;i++)
 	{
@@ -378,10 +454,10 @@ int CAmekaView::amekaDrawPos()
 		}
 	
 	//draw scan bar
-	CBrush brushS(CUSTOM_SCANBAR);
+	CBrush brushS(CUSTOM_PEN);
 	//CBrush* pOldBrush1 = MemDC.SelectObject(&brushS);
 	MemDC.FillRect(CRect(distance * buflen, 0, distance * buflen + SBAR_W, rect.Height()),&brushS);
-	
+
 	pDC->BitBlt(crtPos, 0, distance * buflen + SBAR_W, rect.Height(), &MemDC, 0, 0, SRCCOPY);
 	
 	prePos = data[buflen-1];
@@ -395,6 +471,8 @@ int CAmekaView::amekaDrawPos()
 	//DeleteObject(bitmap);
 	delete[] data;
 	DeleteObject(bitmap);
+	DeleteObject(&brushS);
+	DeleteObject(&brush);
 	delete bitmap;
 	bitmap = NULL;
 	//delete bitmap;
@@ -415,7 +493,15 @@ int CAmekaView::drawBarGraph( void )
 	if (pDC == NULL)
 		return -1;
 
-	mDistance = (float)graphData.paperSpeed*(float)graphData.dotPmm/graphData.sampleRate;
+	SecondaryDataType* data = this->mDoc->SecondaryData->popData(1);
+	buflen = this->mDoc->SecondaryData->rLen;
+	if ((buflen <= 0) || (data == NULL))
+		return -2;
+
+	if (data->fre > theApp.photicMax)
+		return 1;
+
+	//mDistance = (float)graphData.paperSpeed*(float)graphData.dotPmm/graphData.sampleRate;
 
 	CRect rect;
     GetClientRect(&rect);
@@ -431,9 +517,12 @@ int CAmekaView::drawBarGraph( void )
 	else
 		startPos = rect.Width();
 
+	int range = theApp.photicMax - theApp.photicMin;
+	int barNum = range/theApp.photicBarW;
+
 	if(bitmap != NULL)
 	{
-		if(NULL == bitmap->CreateCompatibleBitmap(pDC, rect.Width() - startPos  + 1, rect.Height()))
+		if(NULL == bitmap->CreateCompatibleBitmap(pDC, (rect.Width()-startPos)/barNum, rect.Height()))
 		{
 			DWORD tmp = GetLastError();
 			LOG(ERROR) << static_cast <int>(tmp);
@@ -445,24 +534,48 @@ int CAmekaView::drawBarGraph( void )
 	CBitmap* pOldBmp = MemDC.SelectObject(bitmap);
 
 	CBrush brush;
-	brush.CreateSolidBrush(RGB(255,255,255));
+	brush.CreateSolidBrush(CUSTOM_BARBACK);
 	CRect mrect(0,0,rect.Width(),rect.Height());
 	MemDC.FillRect(mrect,&brush);
 
-	int barNum = 50/TICKER;
+	//CPen pen2(PS_SOLID, 1, CUSTOM_PEN);
+	/*MemDC.SelectObject(pen1);
+	MemDC.MoveTo(0, rect.Height());
+	MemDC.LineTo(0, 0);*/
+	//MemDC.SelectObject(pen2);
+	//for (int i = 1; i <= barNum; i++)
+	//{
+	//	MemDC.MoveTo((i*(rect.Width()-startPos)/barNum), rect.Height()-5);
+	//	MemDC.LineTo((i*(rect.Width()-startPos)/barNum), 0);
+	//	//MemDC.DrawText(itoa(TICKER*i),
+	//}
+	CBrush brushS(CUSTOM_BARCOLOR);
+	MemDC.SelectObject(brushS);
+	int barCount = data->fre/2;
 
-	MemDC.SelectObject(new CPen(PS_SOLID, 1, CUSTOM_PEN));
-	for (int i = 1; i <= barNum; i++)
+	for (int i = 0; i < 16; i++)
 	{
-		MemDC.MoveTo((i*(rect.Width()-startPos)/barNum), rect.Height());
-		MemDC.LineTo((i*(rect.Width()-startPos)/barNum), 0);
+		CRect barRect(0, (i+1)*rect.Height()/16 - data->value[i]/30, 
+			(rect.Width()-startPos)/barNum,(i+1)*rect.Height()/16);
+		MemDC.FillRect(barRect,&brushS);
+
+		/*CPen pen1(PS_SOLID, 1, CUSTOM_PEN);
+		CPen* pen2 = MemDC.SelectObject(&pen1);
+		MemDC.Rectangle(CRect(0, (i+1)*rect.Height()/16 - data->value[i]/10, 
+			(rect.Width()-startPos)/barNum,(i+1)*rect.Height()/16));
+		MemDC.SelectObject(pen2);
+		DeleteObject(&pen1);*/
 	}
 
-	pDC->BitBlt(startPos, 0, rect.Width(), rect.Height(), &MemDC, 0, 0, SRCCOPY);
+	pDC->BitBlt((startPos + barCount*(rect.Width()-startPos)/barNum), 0, rect.Width(), rect.Height(), &MemDC, 0, 0, SRCCOPY);
 	
 	MemDC.SelectObject(pOldBmp);
 	MemDC.DeleteDC();
 	DeleteObject(bitmap);
+	//DeleteObject(pen2);
+	DeleteObject(&brush);
+	DeleteObject(&brushS);
+	delete [] data;
 
 	return 0;
 };

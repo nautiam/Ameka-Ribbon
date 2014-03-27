@@ -69,7 +69,7 @@ CAmekaDoc::CAmekaDoc()
 	mDSP.LPFFre = 30;
 	mDSP.SampleRate = 256;
 	this->m_dspProcess = AfxBeginThread(DSP::DSPThread, (LPVOID)this);
-	thrd = AfxBeginThread(genData, (LPVOID)this);
+	//thrd = AfxBeginThread(genData, (LPVOID)this);
 }
 
 CAmekaDoc::~CAmekaDoc()
@@ -90,14 +90,14 @@ CAmekaDoc::~CAmekaDoc()
 	POSITION pos = theApp.docList.Find(this);
 	theApp.docList.RemoveAt(pos);
 
-	GetExitCodeThread(thrd->m_hThread, &exit_code);
+	/*GetExitCodeThread(thrd->m_hThread, &exit_code);
 	if(exit_code == STILL_ACTIVE)
 	{
 		::TerminateThread(thrd->m_hThread, 0);
 		CloseHandle(thrd->m_hThread);
 	}
 	thrd->m_hThread = NULL;
-	thrd = NULL;
+	thrd = NULL;*/
 }
 
 BOOL CAmekaDoc::OnNewDocument()

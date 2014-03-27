@@ -55,6 +55,11 @@ public:
 	amekaLan* mnLan;
 	Aelectrode* mElec;
 	uint16_t elecNum;
+
+	uint16_t photicMin;
+	uint16_t photicMax;
+	uint16_t photicTick;
+	float photicBarW;
 // Overrides
 public:
 	virtual BOOL InitInstance();
@@ -77,6 +82,7 @@ public:
 	afx_msg void OnDemo();			//Graph demo
 	afx_msg void OnStop();			//Graph demo
 	afx_msg void OnMontage();		//Montage
+	afx_msg void OnSetupPhotic();	//Setup photic
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnScalerate();
 	afx_msg void OnPortOpen();

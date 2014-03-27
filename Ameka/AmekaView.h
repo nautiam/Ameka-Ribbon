@@ -54,7 +54,7 @@ public:
 	static CAmekaView* GetView();
 	static UINT graphHandle(LPVOID pParam);			//handle thread
 	//int amekaDrawPos(CBitmap* bitmap);			//for draw current position only	
-	int amekaDrawPos();			//for draw current position only	
+	int amekaDrawPos(CDC* pDC);			//for draw current position only	
 	void setParentDoc(CAmekaDoc* doc);
 	int drawBarGraph( void );
 #ifdef _DEBUG
@@ -67,6 +67,7 @@ private:
 	float distance;
 	RawDataType* dataBuffer;
 	RawDataType prePos;
+	SecondaryDataType preBar;
 	uint16_t count;
 	uint16_t bufLen;
 	bool isCountFull;
