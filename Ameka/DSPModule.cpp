@@ -68,12 +68,19 @@ UINT DSP::DSPThread(LPVOID pParam)
 		static int count = 0;
 		count++;
 
+		float epocLength = mDoc->mDSP.epocLength;
+		int nfft;
+		nfft = (float)SAMPLE_RATE/epocLength;
+		float NC = (float)nfft/2.0 + 1.0;
+
 		float* audioData[LEAD_NUMBER];
-		RawDataType* data = mDoc->dataBuffer->popAll();
+		//RawDataType* data = mDoc->dataBuffer->popAll();
+		RawDataType* data = mDoc->dataBuffer->checkPopData(nfft);
 		int size =  mDoc->dataBuffer->rLen;
-		RawDataType* output = new RawDataType[size];
+		
 		if (size != 0 && data != NULL)
 		{
+			RawDataType* output = new RawDataType[size];
 			for (int i=0; i<LEAD_NUMBER; i++)
 			{
 				audioData[i] = new float[size];
@@ -142,12 +149,22 @@ UINT DSP::DSPThread(LPVOID pParam)
 			
 			for (int i=0; i<size; i++)
 			{
-				mDoc->PrimaryData->pushData(output[i]);
+				if (mDoc->PrimaryData->pushData(output[i]) != 0)
+				{
+					LOG(DEBUG) << "Primary Data ring buffer is full";	
+				};
 			}
 			
 			// Convert to frequency domain
-			int nfft = size;
-			float NC = nfft/2.0 + 1;
+			/*float epocLength = mDoc->mDSP.epocLength;
+			int nfft;
+
+			nfft = (float)SAMPLE_RATE/epocLength;
+			float NC = (float)nfft/2.0 + 1.0;*/
+			//RawDataType* priData = mDoc->PrimaryData->checkPopData(nfft);
+			//if (priData != NULL)
+			//if (mDoc->PrimaryData->rLen == nfft)
+			//{
 			int isinverse = 0;
 			kiss_fft_cfg st;
 			kiss_fft_cpx * buf[LEAD_NUMBER];
@@ -169,7 +186,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 					buf[j][i].i = 0;
 				}
 				kiss_fft( st , buf[j] ,bufout[j]);
-				convert_to_freq(bufout[j], NC);
+				convert_to_freq(bufout[j], 100);
 				complex_abs(bufout[j], NC);
 			}
 
@@ -183,21 +200,24 @@ UINT DSP::DSPThread(LPVOID pParam)
 
 			// Print output to file
 			
-			for (int i=0; i<NC; i++)
+			for (int i=0; i<(int)NC; i++)
 			{
 				SecondaryDataType temp;
-				float fre = i * (float)(SAMPLE_RATE / nfft);
+				float fre = i * epocLength;
 				temp.fre = fre;
-				for (int j=0; j<LEAD_NUMBER; j++)
+				for (int j=0; j<LEAD_NUMBER; j++)	
 				{
 					temp.value[j] = bufout[j][i].r;
-					/*float fre = i * (float)(SAMPLE_RATE / nfft);
-					LOG(INFO) << "------------";
+					//float fre = i * (float)(SAMPLE_RATE / nfft);
+					/*LOG(INFO) << "------------";
 					LOG(INFO) << j;
 					LOG(INFO) << fre;
 					LOG(INFO) << bufout[j][i].r;*/
 				}
-				mDoc->SecondaryData->pushData(temp);
+				if (mDoc->SecondaryData->pushData(temp) != 0)
+				{
+					LOG(DEBUG) << "Secondary Data Ring buffer is full";
+				};
 			}
 
 			free(st);
@@ -210,6 +230,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 			{
 				delete [] audioData[i];
 			}
+			//}
 			delete output;
 			delete [] data;
 		}

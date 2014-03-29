@@ -47,6 +47,9 @@ struct DSPData
 	float LPFFre;
 	float HPFFre;
 	uint16_t SampleRate;
+
+	// Spectral Data
+	float epocLength;
 };
 
 // Graph data
@@ -118,7 +121,7 @@ public:
 	T get(uint16_t index);
 	T* popAll();
 	T* popData(uint16_t num);
-	//T* popData(uint16_t num);
+	T* checkPopData(uint16_t num);
 	
 private:
 	// to be used later
@@ -224,6 +227,30 @@ T* amekaData<T>::popData(uint16_t num)
 		if (isEmpty())
 		{
 			rLen = i;
+			return data;
+		}
+		data[i] = arrData[LRPos%dataLen];
+		LRPos = (LRPos+1)%dataLen;
+	}
+	//LRPos = (LRPos+num)%dataLen;
+	rLen = num;
+	//LeaveCriticalSection(&csess);
+	return data;
+};
+
+template<class T>
+T* amekaData<T>::checkPopData(uint16_t num)
+{
+	//
+	//EnterCriticalSection(&csess);
+	T* data = (T*)malloc(num*sizeof(T));
+	for (int i = 0; i < num; i++)
+	{
+		if (isEmpty())
+		{
+			rLen = i;
+			data = NULL;
+			LRPos = (LRPos+dataLen-i)%dataLen;
 			return data;
 		}
 		data[i] = arrData[LRPos%dataLen];

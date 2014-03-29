@@ -433,7 +433,7 @@ BOOL ReadThread::byteProcessing(char * buffer)
 	if (packetType == PACKET_CONFIRM)
 	{
 		//AfxMessageBox("Receive a packet confirm!");
-		LOG(DEBUG) << "Receive a packet confirm";
+		//LOG(DEBUG) << "Receive a packet confirm";
 		//confirmTimes++;
 		return TRUE;
 	}
@@ -454,7 +454,7 @@ BOOL ReadThread::byteProcessing(char * buffer)
 	char temp37 = m_serialIO->m_recvBuffer->get(37);
 	if (checksum == temp37)
 	{
-		LOG(DEBUG) << "Receive a packet data";
+		//LOG(DEBUG) << "Receive a packet data";
 		packetType = PACKET_DATA;
 		return TRUE;
 	}

@@ -30,7 +30,7 @@
 #define new DEBUG_NEW
 #endif
 
-#define BUFFER_LEN 1024
+#define BUFFER_LEN 4096
 
 // CAmekaDoc
 
@@ -70,6 +70,7 @@ CAmekaDoc::CAmekaDoc()
 	mDSP.SampleRate = 256;
 	this->m_dspProcess = AfxBeginThread(DSP::DSPThread, (LPVOID)this);
 	//thrd = AfxBeginThread(genData, (LPVOID)this);
+	mDSP.epocLength = 1.0;
 }
 
 CAmekaDoc::~CAmekaDoc()

@@ -39,7 +39,7 @@
 #define CUSTOM_BARBACK RGB(255,255,200)
 #define MONNAME_BAR 20
 #define SBAR_W 4
-#define SAMPLE_RATE 256
+#define SAMPLE_RATE 200
 
 #define CODE_ERR_PDC_NULL -1
 #define CODE_SUCCESS 0
