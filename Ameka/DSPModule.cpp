@@ -44,7 +44,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 {
 	CAmekaDoc* mDoc = (CAmekaDoc*)(pParam);
 	uint16_t numSamples = 2000;
-	Dsp::SmoothedFilterDesign <Dsp::Butterworth::Design::BandPass <4>, LEAD_NUMBER, Dsp::DirectFormII> f (1024);
+	Dsp::SmoothedFilterDesign <Dsp::Butterworth::Design::BandPass <4>, LEAD_NUMBER, Dsp::DirectFormII> f (4096);
 	Dsp::Params params;
 	//params[0] = sampleRate; // sample rate
 	//params[1] = 4; // order
@@ -73,14 +73,17 @@ UINT DSP::DSPThread(LPVOID pParam)
 		nfft = (float)SAMPLE_RATE/epocLength;
 		float NC = (float)nfft/2.0 + 1.0;
 
-		float* audioData[LEAD_NUMBER];
+		
 		//RawDataType* data = mDoc->dataBuffer->popAll();
 		RawDataType* data = mDoc->dataBuffer->checkPopData(nfft);
 		int size =  mDoc->dataBuffer->rLen;
 		
-		if (size != 0 && data != NULL)
+		if (size > 0 && data != NULL)
 		{
+			float* audioData[LEAD_NUMBER];
 			RawDataType* output = new RawDataType[size];
+			if (!output)
+				AfxMessageBox(L"Error!");
 			for (int i=0; i<LEAD_NUMBER; i++)
 			{
 				audioData[i] = new float[size];
@@ -186,7 +189,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 					buf[j][i].i = 0;
 				}
 				kiss_fft( st , buf[j] ,bufout[j]);
-				convert_to_freq(bufout[j], 100);
+				//convert_to_freq(bufout[j], nfft);
 				complex_abs(bufout[j], NC);
 			}
 
@@ -214,24 +217,30 @@ UINT DSP::DSPThread(LPVOID pParam)
 					LOG(INFO) << fre;
 					LOG(INFO) << bufout[j][i].r;*/
 				}
-				if (mDoc->SecondaryData->pushData(temp) != 0)
+				/*if (mDoc->SecondaryData->pushData(temp) != 0)
 				{
 					LOG(DEBUG) << "Secondary Data Ring buffer is full";
-				};
+				};*/
+				mDoc->SecondaryData->pushData(temp);
 			}
-
-			free(st);
+			if (!st)
+				free(st);
 			for (int i=0; i<LEAD_NUMBER; i++)
 			{
-				free(buf[i]);
-				free(bufout[i]);
+				if (!buf[i] )
+					free(buf[i]);
+				if (!bufout[i])
+					free(bufout[i]);
 			}
 			for (int i=0; i<LEAD_NUMBER; i++)
 			{
-				delete [] audioData[i];
+				if (!audioData[i])
+					delete [] audioData[i];
 			}
 			//}
-			delete output;
+			if (!output)
+				delete output;
+			if (!data)
 			delete [] data;
 		}
 	}

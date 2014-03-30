@@ -39,7 +39,7 @@
 #define CUSTOM_BARBACK RGB(255,255,200)
 #define MONNAME_BAR 20
 #define SBAR_W 4
-#define SAMPLE_RATE 200
+#define AAAAA 30
 
 #define CODE_ERR_PDC_NULL -1
 #define CODE_SUCCESS 0
@@ -96,6 +96,19 @@ CAmekaView::~CAmekaView()
 		pThread->m_hThread = NULL;
 		pThread = NULL;
 		isRunning = false;
+	}
+
+	exit_code= NULL;
+	if (this->pPhoticThread != NULL)
+	{
+		GetExitCodeThread(this->pPhoticThread->m_hThread, &exit_code);
+		if(exit_code == STILL_ACTIVE)
+		{
+			::TerminateThread(this->pPhoticThread->m_hThread, 0);
+			CloseHandle(this->pPhoticThread->m_hThread);
+		}
+		this->pPhoticThread->m_hThread = NULL;
+		this->pPhoticThread = NULL;
 	}
 	DeleteCriticalSection(&csess);
 }
@@ -259,25 +272,6 @@ UINT CAmekaView::graphHandle(LPVOID pParam)
 		//ret = pnt->amekaDrawPos(&pnt->bmp);
 		pnt->amekaDrawPos(pDC);
 
-		if (pnt->onPhotic)
-		{
-			int startPos;
-			CRect rect;
-			pnt->GetClientRect(&rect);
-			startPos = rect.Width()*FACTOR;
-			int range = theApp.photicMax - theApp.photicMin;
-			int barNum = range/theApp.photicTick;
-			pDC->SelectObject(&pen2);
-			for (int i = 1; i <= barNum; i++)
-			{
-				pDC->MoveTo((startPos + i*(rect.Width()-startPos)/barNum), rect.Height()-5);
-				pDC->LineTo((startPos + i*(rect.Width()-startPos)/barNum), 0);
-				//MemDC.DrawText(itoa(TICKER*i),
-			}
-		}
-
-		if (pnt->onPhotic)
-			pnt->drawBarGraph();
 		/*
 		if(ret == -1)
 			return -1;
@@ -285,6 +279,28 @@ UINT CAmekaView::graphHandle(LPVOID pParam)
 		::Sleep(timeSleep);
 	}
 	DeleteObject(&pen2);
+	DeleteObject(pDC);
+	return 0;
+}
+
+UINT CAmekaView::photicHandle(LPVOID pParam)
+{
+	CAmekaView* pnt = (CAmekaView *)pParam;
+	CDC* pDC = pnt->GetDC();
+	pnt->setParentDoc(pnt->GetDocument());
+	while(1)
+	{
+		//ret = pnt->amekaDrawPos(&pnt->bmp);
+		if (pnt->onPhotic)
+		{
+			pnt->drawBarGraph();
+		/*
+		if(ret == -1)
+			return -1;
+			*/
+		}
+		::Sleep(timeSleep);
+	}
 	DeleteObject(pDC);
 	return 0;
 }
@@ -484,17 +500,25 @@ int CAmekaView::drawBarGraph( void )
 {
 	CDC MemDC;
 	CBitmap* bitmap = new CBitmap;
+
 	CDC* pDC = GetDC();
-	float mDistance;
 	//RawDataType* data = new RawDataType[dataNum];
-	uint16_t buflen = 0;
 	float startPos;
 	
 	if (pDC == NULL)
 		return -1;
 
-	SecondaryDataType* data = this->mDoc->SecondaryData->popData(1);
-	buflen = this->mDoc->SecondaryData->rLen;
+	CAmekaDoc* pDoc = this->GetDocument();
+	if (pDoc == NULL)
+		return -1;
+
+	uint16_t buflen = SAMPLE_RATE/(this->GetDocument()->mDSP.epocLength);
+
+	SecondaryDataType* data = this->mDoc->SecondaryData->checkPopData(buflen);
+	int size = this->mDoc->SecondaryData->rLen;
+	if (!data)
+		return -1;
+
 	if ((buflen <= 0) || (data == NULL))
 		return -2;
 
@@ -517,18 +541,27 @@ int CAmekaView::drawBarGraph( void )
 	else
 		startPos = rect.Width();
 
-	int range = theApp.photicMax - theApp.photicMin;
-	int barNum = range/theApp.photicBarW;
+	float range = theApp.photicMax - theApp.photicMin;
+	int barNum = range/pDoc->mDSP.epocLength;
 
 	if(bitmap != NULL)
 	{
-		if(NULL == bitmap->CreateCompatibleBitmap(pDC, (rect.Width()-startPos)/barNum, rect.Height()))
+		if(NULL == bitmap->CreateCompatibleBitmap(pDC, (rect.Width()-startPos), rect.Height()))
 		{
 			DWORD tmp = GetLastError();
 			LOG(ERROR) << static_cast <int>(tmp);
 
 			return -1;
 		}
+	}
+
+	CPen pen2(PS_SOLID, 1, CUSTOM_PEN1);
+	pDC->SelectObject(&pen2);
+	for (int i = 1; i <= barNum; i++)
+	{
+		MemDC.MoveTo(i*(rect.Width()-startPos)/barNum, rect.Height()-5);
+		MemDC.LineTo(i*(rect.Width()-startPos)/barNum, 0);
+		//MemDC.DrawText(itoa(TICKER*i),
 	}
 
 	CBitmap* pOldBmp = MemDC.SelectObject(bitmap);
@@ -538,36 +571,23 @@ int CAmekaView::drawBarGraph( void )
 	CRect mrect(0,0,rect.Width(),rect.Height());
 	MemDC.FillRect(mrect,&brush);
 
-	//CPen pen2(PS_SOLID, 1, CUSTOM_PEN);
-	/*MemDC.SelectObject(pen1);
-	MemDC.MoveTo(0, rect.Height());
-	MemDC.LineTo(0, 0);*/
-	//MemDC.SelectObject(pen2);
-	//for (int i = 1; i <= barNum; i++)
-	//{
-	//	MemDC.MoveTo((i*(rect.Width()-startPos)/barNum), rect.Height()-5);
-	//	MemDC.LineTo((i*(rect.Width()-startPos)/barNum), 0);
-	//	//MemDC.DrawText(itoa(TICKER*i),
-	//}
 	CBrush brushS(CUSTOM_BARCOLOR);
 	MemDC.SelectObject(brushS);
-	int barCount = data->fre/2;
 
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < buflen; i++)
 	{
-		CRect barRect(0, (i+1)*rect.Height()/16 - data->value[i]/30, 
-			(rect.Width()-startPos)/barNum,(i+1)*rect.Height()/16);
-		MemDC.FillRect(barRect,&brushS);
+		int barCount = data[i].fre/pDoc->mDSP.epocLength;
+		float barPos = (float)barCount*(rect.Width()-startPos)/barNum;
+		for (int j = 0; j < 16; j++)
+		{
+			CRect barRect(0 + barPos, (j+1)*rect.Height()/16 - (data[i].value[j] + AAAAA - 1)/AAAAA, 
+				(rect.Width()-startPos)/barNum + barPos,(j+1)*rect.Height()/16);
+			MemDC.FillRect(barRect,&brushS);
 
-		/*CPen pen1(PS_SOLID, 1, CUSTOM_PEN);
-		CPen* pen2 = MemDC.SelectObject(&pen1);
-		MemDC.Rectangle(CRect(0, (i+1)*rect.Height()/16 - data->value[i]/10, 
-			(rect.Width()-startPos)/barNum,(i+1)*rect.Height()/16));
-		MemDC.SelectObject(pen2);
-		DeleteObject(&pen1);*/
+		}
 	}
 
-	pDC->BitBlt((startPos + barCount*(rect.Width()-startPos)/barNum), 0, rect.Width(), rect.Height(), &MemDC, 0, 0, SRCCOPY);
+	pDC->BitBlt(startPos , 0, rect.Width(), rect.Height(), &MemDC, 0, 0, SRCCOPY);
 	
 	MemDC.SelectObject(pOldBmp);
 	MemDC.DeleteDC();
@@ -575,6 +595,8 @@ int CAmekaView::drawBarGraph( void )
 	//DeleteObject(pen2);
 	DeleteObject(&brush);
 	DeleteObject(&brushS);
+	DeleteObject(&pen2);
+
 	delete [] data;
 
 	return 0;

@@ -56,9 +56,9 @@ public:
 	Aelectrode* mElec;
 	uint16_t elecNum;
 
-	uint16_t photicMin;
-	uint16_t photicMax;
-	uint16_t photicTick;
+	float photicMin;
+	float photicMax;
+	float photicTick;
 	float photicBarW;
 // Overrides
 public:

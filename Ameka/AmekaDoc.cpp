@@ -23,6 +23,7 @@
 #include "xmlParser.h"
 #include "DSPModule.h"
 #include "MainFrm.h"
+#include "AmekaView.h"
 
 #include <propkey.h>
 
@@ -67,10 +68,10 @@ CAmekaDoc::CAmekaDoc()
 	SecondaryData = new amekaData<SecondaryDataType>(BUFFER_LEN);
 	mDSP.HPFFre = 0.5;
 	mDSP.LPFFre = 30;
-	mDSP.SampleRate = 256;
+	mDSP.SampleRate = 200;
 	this->m_dspProcess = AfxBeginThread(DSP::DSPThread, (LPVOID)this);
 	//thrd = AfxBeginThread(genData, (LPVOID)this);
-	mDSP.epocLength = 1.0;
+	mDSP.epocLength = 2.0;
 }
 
 CAmekaDoc::~CAmekaDoc()
@@ -90,15 +91,6 @@ CAmekaDoc::~CAmekaDoc()
 	dataBuffer = NULL;
 	POSITION pos = theApp.docList.Find(this);
 	theApp.docList.RemoveAt(pos);
-
-	/*GetExitCodeThread(thrd->m_hThread, &exit_code);
-	if(exit_code == STILL_ACTIVE)
-	{
-		::TerminateThread(thrd->m_hThread, 0);
-		CloseHandle(thrd->m_hThread);
-	}
-	thrd->m_hThread = NULL;
-	thrd = NULL;*/
 }
 
 BOOL CAmekaDoc::OnNewDocument()

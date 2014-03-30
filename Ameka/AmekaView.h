@@ -32,6 +32,7 @@ public:
 	CAmekaDoc* GetDocument() const;
 	bool isRunning;
 	CWinThread* pThread;
+	CWinThread* pPhoticThread;
 	GraphData graphData;
 	CBitmap bmp;
 	boolean onPhotic;
@@ -53,6 +54,7 @@ public:
 	virtual ~CAmekaView();
 	static CAmekaView* GetView();
 	static UINT graphHandle(LPVOID pParam);			//handle thread
+	static UINT photicHandle(LPVOID pParam);			//photic thread
 	//int amekaDrawPos(CBitmap* bitmap);			//for draw current position only	
 	int amekaDrawPos(CDC* pDC);			//for draw current position only	
 	void setParentDoc(CAmekaDoc* doc);
