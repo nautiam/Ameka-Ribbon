@@ -71,6 +71,7 @@ CAmekaView::CAmekaView()
 	isNull = true;
 	isCountFull = false;
 	pThread = NULL;
+	pPhoticThread = NULL;
 	count = 0;
 	bufLen = 4096;
 	channelNum = 16;
@@ -98,7 +99,7 @@ CAmekaView::~CAmekaView()
 		isRunning = false;
 	}
 
-	exit_code= NULL;
+	exit_code = NULL;
 	if (this->pPhoticThread != NULL)
 	{
 		GetExitCodeThread(this->pPhoticThread->m_hThread, &exit_code);

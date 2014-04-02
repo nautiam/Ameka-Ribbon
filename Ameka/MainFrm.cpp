@@ -175,7 +175,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (pMon)
 	{
 		POSITION pos =  theApp.monList.GetHeadPosition();
-		for (int i = 0; i < theApp.monList.GetCount(); i++)
+		while(pos)
 		{
 			LPAmontage tmp = theApp.monList.GetNext( pos );
 			pMon->AddItem(tmp->mName,count++);

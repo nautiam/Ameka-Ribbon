@@ -64,7 +64,7 @@ public:
 public:
 	virtual BOOL InitInstance();
 	virtual int ExitInstance();
-
+	ULONG_PTR m_gdiplusToken;
 // Implementation
 	UINT  m_nAppLook;
 	virtual void PreLoadState();

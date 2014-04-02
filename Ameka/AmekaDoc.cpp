@@ -44,22 +44,22 @@ END_MESSAGE_MAP()
 
 
 // CAmekaDoc construction/destruction
-UINT genData(LPVOID pParam)
-{
-	CAmekaDoc* pnt = (CAmekaDoc *)pParam;
-	while(1)
-	{
-		RawDataType data;
-		data.time = 0;
-		for (int i = 0; i < 15; i++)
-		{
-			data.value[i] = (13000+rand()%3000);
-		}
-		pnt->PrimaryData->pushData(data);
-		Sleep(3);
-	}
-	return 0;
-}
+//UINT genData(LPVOID pParam)
+//{
+//	CAmekaDoc* pnt = (CAmekaDoc *)pParam;
+//	while(1)
+//	{
+//		RawDataType data;
+//		data.time = 0;
+//		for (int i = 0; i < 15; i++)
+//		{
+//			data.value[i] = (13000+rand()%3000);
+//		}
+//		pnt->PrimaryData->pushData(data);
+//		Sleep(3);
+//	}
+//	return 0;
+//}
 CAmekaDoc::CAmekaDoc()
 {
 	// TODO: add one-time construction code here
@@ -76,6 +76,9 @@ CAmekaDoc::CAmekaDoc()
 
 CAmekaDoc::~CAmekaDoc()
 {
+	delete dataBuffer;
+	delete PrimaryData;
+	delete SecondaryData;
 	DWORD exit_code = NULL;
 	GetExitCodeThread(this->m_dspProcess->m_hThread, &exit_code);
 
@@ -85,10 +88,7 @@ CAmekaDoc::~CAmekaDoc()
 		CloseHandle(this->m_dspProcess->m_hThread);
 	}
 	m_dspProcess = NULL;
-	
-	delete PrimaryData;
-	delete dataBuffer;
-	dataBuffer = NULL;
+
 	POSITION pos = theApp.docList.Find(this);
 	theApp.docList.RemoveAt(pos);
 }
@@ -111,7 +111,7 @@ BOOL CAmekaDoc::OnNewDocument()
 		CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
 		CMFCRibbonComboBox* pMon = DYNAMIC_DOWNCAST(
 		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_MonList));
-		if (pMon != NULL)
+		if (pMon && mMon)
 			pMon->SetEditText(mMon->mName);
 	}
 

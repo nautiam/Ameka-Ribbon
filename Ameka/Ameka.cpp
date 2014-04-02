@@ -50,7 +50,7 @@
 
 #define monXScale 300
 #define monYScale 300
-#define dotRange 4
+#define POINT_RAD 3
 
 _INITIALIZE_EASYLOGGINGPP
 
@@ -144,8 +144,10 @@ CAmekaApp::CAmekaApp()
 				lead->lFirstID = atoi((LPCSTR)(CStringA)attr1);
 				lead->lSecondID = atoi((LPCSTR)(CStringA)attr2);
 				mon->mList.AddTail(lead);
+				//delete lead;
 			}
 		}
+		//delete mon;
 		monList.AddTail(mon);
 	}
 	doc.Clear();
@@ -202,6 +204,8 @@ CAmekaApp theApp;
 
 BOOL CAmekaApp::InitInstance()
 {
+	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+	Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
 	// InitCommonControlsEx() is required on Windows XP if an application
 	// manifest specifies use of ComCtl32.dll version 6 or later to enable
 	// visual styles.  Otherwise, any window creation will fail.
@@ -298,9 +302,11 @@ BOOL CAmekaApp::InitInstance()
 int CAmekaApp::ExitInstance()
 {
 	//TODO: handle additional resources you may have added
+	Gdiplus::GdiplusShutdown(m_gdiplusToken);
 	AfxOleTerm(FALSE);
 	if (theApp.pIO)
 		theApp.pIO->~CSerialIO();
+	delete dataBuffer;
 	return CWinAppEx::ExitInstance();
 }
 
@@ -795,22 +801,22 @@ void CAmekaApp::OnEvent()
 
 //------------------------------------------------------------------//
 
-/*UINT genData(LPVOID pParam)
-{
-	while(1)
-	{
-		RawDataType* data = new RawDataType[1];
-		data->time = 0;
-		for (int i = 0; i < 15; i++)
-		{
-			data->value[i] = rand()%100;
-		}
-		theApp.dataBuffer->pushData(data, 1);
-		Sleep(3);
-		delete[] data;
-	}
-	return 0;
-}*/
+//UINT genData(LPVOID pParam)
+//{
+//	while(1)
+//	{
+//		RawDataType* data = new RawDataType[1];
+//		data->time = 0;
+//		for (int i = 0; i < 15; i++)
+//		{
+//			data->value[i] = rand()%100;
+//		}
+//		theApp.dataBuffer->pushData(data, 1);
+//		Sleep(3);
+//		delete[] data;
+//	}
+//	return 0;
+//}
 
 //Demo Graph
 void CAmekaApp::OnDemo()
@@ -938,28 +944,29 @@ void CMontageDlg::DrawMontage(CDC* dc, LPAmontage mMon)
 	memDC.CreateCompatibleDC(dc);
 	bmp.CreateCompatibleBitmap(dc, monXScale, monYScale);
 	memDC.SelectObject(bmp);
-	//draw general
-	memDC.SelectStockObject(BLACK_PEN);
-	memDC.Rectangle(0, 0, monXScale, monYScale);
-	CPen newPen(PS_SOLID, 2, RGB(0, 0, 0));
-	memDC.SelectObject(newPen);
-	memDC.Ellipse(2, 2, monXScale - 2, monYScale - 2);
-	//create pen and brush
-	CBrush br1, *pbrOld;
-	br1.CreateSolidBrush(RGB(0,0,0));
-	memDC.SelectObject(&br1);
+	Graphics graphics(memDC.m_hDC);
+	graphics.SetSmoothingMode(SmoothingMode::SmoothingModeAntiAlias);
 
+	//Draw montage area
+	SolidBrush whiteBrush(Gdiplus::Color(255, 255, 255, 255));
+	Pen blackPen(Gdiplus::Color::Black);
+	graphics.FillRectangle(&whiteBrush, 0, 0, monXScale - 1, monYScale - 1);
+	
+	graphics.DrawEllipse(&blackPen, 0, 0, monXScale - 1, monYScale - 1);
+
+	//draw elec point
 	for (int i = 0; i < theApp.elecNum; i++)
 	{
-		memDC.Ellipse(theApp.mElec[i].ePos->x - dotRange, theApp.mElec[i].ePos->y - dotRange, theApp.mElec[i].ePos->x + dotRange, theApp.mElec[i].ePos->y + dotRange);
-		CRect rect;
-		//GetClientRect(&rect);
-		rect.left = theApp.mElec[i].ePos->x + 1;
-		rect.right = theApp.mElec[i].ePos->x + 30;
-		rect.bottom = theApp.mElec[i].ePos->y - 1;
-		rect.top = theApp.mElec[i].ePos->y - 20;
+		SolidBrush blackBrush(Gdiplus::Color(255, 0, 0, 0));
+		graphics.FillEllipse(&blackBrush, theApp.mElec[i].ePos->x - POINT_RAD, theApp.mElec[i].ePos->y - POINT_RAD, 2 * POINT_RAD, 2 * POINT_RAD);
 
-		memDC.DrawText(theApp.mElec[i].eName, rect, DT_SINGLELINE );
+		// Initialize arguments.
+		Gdiplus::Font myFont(L"Arial", 8);
+		PointF origin(theApp.mElec[i].ePos->x + 2, theApp.mElec[i].ePos->y - 2);
+		graphics.DrawString(theApp.mElec[i].eName, theApp.mElec[i].eName.GetLength(),
+			&myFont,
+			origin,
+			&blackBrush);
 	}
 
 	POSITION pos =  crtMon->mList.GetHeadPosition();
@@ -969,20 +976,11 @@ void CMontageDlg::DrawMontage(CDC* dc, LPAmontage mMon)
 		CPoint* p1 = getElecPoint(curr->lFirstID);
 		CPoint* p2 = getElecPoint(curr->lSecondID);
 		if (p1 != NULL && p2 != NULL)
-		{
-			ARROWSTRUCT a;
-			// setup arrows
-			a.nWidth = 10;
-			a.fTheta = 0.6f;
-			a.bFill = true;
-			
-			//memDC.Ellipse(p1->x - dotRange, p1->y - dotRange, p1->x + dotRange, p1->y + dotRange);
-			//memDC.Ellipse(p2->x - dotRange, p2->y - dotRange, p2->x + dotRange, p2->y + dotRange);
-			if (p1->x != p2->x && p1->y != p2->y)
-			{
-				memDC.MoveTo(*p1);
-				ArrowTo(memDC, p2->x, p2->y, &a);	
-			}
+		{			
+			AdjustableArrowCap arrowCap(7.0, 4.0, TRUE);
+			blackPen.SetCustomEndCap(&arrowCap);
+
+			graphics.DrawLine(&blackPen, p1->x, p1->y, p2->x, p2->y);
 		}
 	}
 	dc->BitBlt(220, 35, 300, 300, &memDC, 0, 0, SRCCOPY);
