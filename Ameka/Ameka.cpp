@@ -621,6 +621,7 @@ void CAmekaApp::OnPhotic()
 			}
 		}
 	}
+	pView->OnDraw(pView->GetDC());
 }
 
 void CAmekaApp::OnSetupPhotic()
@@ -1970,3 +1971,4 @@ void CAmekaApp::OnLan()
 }
 
 
+ 
