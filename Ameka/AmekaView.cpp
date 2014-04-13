@@ -536,7 +536,6 @@ int CAmekaView::drawBarGraph( void )
 		return -1;
 
 	uint16_t buflen = SAMPLE_RATE/(this->GetDocument()->mDSP.epocLength);
-
 	SecondaryDataType* data = this->mDoc->SecondaryData->checkPopData(buflen);
 	int size = this->mDoc->SecondaryData->rLen;
 	if (!data)
@@ -545,11 +544,10 @@ int CAmekaView::drawBarGraph( void )
 	if ((buflen <= 0) || (data == NULL))
 		return -2;
 
-	if (data->fre > theApp.photicMax)
-		return 1;
+	//if (data->fre > theApp.photicMax)
+	//	return 1;
 
 	//mDistance = (float)graphData.paperSpeed*(float)graphData.dotPmm/graphData.sampleRate;
-
 	CRect rect;
     GetClientRect(&rect);
 
@@ -585,21 +583,6 @@ int CAmekaView::drawBarGraph( void )
 	CRect mrect(0,0,rect.Width(),rect.Height());
 	MemDC.FillRect(mrect,&brush);
 
-	//draw grid
-	CPen pen2(PS_SOLID, 1, CUSTOM_PEN1);
-	CPen* pOldPen = MemDC.SelectObject(&pen2);
-	for (int i = 1; i <= barNum; i++)
-	{
-		MemDC.MoveTo(i*(rect.Width() - startPos) / barNum, rect.Height() - FOOT_RANGE);
-		MemDC.LineTo(i*(rect.Width() - startPos) / barNum, 0);
-		CRect txtRect((int)(i*(rect.Width() - startPos) / barNum), (rect.Height() - FOOT_RANGE),
-			i*(rect.Width() - startPos) / barNum + 5, rect.Height());
-		CString text;
-		text.Format(_T("%d"), (int)(theApp.photicTick*i));
-		MemDC.DrawTextW(text, txtRect, 0);
-	}
-	MemDC.SelectObject(pOldPen);
-	DeleteObject(&pen2);
 	//draw bar
 	CBrush brushS(CUSTOM_BARCOLOR);
 	MemDC.SelectObject(brushS);
@@ -616,6 +599,25 @@ int CAmekaView::drawBarGraph( void )
 
 		}
 	}
+
+	//draw grid
+	CPen pen2(PS_SOLID, 1, CUSTOM_PEN1);
+	CPen* pOldPen = MemDC.SelectObject(&pen2);
+	CFont txtFont;
+	txtFont.CreatePointFont(70, _T("Arial"), &MemDC);
+	for (int i = 1; i <= barNum; i++)
+	{
+		MemDC.MoveTo(i*(rect.Width() - startPos) / barNum, rect.Height() - FOOT_RANGE);
+		MemDC.LineTo(i*(rect.Width() - startPos) / barNum, 0);
+		CRect txtRect((int)(i*(rect.Width() - startPos) / barNum), (rect.Height() - FOOT_RANGE),
+				i*(rect.Width() - startPos) / barNum + 10, rect.Height());
+		CString text;
+		MemDC.SelectObject(&txtFont);
+		text.Format(_T("%d"), (int)(pDoc->mDSP.epocLength*i + theApp.photicMin));
+		MemDC.DrawTextW(text, txtRect, 0);
+	}
+	MemDC.SelectObject(pOldPen);
+	DeleteObject(&pen2);
 
 	pDC->BitBlt(startPos , 0, rect.Width(), rect.Height(), &MemDC, 0, 0, SRCCOPY);
 	
