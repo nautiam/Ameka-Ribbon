@@ -1,4 +1,4 @@
-// This MFC Samples source code demonstrates using MFC Microsoft Office Fluent User Interface 
+﻿// This MFC Samples source code demonstrates using MFC Microsoft Office Fluent User Interface 
 // (the "Fluent UI") and is provided only as referential material to supplement the 
 // Microsoft Foundation Classes Reference and related electronic documentation 
 // included with the MFC C++ library software.  
@@ -1727,6 +1727,13 @@ void CAmekaApp::OnPortOpen()
 	// TODO: Add your command handler code here
 	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
 	CString tmp;
+
+	CMFCRibbonButton* pPortOpen = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_PortOpen));
+
+	if (!pPortOpen)
+		return;
+
 	CMFCRibbonComboBox* pPort = DYNAMIC_DOWNCAST(
 		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_PortName));
 	if (pPort != NULL)
@@ -1753,7 +1760,25 @@ void CAmekaApp::OnPortOpen()
 	//portDlg.DoModal();
 	CString portFullName = L"\\\.\\" + m_portNo;
 	//MessageBox("Opening Port " + portFullName,"Info",0);
-	pIO = new CSerialIO(portFullName, m_baudRate);
+	if (!pIO)
+	{
+		pIO = new CSerialIO(portFullName, m_baudRate);
+		if (pIO->m_bState == S_CONNECTED || pIO->m_bState == S_NOCONNECTED)
+		{
+			pPortOpen->SetText(L"Đóng cổng");
+		}
+		else
+		{
+			delete pIO;
+			pIO = NULL;
+		}
+	}
+	else
+	{
+		pPortOpen->SetText(L"Mở cổng");
+		delete pIO;
+		pIO = NULL;
+	}
 
 	//m_dspProcess->setOwner(this);
 }

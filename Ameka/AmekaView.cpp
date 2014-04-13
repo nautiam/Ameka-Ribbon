@@ -157,6 +157,18 @@ void CAmekaView::OnDraw(CDC* pDC)
 	CRect mrect(0,0,rect.Width(),rect.Height());
 	MemDC.FillRect(mrect,&brush);
 	
+	//draw foot line
+	MemDC.MoveTo(MONNAME_BAR + 1, rect.Height() - FOOT_RANGE);
+	MemDC.LineTo(rect.Width(), rect.Height() - FOOT_RANGE);
+	CPen thick_pen(PS_SOLID, 2, CUSTOM_PEN);
+	CPen* oldPen = MemDC.SelectObject(&thick_pen);
+
+	MemDC.MoveTo(MONNAME_BAR + 1, 0);
+	MemDC.LineTo(MONNAME_BAR + 1, rect.Height());
+
+	MemDC.SelectObject(oldPen);
+	DeleteObject(&thick_pen);
+
 	if (isCountFull || count != 0)
 	{
 		EnterCriticalSection(&csess);
@@ -170,15 +182,6 @@ void CAmekaView::OnDraw(CDC* pDC)
 			firstPos = (count-1+bufLen-numPos)%bufLen;
 
 		int j,tmp;
-		
-		CPen thick_pen(PS_SOLID, 2, CUSTOM_PEN);
-		CPen* oldPen = MemDC.SelectObject(&thick_pen);
-
-		MemDC.MoveTo(MONNAME_BAR + 1, 0);
-		MemDC.LineTo(MONNAME_BAR + 1, rect.Height());
-
-		MemDC.SelectObject(oldPen);
-		DeleteObject(&thick_pen);
 		
 		for(int i = 0; i < channelNum; i++)
 		{
@@ -457,6 +460,10 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 		DeleteObject(&thick_pen);
 	}
 	
+	//draw foot line
+	MemDC.MoveTo(0, rect.Height() - FOOT_RANGE);
+	MemDC.LineTo(rect.Width(), rect.Height() - FOOT_RANGE);
+
 	for(int i = 0; i < channelNum;i++)
 	{
 		tmp = ((rect.Height()*i)/channelNum + (rect.Height()/channelNum)/2 - (((float)prePos.value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
