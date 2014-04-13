@@ -466,11 +466,11 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 			tmp = 0;
 		//MemDC.SetPixel(0, tmp, CUSTOM_PEN);
 		MemDC.MoveTo(0, tmp);
+		tmp = ((rect.Height()*i)/channelNum + (rect.Height()/channelNum)/2 - (((float)data[0].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
 		if (tmp > (rect.Height() - FOOT_RANGE))
 			tmp = rect.Height() - FOOT_RANGE;
 		if (tmp < 0)
 			tmp = 0;
-		tmp = ((rect.Height()*i)/channelNum + (rect.Height()/channelNum)/2 - (((float)data[0].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
 		//MemDC.SetPixel(distance,tmp ,CUSTOM_PEN);
 		MemDC.LineTo(distance, tmp);
 	}
