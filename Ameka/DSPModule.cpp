@@ -117,8 +117,9 @@ UINT DSP::DSPThread(LPVOID pParam)
 		}		
 
 		float epocLength = mDoc->mDSP.epocLength;
+		float fre_step = FRE_STEP;
 		int nfft;
-		nfft = (float)SAMPLE_RATE/epocLength;
+		nfft = (float)SAMPLE_RATE/fre_step;
 		float NC = (float)nfft/2.0 + 1.0;
 
 		RawDataType* output = mDoc->TemporaryData->checkPopData(nfft);
@@ -165,7 +166,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 			for (int i=0; i<(int)NC; i++)
 			{
 				SecondaryDataType temp;
-				float fre = i * epocLength;
+				float fre = i * fre_step;
 				temp.fre = fre;
 				for (int j=0; j<LEAD_NUMBER; j++)	
 				{

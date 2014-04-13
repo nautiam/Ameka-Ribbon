@@ -545,7 +545,7 @@ int CAmekaView::drawBarGraph( void )
 	if (pDoc == NULL)
 		return -1;
 
-	uint16_t buflen = SAMPLE_RATE/(this->GetDocument()->mDSP.epocLength);
+	uint16_t buflen = SAMPLE_RATE/FRE_STEP;
 	SecondaryDataType* data = this->mDoc->SecondaryData->checkPopData(buflen);
 	int size = this->mDoc->SecondaryData->rLen;
 	if (!data)
@@ -610,7 +610,8 @@ int CAmekaView::drawBarGraph( void )
 
 	for (int i = 0; i < buflen; i++)
 	{
-		int barCount = data[i].fre/pDoc->mDSP.epocLength;
+		float freVal = data[i].fre - theApp.photicMin;
+		int barCount = freVal/pDoc->mDSP.epocLength;
 		float barPos = (float)barCount*(rect.Width()-startPos)/barNum;
 		float barW = (float)range/barCount;
 		for (int j = 0; j < 16; j++)

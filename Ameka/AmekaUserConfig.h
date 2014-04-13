@@ -12,6 +12,7 @@
 #ifndef _USERCONFIG_H_
 #define _USERCONFIG_H_
 
+#define FRE_STEP 0.1
 // Electrode struct
 typedef struct _Aelectrode {
 	uint16_t eID;
