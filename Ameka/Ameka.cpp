@@ -45,12 +45,12 @@
 #define strHP "1 2 3 5 8"
 #define strCOM "COM1 COM2 COM3 COM4 COM5 COM6 COM7 COM8 COM9 COM10"
 #define strBaud "9600 14400 19200 38400 56000 115200 "
-#define xmlName "abc.xml"
+#define xmlName "listmontage.xml"
 #define settingName "config.xml"
 
 #define monXScale 300
 #define monYScale 300
-#define POINT_RAD 3
+#define POINT_RAD 5
 
 _INITIALIZE_EASYLOGGINGPP
 
@@ -943,7 +943,7 @@ void CMontageDlg::DrawMontage(CDC* dc, LPAmontage mMon)
 	CDC memDC;
 	CBitmap bmp;
 	memDC.CreateCompatibleDC(dc);
-	bmp.CreateCompatibleBitmap(dc, monXScale, monYScale);
+	bmp.CreateCompatibleBitmap(dc, monXScale + 20, monYScale);
 	memDC.SelectObject(bmp);
 	Graphics graphics(memDC.m_hDC);
 	graphics.SetSmoothingMode(SmoothingMode::SmoothingModeAntiAlias);
@@ -951,9 +951,9 @@ void CMontageDlg::DrawMontage(CDC* dc, LPAmontage mMon)
 	//Draw montage area
 	SolidBrush whiteBrush(Gdiplus::Color(255, 255, 255, 255));
 	Pen blackPen(Gdiplus::Color::Black);
-	graphics.FillRectangle(&whiteBrush, 0, 0, monXScale - 1, monYScale - 1);
+	graphics.FillRectangle(&whiteBrush, 0, 0, monXScale + 20 - 1, monYScale - 1);
 	
-	graphics.DrawEllipse(&blackPen, 0, 0, monXScale - 1, monYScale - 1);
+	graphics.DrawEllipse(&blackPen, 10, 0, monXScale - 1, monYScale - 1);
 
 	//draw elec point
 	for (int i = 0; i < theApp.elecNum; i++)
@@ -984,7 +984,7 @@ void CMontageDlg::DrawMontage(CDC* dc, LPAmontage mMon)
 			graphics.DrawLine(&blackPen, p1->x, p1->y, p2->x, p2->y);
 		}
 	}
-	dc->BitBlt(220, 35, 300, 300, &memDC, 0, 0, SRCCOPY);
+	dc->BitBlt(220, 35, monXScale + 20, monYScale, &memDC, 0, 0, SRCCOPY);
 	return;
 }
 

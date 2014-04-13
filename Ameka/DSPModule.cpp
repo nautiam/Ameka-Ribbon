@@ -202,7 +202,6 @@ UINT DSP::DSPThread(LPVOID pParam)
 			}*/
 
 			// Print output to file
-			
 			for (int i=0; i<(int)NC; i++)
 			{
 				SecondaryDataType temp;
@@ -210,18 +209,25 @@ UINT DSP::DSPThread(LPVOID pParam)
 				temp.fre = fre;
 				for (int j=0; j<LEAD_NUMBER; j++)	
 				{
-					temp.value[j] = bufout[j][i].r;
+					if (fre < HighFre)
+					{
+						temp.value[j] = 0;
+					}
+					else
+					{
+						temp.value[j] = bufout[j][i].r;
+					}
 					//float fre = i * (float)(SAMPLE_RATE / nfft);
 					/*LOG(INFO) << "------------";
 					LOG(INFO) << j;
 					LOG(INFO) << fre;
 					LOG(INFO) << bufout[j][i].r;*/
-				}
-				/*if (mDoc->SecondaryData->pushData(temp) != 0)
+				}				
+				if (mDoc->SecondaryData->pushData(temp) != 0)
 				{
 					LOG(DEBUG) << "Secondary Data Ring buffer is full";
-				};*/
-				mDoc->SecondaryData->pushData(temp);
+				};				
+				//mDoc->SecondaryData->pushData(temp);
 			}
 			if (!st)
 				free(st);
