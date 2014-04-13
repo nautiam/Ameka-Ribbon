@@ -186,15 +186,15 @@ void CAmekaView::OnDraw(CDC* pDC)
 			while(crtPos - distance*(j+1) > MONNAME_BAR)
 			{
 				tmp = (rect.Height()*i/channelNum) + (rect.Height()/channelNum)/2 - (((float)dataBuffer[(count-1+bufLen-j)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
-				if (tmp > rect.Height())
-				tmp = rect.Height();
+				if (tmp > (rect.Height() - FOOT_RANGE))
+					tmp = rect.Height() - FOOT_RANGE;
 				if (tmp < 0)
 					tmp = 0;
 				//MemDC.SetPixel(0, tmp, CUSTOM_PEN);
 				MemDC.MoveTo(crtPos - distance*j, tmp);
 				tmp = (rect.Height()*i/channelNum) + (rect.Height()/channelNum)/2 - (((float)dataBuffer[(count-1+bufLen-j-1)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
-				if (tmp > rect.Height())
-				tmp = rect.Height();
+				if (tmp > (rect.Height() - FOOT_RANGE))
+					tmp = rect.Height() - FOOT_RANGE;
 				if (tmp < 0)
 					tmp = 0;
 				//MemDC.SetPixel(0, tmp, CUSTOM_PEN);
@@ -235,6 +235,8 @@ void CAmekaView::OnDraw(CDC* pDC)
 
 		DeleteObject(brushS);
 	}
+
+	//draw photic
 	if (onPhotic)
 	{
 		float range = theApp.photicMax - theApp.photicMin;
@@ -458,14 +460,14 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	for(int i = 0; i < channelNum;i++)
 	{
 		tmp = ((rect.Height()*i)/channelNum + (rect.Height()/channelNum)/2 - (((float)prePos.value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
-		if (tmp > rect.Height())
-			tmp = rect.Height();
+		if (tmp > (rect.Height() - FOOT_RANGE))
+			tmp = rect.Height() - FOOT_RANGE;
 		if (tmp < 0)
 			tmp = 0;
 		//MemDC.SetPixel(0, tmp, CUSTOM_PEN);
 		MemDC.MoveTo(0, tmp);
-		if (tmp > rect.Height())
-			tmp = rect.Height();
+		if (tmp > (rect.Height() - FOOT_RANGE))
+			tmp = rect.Height() - FOOT_RANGE;
 		if (tmp < 0)
 			tmp = 0;
 		tmp = ((rect.Height()*i)/channelNum + (rect.Height()/channelNum)/2 - (((float)data[0].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
@@ -477,15 +479,15 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 		for(int j = 1; j < buflen; j++)
 		{
 			tmp = ((rect.Height()*i)/channelNum + (rect.Height()/channelNum)/2 - (((float)data[j-1].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
-			if (tmp > rect.Height())
-				tmp = rect.Height();
+			if (tmp > (rect.Height() - FOOT_RANGE))
+			tmp = rect.Height() - FOOT_RANGE;
 			if (tmp < 0)
 				tmp = 0;
 			//MemDC.SetPixel((distance*j),tmp ,CUSTOM_PEN);
 			MemDC.MoveTo((distance*j), tmp);		//draw 16 channel
 			tmp = ((rect.Height()*i)/channelNum + (rect.Height()/channelNum)/2 - (((float)data[j].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
-			if (tmp > rect.Height())
-				tmp = rect.Height();
+			if (tmp > (rect.Height() - FOOT_RANGE))
+			tmp = rect.Height() - FOOT_RANGE;
 			if (tmp < 0)
 				tmp = 0;
 			//MemDC.SetPixel((distance*(j+1)),tmp ,CUSTOM_PEN);
@@ -593,8 +595,8 @@ int CAmekaView::drawBarGraph( void )
 		float barPos = (float)barCount*(rect.Width()-startPos)/barNum;
 		for (int j = 0; j < 16; j++)
 		{
-			CRect barRect(0 + barPos, (j+1)*rect.Height()/16 - (data[i].value[j] + BAR_SCALE - 1)/BAR_SCALE, 
-				(rect.Width()-startPos)/barNum + barPos,(j+1)*rect.Height()/16);
+			CRect barRect(0 + barPos, (j+1)*(rect.Height() - FOOT_RANGE)/16 - (data[i].value[j] + BAR_SCALE - 1)/BAR_SCALE, 
+				(rect.Width()  -startPos)/barNum + barPos,(j+1)*(rect.Height() - FOOT_RANGE)/16);
 			MemDC.FillRect(barRect,&brushS);
 
 		}
