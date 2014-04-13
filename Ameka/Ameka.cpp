@@ -95,6 +95,7 @@ CAmekaApp::CAmekaApp()
 	this->photicMin = 0.0;
 	this->photicTick = 10.0;
 	this->photicBarW = 2.0;
+	this->pIO = NULL;
 	//init electrode name
 	const char* setFileName = settingName;
 	//writeSetting(setFileName);
@@ -598,10 +599,7 @@ void CAmekaApp::OnPhotic()
 		if (pView->onPhotic)
 		{			
 			CAmekaView *pView = CAmekaView::GetView();
-			if (pView->isRunning)
-			{
-				pView->pPhoticThread = AfxBeginThread(pView->photicHandle, (LPVOID)pView);
-			}
+			pView->pPhoticThread = AfxBeginThread(pView->photicHandle, (LPVOID)pView);
 		}
 		else
 		{
@@ -1763,6 +1761,7 @@ void CAmekaApp::OnPortOpen()
 	if (!pIO)
 	{
 		pIO = new CSerialIO(portFullName, m_baudRate);
+		Sleep(100);
 		if (pIO->m_bState == S_CONNECTED || pIO->m_bState == S_NOCONNECTED)
 		{
 			pPortOpen->SetText(L"Đóng cổng");

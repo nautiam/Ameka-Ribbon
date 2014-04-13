@@ -233,7 +233,7 @@ void CAmekaView::OnDraw(CDC* pDC)
 
 		CBrush brushS(CUSTOM_PEN);
 		//CBrush* pOldBrush1 = MemDC.SelectObject(&brushS);
-		MemDC.FillRect(CRect(crtPos, 0, crtPos + SBAR_W, rect.Height()),&brushS);
+		MemDC.FillRect(CRect(crtPos, 0, crtPos + SBAR_W, rect.Height() - FOOT_RANGE),&brushS);
 		LeaveCriticalSection(&csess);
 
 		DeleteObject(brushS);
@@ -243,7 +243,7 @@ void CAmekaView::OnDraw(CDC* pDC)
 	if (onPhotic)
 	{
 		float range = theApp.photicMax - theApp.photicMin;
-		int barNum = range / pDoc->mDSP.epocLength;
+		int barNum = range / theApp.photicTick;
 
 		CBrush brushBar;
 		brushBar.CreateSolidBrush(CUSTOM_BARBACK);
@@ -255,16 +255,17 @@ void CAmekaView::OnDraw(CDC* pDC)
 		MemDC.SelectObject(&pen2);
 		CFont txtFont;
 		txtFont.CreatePointFont(70, _T("Arial"), &MemDC);
-		for (int i = 1; i <= barNum; i++)
+		float barW = (float)(rect.Width() - maxWidth) / barNum;
+		for (int i = 0; i <= barNum; i++)
 		{
-			MemDC.MoveTo(maxWidth + i*(rect.Width() - maxWidth) / barNum, rect.Height() - 5);
-			MemDC.LineTo(maxWidth + i*(rect.Width() - maxWidth) / barNum, 0);
+			MemDC.MoveTo(maxWidth + i*barW, rect.Height() - 5);
+			MemDC.LineTo(maxWidth + i*barW, 0);
 			//draw text
-			CRect txtRect(maxWidth + (int)(i*(rect.Width() - maxWidth) / barNum), (rect.Height() - FOOT_RANGE),
-				maxWidth + i*(rect.Width() - maxWidth) / barNum + 10, rect.Height());
+			CRect txtRect(maxWidth + (int)(i*barW), (rect.Height() - FOOT_RANGE),
+				maxWidth + i*barW + 10, rect.Height());
 			CString text;
 			MemDC.SelectObject(&txtFont);
-			text.Format(_T("%d"), (int)(pDoc->mDSP.epocLength*i + theApp.photicMin));
+			text.Format(_T("%d"), (int)(theApp.photicTick*i + theApp.photicMin));
 			MemDC.DrawTextW(text, txtRect, 0);
 			
 		}
@@ -504,7 +505,7 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	//draw scan bar
 	CBrush brushS(CUSTOM_PEN);
 	//CBrush* pOldBrush1 = MemDC.SelectObject(&brushS);
-	MemDC.FillRect(CRect(distance * buflen, 0, distance * buflen + SBAR_W, rect.Height()),&brushS);
+	MemDC.FillRect(CRect(distance * buflen, 0, distance * buflen + SBAR_W, rect.Height() - FOOT_RANGE),&brushS);
 
 	pDC->BitBlt(crtPos, 0, distance * buflen + SBAR_W, rect.Height(), &MemDC, 0, 0, SRCCOPY);
 	
@@ -600,29 +601,32 @@ int CAmekaView::drawBarGraph( void )
 	{
 		int barCount = data[i].fre/pDoc->mDSP.epocLength;
 		float barPos = (float)barCount*(rect.Width()-startPos)/barNum;
+		float barW = (float)range/barCount;
 		for (int j = 0; j < 16; j++)
 		{
-			CRect barRect(0 + barPos, (j+1)*(rect.Height() - FOOT_RANGE)/16 - (data[i].value[j] + BAR_SCALE - 1)/BAR_SCALE, 
-				(rect.Width()  -startPos)/barNum + barPos,(j+1)*(rect.Height() - FOOT_RANGE)/16);
+			CRect barRect(abs(barPos - barW/2), (j+1)*(rect.Height() - FOOT_RANGE)/16 - (data[i].value[j] + BAR_SCALE - 1)/BAR_SCALE, 
+				abs((rect.Width() - startPos)/barNum + barPos - barW/2),(j+1)*(rect.Height() - FOOT_RANGE)/16);
 			MemDC.FillRect(barRect,&brushS);
 
 		}
 	}
 
 	//draw grid
+	int gridNum = range/theApp.photicTick;
 	CPen pen2(PS_SOLID, 1, CUSTOM_PEN1);
 	CPen* pOldPen = MemDC.SelectObject(&pen2);
 	CFont txtFont;
 	txtFont.CreatePointFont(70, _T("Arial"), &MemDC);
-	for (int i = 1; i <= barNum; i++)
+	float barGridW = (float)(rect.Width() - startPos ) / gridNum;
+	for (int i = 0; i < gridNum; i++)
 	{
-		MemDC.MoveTo(i*(rect.Width() - startPos) / barNum, rect.Height() - FOOT_RANGE);
-		MemDC.LineTo(i*(rect.Width() - startPos) / barNum, 0);
-		CRect txtRect((int)(i*(rect.Width() - startPos) / barNum), (rect.Height() - FOOT_RANGE),
-				i*(rect.Width() - startPos) / barNum + 10, rect.Height());
+		MemDC.MoveTo(i*barGridW, rect.Height() - FOOT_RANGE);
+		MemDC.LineTo(i*barGridW, 0);
+		CRect txtRect((int)(i*barGridW), (rect.Height() - FOOT_RANGE),
+				i*barGridW + 10, rect.Height());
 		CString text;
 		MemDC.SelectObject(&txtFont);
-		text.Format(_T("%d"), (int)(pDoc->mDSP.epocLength*i + theApp.photicMin));
+		text.Format(_T("%d"), (int)(theApp.photicTick*i + theApp.photicMin));
 		MemDC.DrawTextW(text, txtRect, 0);
 	}
 	MemDC.SelectObject(pOldPen);
