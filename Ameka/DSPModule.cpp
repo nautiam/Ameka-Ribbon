@@ -46,12 +46,6 @@ UINT DSP::DSPThread(LPVOID pParam)
 	uint16_t numSamples = 2000;
 	Dsp::SmoothedFilterDesign <Dsp::Butterworth::Design::BandPass <4>, LEAD_NUMBER, Dsp::DirectFormII> f (4096);
 	Dsp::Params params;
-	//params[0] = sampleRate; // sample rate
-	//params[1] = 4; // order
-	//params[2] = CenterFre; // center frequency
-	//params[3] = BandWidth; // band width
-	//f.setParams (params);
-	//float* audioData[LEAD_NUMBER];
 	while (1)
 	{
 		Sleep(50);
@@ -67,15 +61,11 @@ UINT DSP::DSPThread(LPVOID pParam)
 		f.setParams (params);
 		static int count = 0;
 		count++;
-
-		float epocLength = mDoc->mDSP.epocLength;
-		int nfft;
-		nfft = (float)SAMPLE_RATE/epocLength;
-		float NC = (float)nfft/2.0 + 1.0;
-
+		//AfxMessageBox(mDoc->mMon->mName);
+		//LOG(DEBUG) << mDoc->mMon->mList.GetCount();
+		//POSITION pos;
 		
-		//RawDataType* data = mDoc->dataBuffer->popAll();
-		RawDataType* data = mDoc->dataBuffer->checkPopData(nfft);
+		RawDataType* data = mDoc->dataBuffer->checkPopData(100);
 		int size =  mDoc->dataBuffer->rLen;
 		
 		if (size > 0 && data != NULL)
@@ -97,50 +87,6 @@ UINT DSP::DSPThread(LPVOID pParam)
 
 			f.process (size, audioData);
 
-			//switch (Type_design)
-			//{
-			//case 0:	//RBJ BandPass1
-			//	Dsp::SmoothedFilterDesign <Dsp::RBJ::Design::BandPass1, LEAD_NUMBER> f (1024);
-			//	//Dsp::Params params;
-			//	params[0] = sampleRate; // sample rate
-			//	params[1] = CenterFre; // Center frequency
-			//	params[2] = BandWidth; // Band Width
-			//	f.setParams (params);
-			//	f.process (numSamples, audioData);
-			//	break;
-			//case 1: //RBJ BandPass2
-			//	Dsp::SmoothedFilterDesign <Dsp::RBJ::Design::BandPass2, LEAD_NUMBER> f (1024);
-			//	//Dsp::Params params;
-			//	params[0] = sampleRate; // sample rate
-			//	params[1] = CenterFre; // Center frequency
-			//	params[2] = BandWidth; // Band Width
-			//	f.setParams (params);
-			//	f.process (numSamples, audioData);
-			//	break;
-			//case 2: //Butterworth BandPass
-			//	//Dsp::Filter* f = new Dsp::SmoothedFilterDesign
-			//	//<Dsp::Butterworth::Design::BandPass <4>, LEAD_NUMBER, Dsp::DirectFormII> (1024);
-			//	Dsp::SmoothedFilterDesign <Dsp::Butterworth::Design::BandPass <4>, LEAD_NUMBER, Dsp::DirectFormII> f (1024);
-			//	//Dsp::Params params;
-			//	params[0] = sampleRate; // sample rate
-			//	params[1] = 4; // order
-			//	params[2] = CenterFre; // center frequency
-			//	params[3] = BandWidth; // band width
-			//	f.setParams (params);
-			//	f.process (numSamples, audioData);
-			//	break;
-			//case 3: //Chebyshevl1 BandPassBase
-			//	break;
-			//case 4: //Chebyshevl2 BandPassBase
-			//	break;
-			//case 5: //Eliliptic BandPassBase
-			//	break;
-			//case 6: //Legendre BandPassBase
-			//	break;
-			//default:
-			//	break;
-			//}
-
 			for (int j=0; j<size; j++)
 			{
 				for (int i=0; i<LEAD_NUMBER; i++)				
@@ -155,19 +101,33 @@ UINT DSP::DSPThread(LPVOID pParam)
 				if (mDoc->PrimaryData->pushData(output[i]) != 0)
 				{
 					LOG(DEBUG) << "Primary Data ring buffer is full";	
-				};
+				}
+				if (mDoc->TemporaryData->pushData(output[i]) != 0)
+				{
+					LOG(DEBUG) << "Temporary Data ring buffer is full";	
+				}
 			}
 			
-			// Convert to frequency domain
-			/*float epocLength = mDoc->mDSP.epocLength;
-			int nfft;
+			for (int i=0; i<LEAD_NUMBER; i++)
+			{
+				delete [] audioData[i];
+			}
+			delete [] data;			
+			delete [] output;
+		}		
 
-			nfft = (float)SAMPLE_RATE/epocLength;
-			float NC = (float)nfft/2.0 + 1.0;*/
-			//RawDataType* priData = mDoc->PrimaryData->checkPopData(nfft);
-			//if (priData != NULL)
-			//if (mDoc->PrimaryData->rLen == nfft)
-			//{
+		float epocLength = mDoc->mDSP.epocLength;
+		int nfft;
+		nfft = (float)SAMPLE_RATE/epocLength;
+		float NC = (float)nfft/2.0 + 1.0;
+
+		RawDataType* output = mDoc->TemporaryData->checkPopData(nfft);
+		size =  mDoc->TemporaryData->rLen;
+		
+		if (size > 0 && output != NULL)
+		{
+			int dataLen = mDoc->TemporaryData->dataLen;
+			mDoc->TemporaryData->LRPos = (mDoc->TemporaryData->LRPos + dataLen - size + 100) % dataLen;
 			int isinverse = 0;
 			kiss_fft_cfg st;
 			kiss_fft_cpx * buf[LEAD_NUMBER];
@@ -226,28 +186,15 @@ UINT DSP::DSPThread(LPVOID pParam)
 				if (mDoc->SecondaryData->pushData(temp) != 0)
 				{
 					LOG(DEBUG) << "Secondary Data Ring buffer is full";
-				};				
-				//mDoc->SecondaryData->pushData(temp);
+				};
 			}
-			if (!st)
-				free(st);
+			free(st);
 			for (int i=0; i<LEAD_NUMBER; i++)
 			{
-				if (!buf[i] )
-					free(buf[i]);
-				if (!bufout[i])
-					free(bufout[i]);
+				free(buf[i]);
+				free(bufout[i]);
 			}
-			for (int i=0; i<LEAD_NUMBER; i++)
-			{
-				if (!audioData[i])
-					delete [] audioData[i];
-			}
-			//}
-			if (!output)
-				delete output;
-			if (!data)
-			delete [] data;
+			delete [] output;			
 		}
 	}
 	return 0;

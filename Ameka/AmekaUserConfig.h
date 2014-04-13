@@ -221,7 +221,7 @@ T* amekaData<T>::popData(uint16_t num)
 {
 	//
 	//EnterCriticalSection(&csess);
-	T* data = (T*)malloc(num*sizeof(T));
+	T* data = new T[num];
 	for (int i = 0; i < num; i++)
 	{
 		if (isEmpty())
@@ -243,15 +243,15 @@ T* amekaData<T>::checkPopData(uint16_t num)
 {
 	//
 	//EnterCriticalSection(&csess);
-	T* data = (T*)malloc(num*sizeof(T));
+	T* data = new T[num];
 	for (int i = 0; i < num; i++)
 	{
 		if (isEmpty())
 		{
 			rLen = i;
-			data = NULL;
+			delete [] data;
 			LRPos = (LRPos+dataLen-i)%dataLen;
-			return data;
+			return NULL;
 		}
 		data[i] = arrData[LRPos%dataLen];
 		LRPos = (LRPos+1)%dataLen;

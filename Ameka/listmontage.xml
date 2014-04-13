@@ -1,18 +1,4 @@
 <root>
-    <mon1>
-        <mon1 channel1="5" channel2="3" />
-        <mon1 channel1="3" channel2="7" />
-        <mon1 channel1="12" channel2="9" />
-        <mon1 channel1="11" channel2="13" />
-    </mon1>
-    <da>
-        <da channel1="5" channel2="3" />
-        <da channel1="3" channel2="7" />
-        <da channel1="12" channel2="9" />
-        <da channel1="11" channel2="13" />
-        <da channel1="3" channel2="5" />
-        <da channel1="15" channel2="16" />
-    </da>
     <default>
         <default channel1="1" channel2="3" />
         <default channel1="1" channel2="7" />
@@ -31,4 +17,18 @@
         <default channel1="2" channel2="4" />
         <default channel1="2" channel2="14" />
     </default>
+    <mon1>
+        <mon1 channel1="5" channel2="3" />
+        <mon1 channel1="3" channel2="7" />
+        <mon1 channel1="12" channel2="9" />
+        <mon1 channel1="11" channel2="13" />
+    </mon1>
+    <da>
+        <da channel1="5" channel2="3" />
+        <da channel1="3" channel2="7" />
+        <da channel1="12" channel2="9" />
+        <da channel1="11" channel2="13" />
+        <da channel1="3" channel2="5" />
+        <da channel1="15" channel2="16" />
+    </da>
 </root>

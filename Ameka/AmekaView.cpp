@@ -389,6 +389,8 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 		prePos = data[buflen - 1];
 		dataBuffer[count++] = data[buflen - 1];
 		isNull = false;
+		delete [] data;
+		delete bitmap;
 		return 0;
 	}
 
@@ -403,6 +405,8 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	if (NULL == MemDC.CreateCompatibleDC(pDC))
 	{
 		MemDC.DeleteDC();
+		delete [] data;
+		delete bitmap;
 		return -1;
 	}
 
@@ -416,7 +420,8 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 			{
 				DWORD tmp = GetLastError();
 				LOG(ERROR) << static_cast <int>(tmp);
-
+				delete [] data;
+				delete bitmap;
 				return -1;
 			}
 		}
@@ -426,7 +431,8 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 			{
 				DWORD tmp = GetLastError();
 				LOG(ERROR) << static_cast <int>(tmp);
-
+				delete [] data;
+				delete bitmap;
 				return -1;
 			}
 		}
@@ -514,7 +520,7 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	crtPos += distance*buflen;
 
 	//free all resource
-	MemDC.DeleteDC();
+	
 	//DeleteObject(brushS);
 	//DeleteObject(brush);
 	//DeleteObject(bitmap);
@@ -524,6 +530,7 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	DeleteObject(&brush);
 	delete bitmap;
 	bitmap = NULL;
+	MemDC.DeleteDC();
 	//delete bitmap;
 	return 0;
 	
@@ -532,15 +539,8 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 int CAmekaView::drawBarGraph( void )
 {
 	CDC MemDC;
-	CBitmap* bitmap = new CBitmap;
 
-	CDC* pDC = GetDC();
-	//RawDataType* data = new RawDataType[dataNum];
 	float startPos;
-	
-	if (pDC == NULL)
-		return -1;
-
 	CAmekaDoc* pDoc = this->GetDocument();
 	if (pDoc == NULL)
 		return -1;
@@ -561,9 +561,17 @@ int CAmekaView::drawBarGraph( void )
 	CRect rect;
     GetClientRect(&rect);
 
+	CDC* pDC = GetDC();
+	//RawDataType* data = new RawDataType[dataNum];
+	
+	if (pDC == NULL)
+		return -1;
+
 	if (NULL == MemDC.CreateCompatibleDC(pDC))
 	{
 		MemDC.DeleteDC();
+		DeleteObject(pDC);
+		delete [] data;
 		return -1;
 	}
 
@@ -575,13 +583,16 @@ int CAmekaView::drawBarGraph( void )
 	float range = theApp.photicMax - theApp.photicMin;
 	int barNum = range/pDoc->mDSP.epocLength;
 
+	CBitmap* bitmap = new CBitmap;
 	if(bitmap != NULL)
 	{
 		if(NULL == bitmap->CreateCompatibleBitmap(pDC, (rect.Width()-startPos), rect.Height()))
 		{
 			DWORD tmp = GetLastError();
 			LOG(ERROR) << static_cast <int>(tmp);
-
+			DeleteObject(pDC);
+			delete [] data;
+			delete bitmap;
 			return -1;
 		}
 	}
@@ -635,13 +646,14 @@ int CAmekaView::drawBarGraph( void )
 	pDC->BitBlt(startPos , 0, rect.Width(), rect.Height(), &MemDC, 0, 0, SRCCOPY);
 	
 	MemDC.SelectObject(pOldBmp);
-	MemDC.DeleteDC();
 	DeleteObject(bitmap);
 	//DeleteObject(pen2);
 	DeleteObject(&brush);
 	DeleteObject(&brushS);
 	DeleteObject(&pen2);
-
+	MemDC.DeleteDC();
+	DeleteObject(pDC);
+	delete bitmap;
 	delete [] data;
 
 	return 0;

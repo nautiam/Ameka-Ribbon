@@ -65,13 +65,14 @@ CAmekaDoc::CAmekaDoc()
 	// TODO: add one-time construction code here
 	dataBuffer = new amekaData<RawDataType>(BUFFER_LEN);
 	PrimaryData = new amekaData<RawDataType>(BUFFER_LEN);
+	TemporaryData = new amekaData<RawDataType>(BUFFER_LEN);
 	SecondaryData = new amekaData<SecondaryDataType>(BUFFER_LEN);
 	mDSP.HPFFre = 0.5;
 	mDSP.LPFFre = 30;
 	mDSP.SampleRate = 200;
 	this->m_dspProcess = AfxBeginThread(DSP::DSPThread, (LPVOID)this);
 	//thrd = AfxBeginThread(genData, (LPVOID)this);
-	mDSP.epocLength = 2.0;
+	mDSP.epocLength = 0.2;
 }
 
 CAmekaDoc::~CAmekaDoc()

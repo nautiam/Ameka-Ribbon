@@ -35,6 +35,7 @@ public:
 	CWinThread*  m_dspProcess;
 	amekaData<RawDataType>* dataBuffer;
 	amekaData<RawDataType>* PrimaryData;
+	amekaData<RawDataType>* TemporaryData; // Temporary Data is used to calculate photic
 	amekaData<SecondaryDataType>* SecondaryData;
 	CWinThread* thrd;
 	//UINT genData(LPVOID pParam);
