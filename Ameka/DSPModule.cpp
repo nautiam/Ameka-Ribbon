@@ -187,7 +187,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 					buf[j][i].i = 0;
 				}
 				kiss_fft( st , buf[j] ,bufout[j]);
-				//convert_to_freq(bufout[j], nfft);
+				convert_to_freq(bufout[j], nfft);
 				complex_abs(bufout[j], NC);
 			}
 
