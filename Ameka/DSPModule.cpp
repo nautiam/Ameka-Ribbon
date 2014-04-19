@@ -45,6 +45,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 {
 	CAmekaDoc* mDoc = (CAmekaDoc*)(pParam);
 	uint16_t numSamples = 2000;
+	time_t oldtime = 0;
 	Dsp::SmoothedFilterDesign <Dsp::Butterworth::Design::BandPass <4>, MONTAGE_NUM, Dsp::DirectFormII> f (50);
 	Dsp::Params params;
 	while (1)
@@ -88,7 +89,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 
 				for (int j=0; j<size; j++)
 				{
-					//audioData[i][j] = (float)data[j].value[i];				
+					//audioData[i][j] = (float)data[j].value[i];
 					float fData;
 					float sData;
 					if (fID <= 2)
@@ -114,10 +115,19 @@ UINT DSP::DSPThread(LPVOID pParam)
 
 			for (int j=0; j<size; j++)
 			{
+				output[j].time = data[j].time;
+				if (data[j].time - oldtime)
+				{
+					output[j].isDraw = TRUE;
+					oldtime = data[j].time;
+				}
+				else
+				{
+					output[j].isDraw = FALSE;
+				}
 				for (int i=0; i<MONTAGE_NUM; i++)				
 				{
-					output[j].value[i] = (uint16_t)audioData[i][j];
-					output[j].time = data[j].time;				
+					output[j].value[i] = (uint16_t)audioData[i][j];					
 				}
 			}
 			

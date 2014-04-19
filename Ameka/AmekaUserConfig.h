@@ -78,6 +78,7 @@ struct RawDataType {
 struct PrimaryDataType {
 	uint16_t value[MONTAGE_NUM];
 	time_t time;
+	bool isDraw;
 };
 
 struct SecondaryDataType {

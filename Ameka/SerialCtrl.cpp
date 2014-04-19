@@ -490,7 +490,7 @@ int ReadThread::packetProcessing()
 			//AfxMessageBox("Packet Data received");
 			RawDataType temp;
 			temp.time = 0;
-			CTime t = GetCurrentTime();
+			CTime t = CTime::GetCurrentTime();
 			temp.time = t.GetTime();
 			for (int i=0; i<16; i++)
 			{
