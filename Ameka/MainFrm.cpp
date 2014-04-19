@@ -40,6 +40,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
 	ON_COMMAND(MN_ScaleRate, &CMainFrame::OnScalerate)
 	ON_COMMAND(MN_SpeedRate, &CMainFrame::OnSpeedrate)
 	ON_COMMAND(MN_MonList, &CMainFrame::OnMonlist)
+	ON_COMMAND(MN_LP, &CMainFrame::OnLp)
+	ON_COMMAND(MN_HP, &CMainFrame::OnHp)
 END_MESSAGE_MAP()
 
 // CMainFrame construction/destruction
@@ -466,4 +468,46 @@ void CMainFrame::OnMonlist()
 		if (mon->mName == data)
 			doc->mMon = mon;
 	}
+}
+
+
+void CMainFrame::OnLp()
+{
+	// TODO: Add your command handler code here
+	CMFCRibbonComboBox* pLP = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, m_wndRibbonBar.FindByID(MN_LP));
+    // Get the selected index
+    int nCurSel =pLP->GetCurSel();
+    if (nCurSel >= 0)
+    {
+        CString item=pLP->GetItem(nCurSel);
+		CAmekaView* pView = CAmekaView::GetView();
+		pView->GetDocument()->mDSP.LPFFre = atoi((LPCSTR)(CStringA)item);
+		pView->OnDraw(pView->GetDC());
+    }
+    else
+    {
+        MessageBox(_T("Please select one item from droplist of Combo Box."), _T("Combo Box Item"), MB_OK);
+    }
+}
+
+
+void CMainFrame::OnHp()
+{
+	// TODO: Add your command handler code here
+	CMFCRibbonComboBox* pHP = DYNAMIC_DOWNCAST(
+		CMFCRibbonComboBox, m_wndRibbonBar.FindByID(MN_HP));
+    // Get the selected index
+    int nCurSel =pHP->GetCurSel();
+    if (nCurSel >= 0)
+    {
+        CString item=pHP->GetItem(nCurSel);
+		CAmekaView* pView = CAmekaView::GetView();
+		pView->GetDocument()->mDSP.HPFFre = atoi((LPCSTR)(CStringA)item);
+		pView->OnDraw(pView->GetDC());
+    }
+    else
+    {
+        MessageBox(_T("Please select one item from droplist of Combo Box."), _T("Combo Box Item"), MB_OK);
+    }
 }

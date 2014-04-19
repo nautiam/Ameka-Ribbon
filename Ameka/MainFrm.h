@@ -68,6 +68,8 @@ public:
 	afx_msg void OnScalerate();
 	afx_msg void OnSpeedrate();
 	afx_msg void OnMonlist();
+	afx_msg void OnLp();
+	afx_msg void OnHp();
 };
 
 

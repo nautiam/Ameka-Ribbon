@@ -41,8 +41,8 @@
 
 #define strSen "10 15 30 60 90 120"
 #define strSpeed "15 30 75 150 200 300"
-#define strLP "15 20 30 40 50 60 70"
-#define strHP "1 2 3 5 8"
+#define strLP "10 15 20 30 40 50 60 70"
+#define strHP "0.5 1 2 3 5 8"
 #define strCOM "COM1 COM2 COM3 COM4 COM5 COM6 COM7 COM8 COM9 COM10"
 #define strBaud "9600 14400 19200 38400 56000 115200 "
 #define xmlName "listmontage.xml"

@@ -72,7 +72,7 @@ CAmekaDoc::CAmekaDoc()
 	mDSP.SampleRate = 200;
 	this->m_dspProcess = AfxBeginThread(DSP::DSPThread, (LPVOID)this);
 	//thrd = AfxBeginThread(genData, (LPVOID)this);
-	mDSP.epocLength = 0.1;
+	mDSP.epocLength = 1.6;
 }
 
 CAmekaDoc::~CAmekaDoc()

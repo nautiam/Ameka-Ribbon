@@ -45,11 +45,11 @@ UINT DSP::DSPThread(LPVOID pParam)
 {
 	CAmekaDoc* mDoc = (CAmekaDoc*)(pParam);
 	uint16_t numSamples = 2000;
-	Dsp::SmoothedFilterDesign <Dsp::Butterworth::Design::BandPass <4>, MONTAGE_NUM, Dsp::DirectFormII> f (4096);
+	Dsp::SmoothedFilterDesign <Dsp::Butterworth::Design::BandPass <4>, MONTAGE_NUM, Dsp::DirectFormII> f (50);
 	Dsp::Params params;
 	while (1)
 	{
-		Sleep(50);
+		Sleep(5);
 		float HighFre = mDoc->mDSP.HPFFre;
 		float LowFre = mDoc->mDSP.LPFFre;
 		float sampleRate = mDoc->mDSP.SampleRate;
@@ -62,7 +62,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 		f.setParams (params);
 		//AfxMessageBox(mDoc->mMon->mName);
 
-		RawDataType* data = mDoc->dataBuffer->checkPopData(100);
+		RawDataType* data = mDoc->dataBuffer->checkPopData(5);
 		int size =  mDoc->dataBuffer->rLen;
 		
 		if (size > 0 && data != NULL)
@@ -76,7 +76,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 			}
 
 			int monNum =  mDoc->mMon->mList.GetCount();
-			LOG(DEBUG) << monNum;
+			//LOG(DEBUG) << monNum;
 			POSITION pos;
 			pos = mDoc->mMon->mList.GetHeadPosition();
 			for (int i=0; i<monNum; i++)
@@ -123,14 +123,16 @@ UINT DSP::DSPThread(LPVOID pParam)
 			
 			for (int i=0; i<size; i++)
 			{
-				if (mDoc->PrimaryData->pushData(output[i]) != 0)
+				/*if (mDoc->PrimaryData->pushData(output[i]) != 0)
 				{
 					LOG(DEBUG) << "Primary Data ring buffer is full";	
 				}
 				if (mDoc->TemporaryData->pushData(output[i]) != 0)
 				{
 					LOG(DEBUG) << "Temporary Data ring buffer is full";	
-				}
+				}*/
+				mDoc->PrimaryData->pushData(output[i]);
+				mDoc->TemporaryData->pushData(output[i]);
 			}
 			
 			for (int i=0; i<MONTAGE_NUM; i++)
@@ -209,10 +211,11 @@ UINT DSP::DSPThread(LPVOID pParam)
 					LOG(INFO) << fre;
 					LOG(INFO) << bufout[j][i].r;*/
 				}				
-				if (mDoc->SecondaryData->pushData(temp) != 0)
+				/*if (mDoc->SecondaryData->pushData(temp) != 0)
 				{
 					LOG(DEBUG) << "Secondary Data Ring buffer is full";
-				};
+				};*/
+				mDoc->SecondaryData->pushData(temp);
 			}
 			free(st);
 			for (int i=0; i<MONTAGE_NUM; i++)
