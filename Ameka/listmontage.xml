@@ -16,6 +16,7 @@
         <default channel1="2" channel2="6" />
         <default channel1="2" channel2="4" />
         <default channel1="2" channel2="14" />
+        <default channel1="5" channel2="9" />
     </default>
     <mon1>
         <mon1 channel1="5" channel2="3" />

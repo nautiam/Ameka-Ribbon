@@ -1529,6 +1529,12 @@ void CMontageDlg::OnBnClickedOk()
 
 	bool success = doc.SaveFile(xmlName);
 	doc.Clear();
+
+	CAmekaView* pView = CAmekaView::GetView();
+	if (pView)
+	{
+		pView->OnDraw(pView->GetDC());
+	}
 	CDialogEx::OnOK();
 }
 

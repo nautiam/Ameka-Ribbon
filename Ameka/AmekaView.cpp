@@ -24,6 +24,7 @@
 #include "AmekaView.h"
 #include <stdint.h>
 #include "easylogging++.h"
+#include "AmekaLan.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -37,7 +38,7 @@
 #define CUSTOM_PEN1 RGB(192,192,192)
 #define CUSTOM_BARCOLOR RGB(41,102,0)
 #define CUSTOM_BARBACK RGB(255,255,200)
-#define MONNAME_BAR 20
+#define MONNAME_BAR 35
 #define SBAR_W 4
 #define BAR_SCALE 30
 #define FOOT_RANGE 12
@@ -158,10 +159,14 @@ void CAmekaView::OnDraw(CDC* pDC)
 	MemDC.FillRect(mrect,&brush);
 	
 	//draw foot line
+	CPen silverPen(PS_SOLID, 1, RGB(0xC0, 0xC0, 0xC0));
+	CPen* oldPen = MemDC.SelectObject(&silverPen);
 	MemDC.MoveTo(MONNAME_BAR + 1, rect.Height() - FOOT_RANGE);
 	MemDC.LineTo(rect.Width(), rect.Height() - FOOT_RANGE);
+	MemDC.SelectObject(oldPen);
+	DeleteObject(&silverPen);
 	CPen thick_pen(PS_SOLID, 2, CUSTOM_PEN);
-	CPen* oldPen = MemDC.SelectObject(&thick_pen);
+	oldPen = MemDC.SelectObject(&thick_pen);
 
 	MemDC.MoveTo(MONNAME_BAR + 1, 0);
 	MemDC.LineTo(MONNAME_BAR + 1, rect.Height());
@@ -169,6 +174,7 @@ void CAmekaView::OnDraw(CDC* pDC)
 	MemDC.SelectObject(oldPen);
 	DeleteObject(&thick_pen);
 
+	//draw whole graph
 	if (isCountFull || count != 0)
 	{
 		EnterCriticalSection(&csess);
@@ -241,6 +247,25 @@ void CAmekaView::OnDraw(CDC* pDC)
 		DeleteObject(brushS);
 	}
 
+	CFont txtFont;
+	txtFont.CreatePointFont(70, _T("Arial"), &MemDC);
+	MemDC.SelectObject(&txtFont);
+	//draw lead name
+	POSITION pos = this->GetDocument()->mMon->mList.GetHeadPosition();
+	int leadNum = this->GetDocument()->mMon->mList.GetCount();
+	for (int i = 0; i < leadNum; i++)
+	{
+		LPAlead lead = this->GetDocument()->mMon->mList.GetNext(pos);
+		CString leadTxt;
+		CRect txtRect(0, i*(rect.Height() - FOOT_RANGE)/leadNum + 1, MONNAME_BAR,(i + 1)*(rect.Height() - FOOT_RANGE)/leadNum - 1);
+		leadTxt = getElecName(lead->lFirstID) + "-" + getElecName(lead->lSecondID);
+		MemDC.DrawTextW(leadTxt, txtRect, 0);
+		CPen silverPen(PS_SOLID, 1, RGB(0xC0, 0xC0, 0xC0));
+		MemDC.SelectObject(&silverPen);
+		MemDC.MoveTo(0, (i + 1)*(rect.Height() - FOOT_RANGE)/leadNum);
+		MemDC.LineTo(MONNAME_BAR, (i + 1)*(rect.Height() - FOOT_RANGE)/leadNum);
+	}
+
 	//draw photic
 	if (onPhotic)
 	{
@@ -255,8 +280,6 @@ void CAmekaView::OnDraw(CDC* pDC)
 		//draw grid
 		CPen pen2(PS_SOLID, 1, CUSTOM_PEN1);
 		MemDC.SelectObject(&pen2);
-		CFont txtFont;
-		txtFont.CreatePointFont(70, _T("Arial"), &MemDC);
 		float barW = (float)(rect.Width() - maxWidth) / barNum;
 		for (int i = 0; i <= barNum; i++)
 		{
@@ -266,7 +289,6 @@ void CAmekaView::OnDraw(CDC* pDC)
 			CRect txtRect(maxWidth + (int)(i*barW), (rect.Height() - FOOT_RANGE),
 				maxWidth + i*barW + 10, rect.Height());
 			CString text;
-			MemDC.SelectObject(&txtFont);
 			text.Format(_T("%d"), (int)(theApp.photicTick*i + theApp.photicMin));
 			MemDC.DrawTextW(text, txtRect, 0);
 			
@@ -280,6 +302,7 @@ void CAmekaView::OnDraw(CDC* pDC)
 	MemDC.DeleteDC();
 	DeleteObject(&brush);
 	DeleteObject(&Wbmp);
+	DeleteObject(&txtFont);
 
 	//DeleteObject(pOldBmp);
 	// TODO: add draw code for native data here
