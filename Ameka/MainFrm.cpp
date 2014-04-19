@@ -468,6 +468,10 @@ void CMainFrame::OnMonlist()
 		if (mon->mName == data)
 			doc->mMon = mon;
 	}
+
+	CAmekaView* pView = CAmekaView::GetView();
+	if (pView)
+		pView->OnDraw(pView->GetDC());
 }
 
 

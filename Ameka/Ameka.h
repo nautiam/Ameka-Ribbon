@@ -57,6 +57,7 @@ public:
 	uint16_t elecNum;
 
 	float photicMin;
+	float photicWRate;
 	float photicMax;
 	float photicTick;
 	float photicBarW;

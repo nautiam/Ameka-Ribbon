@@ -40,7 +40,6 @@
 #define CUSTOM_BARBACK RGB(255,255,200)
 #define MONNAME_BAR 35
 #define SBAR_W 4
-#define BAR_SCALE 30
 #define FOOT_RANGE 12
 
 #define CODE_ERR_PDC_NULL -1
@@ -239,12 +238,11 @@ void CAmekaView::OnDraw(CDC* pDC)
 			}
 		}
 
-		CBrush brushS(CUSTOM_PEN);
-		//CBrush* pOldBrush1 = MemDC.SelectObject(&brushS);
-		MemDC.FillRect(CRect(crtPos, 0, crtPos + SBAR_W, rect.Height() - FOOT_RANGE),&brushS);
+		//CBrush brushS(CUSTOM_PEN);
+		////CBrush* pOldBrush1 = MemDC.SelectObject(&brushS);
+		//MemDC.FillRect(CRect(crtPos, 0, crtPos + SBAR_W, rect.Height() - FOOT_RANGE),&brushS);
 		LeaveCriticalSection(&csess);
 
-		DeleteObject(brushS);
 	}
 
 	CFont txtFont;
@@ -258,7 +256,7 @@ void CAmekaView::OnDraw(CDC* pDC)
 		LPAlead lead = this->GetDocument()->mMon->mList.GetNext(pos);
 		CString leadTxt;
 		CRect txtRect(0, i*(rect.Height() - FOOT_RANGE)/leadNum + 1, MONNAME_BAR,(i + 1)*(rect.Height() - FOOT_RANGE)/leadNum - 1);
-		leadTxt = getElecName(lead->lFirstID) + "-" + getElecName(lead->lSecondID);
+		leadTxt = getElecName(lead->lSecondID) + "-" + getElecName(lead->lFirstID);
 		MemDC.DrawTextW(leadTxt, txtRect, 0);
 		CPen silverPen(PS_SOLID, 1, RGB(0xC0, 0xC0, 0xC0));
 		MemDC.SelectObject(&silverPen);
@@ -474,11 +472,9 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	CRect mrect(0,0,rect.Width(),rect.Height());
 	MemDC.FillRect(mrect,&brush);
 	
-	//CPen thick_pen(PS_SOLID, 1, CUSTOM_PEN);
-	//MemDC.SelectObject(&thick_pen);
+	CPen silverPen(PS_SOLID, 1, RGB(0xC0, 0xC0, 0xC0));
 	
 	int tmp = 0;
-	//draw all point to current bitmap
 
 	if (crtPos == MONNAME_BAR)
 	{
@@ -493,13 +489,34 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	}
 	
 	//draw foot line
+	CPen* tmpPen = MemDC.SelectObject(&silverPen);
 	MemDC.MoveTo(0, rect.Height() - FOOT_RANGE);
 	MemDC.LineTo(rect.Width(), rect.Height() - FOOT_RANGE);
+	MemDC.SelectObject(tmpPen);
 
 	channelNum = this->GetDocument()->mMon->mList.GetCount();
-
+	CFont txtFont;
+	txtFont.CreatePointFont(50, _T("Arial"), &MemDC);
+	MemDC.SelectObject(&txtFont);
+	//draw all point to current bitmap
 	for(int i = 0; i < channelNum;i++)
 	{
+		if (data[0].isDraw)
+		{
+			CPen* tmpPen = MemDC.SelectObject(&silverPen);
+			MemDC.MoveTo(distance, 0);
+			MemDC.LineTo(distance, rect.Height() - FOOT_RANGE);
+			MemDC.SelectObject(tmpPen);
+			CRect txtRect(0, rect.Height() - FOOT_RANGE + 1, drawW,rect.Height());
+			
+			time_t tim = data[0].time;
+			struct tm timeinfo;
+			time (&tim);
+			localtime_s (&timeinfo, &tim);
+			CString s;
+			s.Format(_T("%d:%d:%d"), timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+			MemDC.DrawTextW(s, txtRect, 0);
+		}
 		tmp = (((rect.Height() - FOOT_RANGE)*i)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)prePos.value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
 		if (tmp > (rect.Height() - FOOT_RANGE))
 			tmp = rect.Height() - FOOT_RANGE;
@@ -519,6 +536,22 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	for(int i = 0; i < channelNum; i++)
 		for(int j = 1; j < buflen; j++)
 		{
+			if (data[j].isDraw)
+			{
+				CPen* tmpPen = MemDC.SelectObject(&silverPen);
+				MemDC.MoveTo(j*distance, 0);
+				MemDC.LineTo(j*distance, rect.Height() - FOOT_RANGE);
+				MemDC.SelectObject(tmpPen);
+				CRect txtRect(0, rect.Height() - FOOT_RANGE + 1, drawW,rect.Height());
+			
+				time_t tim = data[j].time;
+				struct tm timeinfo;
+				time (&tim);
+				localtime_s (&timeinfo, &tim);
+				CString s;
+				s.Format(_T("%d:%d:%d"), timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+				MemDC.DrawTextW(s, txtRect, 0);
+			}
 			tmp = (((rect.Height() - FOOT_RANGE)*i)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)data[j-1].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
 			if (tmp > (rect.Height() - FOOT_RANGE))
 			tmp = rect.Height() - FOOT_RANGE;
@@ -555,6 +588,7 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	DeleteObject(bitmap);
 	DeleteObject(&brushS);
 	DeleteObject(&brush);
+	DeleteObject(&silverPen);
 	delete bitmap;
 	bitmap = NULL;
 	MemDC.DeleteDC();
@@ -645,7 +679,7 @@ int CAmekaView::drawBarGraph( void )
 		float barW = (float)range/barCount;
 		for (int j = 0; j < channelNum; j++)
 		{
-			CRect barRect(abs(barPos - barW/2), (j+1)*(rect.Height() - FOOT_RANGE)/channelNum - (data[i].value[j] + BAR_SCALE - 1)/BAR_SCALE - ((rect.Height() - FOOT_RANGE)/channelNum)/2, 
+			CRect barRect(abs(barPos - barW/2), (j+1)*(rect.Height() - FOOT_RANGE)/channelNum - (data[i].value[j])/theApp.photicWRate - ((rect.Height() - FOOT_RANGE)/channelNum)/2, 
 				abs((rect.Width() - startPos)/barNum + barPos - barW/2),(j+1)*(rect.Height() - FOOT_RANGE)/channelNum - ((rect.Height() - FOOT_RANGE)/channelNum)/2);
 			MemDC.FillRect(barRect,&brushS);
 

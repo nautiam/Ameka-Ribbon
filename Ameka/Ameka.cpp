@@ -95,6 +95,7 @@ CAmekaApp::CAmekaApp()
 	this->photicMin = 0.0;
 	this->photicTick = 10.0;
 	this->photicBarW = 2.0;
+	this->photicWRate = 50;
 	this->pIO = NULL;
 	//init electrode name
 	const char* setFileName = settingName;
@@ -510,6 +511,7 @@ public:
 	CEdit photicName5;
 	CEdit photicWidth;
 	CMFCColorButton photicColor;
+	CEdit photicWRate;
 };
 
 int CPhoticDlg::OnInitDialog()
@@ -519,6 +521,7 @@ int CPhoticDlg::OnInitDialog()
 		return -1;
 	float min = theApp.photicMin;
 	float max = theApp.photicMax;
+	float rate = theApp.photicWRate;
 	float width = pDoc->mDSP.epocLength;
 	float tick = theApp.photicTick;
 	CDialog::OnInitDialog();
@@ -532,6 +535,9 @@ int CPhoticDlg::OnInitDialog()
 	this->photicTick.SetWindowTextW(t);
 	t.Format(_T("%.1f"), width);
 	this->photicWidth.SetWindowTextW(t);
+	t.Format(_T("%.1f"), rate);
+	this->photicWRate.SetWindowTextW(t);
+
 	this->photicName1.SetWindowTextW(L"Alpha");
 	this->photicName2.SetWindowTextW(L"Beta");
 	this->photicName3.SetWindowTextW(L"Theta");
@@ -558,7 +564,7 @@ void CPhoticDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT12, photicName4);
 	DDX_Control(pDX, IDC_EDIT13, photicName5);
 	DDX_Control(pDX, photic_Width, photicWidth);
-	DDX_Control(pDX, photic_Color, photicColor);
+	DDX_Control(pDX, photic_WRate, photicWRate);
 	CString tmp;
 	DDX_Text(pDX, photic_max, tmp);
 	if (tmp != "")
@@ -576,7 +582,12 @@ void CPhoticDlg::DoDataExchange(CDataExchange* pDX)
 	if (tmp != "")
 		pDoc->mDSP.epocLength = _ttof(tmp);
 
+	DDX_Text(pDX, photic_WRate, tmp);
+	if (tmp != "")
+		theApp.photicWRate = _ttof(tmp);
+
 	//CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, photic_WRate, photicWRate);
 }
 
 BEGIN_MESSAGE_MAP(CPhoticDlg, CDialogEx)
