@@ -13,6 +13,10 @@
 #define _USERCONFIG_H_
 
 #define FRE_STEP 0.1
+#define LEAD_NUMBER 16
+#define MONTAGE_NUM 32
+#define BASELINE 16383
+
 // Electrode struct
 typedef struct _Aelectrode {
 	uint16_t eID;
@@ -67,17 +71,17 @@ struct GraphData
 
 //template<class T> CList<int, int> *rawData[16];
 struct RawDataType {
-	uint16_t value[16];
+	uint16_t value[LEAD_NUMBER];
 	time_t time;
 };
 
 struct PrimaryDataType {
-	uint16_t* value;
+	uint16_t value[MONTAGE_NUM];
 	time_t time;
 };
 
 struct SecondaryDataType {
-	float value[16];
+	float value[MONTAGE_NUM];
 	float fre;
 };
 
@@ -244,6 +248,9 @@ T* amekaData<T>::checkPopData(uint16_t num)
 {
 	//
 	//EnterCriticalSection(&csess);
+	if (((crtWPos+dataLen-LRPos)%dataLen) < num)
+		return NULL;
+
 	T* data = new T[num];
 	for (int i = 0; i < num; i++)
 	{
@@ -257,9 +264,7 @@ T* amekaData<T>::checkPopData(uint16_t num)
 		data[i] = arrData[LRPos%dataLen];
 		LRPos = (LRPos+1)%dataLen;
 	}
-	//LRPos = (LRPos+num)%dataLen;
 	rLen = num;
-	//LeaveCriticalSection(&csess);
 	return data;
 };
 

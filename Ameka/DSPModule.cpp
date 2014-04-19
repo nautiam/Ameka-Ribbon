@@ -4,6 +4,7 @@
 #include "dsp_filters.h"
 #include "DSPModule.h"
 #include "kiss_fft.h"
+#include "AmekaUserConfig.h"
 
 static void convert_to_freq(kiss_fft_cpx *cout, int n) {
 	const float NC = n/2.0 + 1;
@@ -44,7 +45,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 {
 	CAmekaDoc* mDoc = (CAmekaDoc*)(pParam);
 	uint16_t numSamples = 2000;
-	Dsp::SmoothedFilterDesign <Dsp::Butterworth::Design::BandPass <4>, LEAD_NUMBER, Dsp::DirectFormII> f (4096);
+	Dsp::SmoothedFilterDesign <Dsp::Butterworth::Design::BandPass <4>, MONTAGE_NUM, Dsp::DirectFormII> f (4096);
 	Dsp::Params params;
 	while (1)
 	{
@@ -59,37 +60,61 @@ UINT DSP::DSPThread(LPVOID pParam)
 		params[2] = CenterFre; // center frequency
 		params[3] = BandWidth; // band width
 		f.setParams (params);
-		static int count = 0;
-		count++;
 		//AfxMessageBox(mDoc->mMon->mName);
-		//LOG(DEBUG) << mDoc->mMon->mList.GetCount();
-		//POSITION pos;
-		
+
 		RawDataType* data = mDoc->dataBuffer->checkPopData(100);
 		int size =  mDoc->dataBuffer->rLen;
 		
 		if (size > 0 && data != NULL)
 		{
-			float* audioData[LEAD_NUMBER];
-			RawDataType* output = new RawDataType[size];
-			if (!output)
-				AfxMessageBox(L"Error!");
-			for (int i=0; i<LEAD_NUMBER; i++)
+			float* audioData[MONTAGE_NUM];
+			PrimaryDataType* output = new PrimaryDataType[size];
+			
+			for (int i=0; i<MONTAGE_NUM; i++)
 			{
 				audioData[i] = new float[size];
 			}
 
-			for (int i=0; i<LEAD_NUMBER; i++)
-				for (int j=0; j<size; j++)
+			int monNum =  mDoc->mMon->mList.GetCount();
+			LOG(DEBUG) << monNum;
+			POSITION pos;
+			pos = mDoc->mMon->mList.GetHeadPosition();
+			for (int i=0; i<monNum; i++)
 			{
-				audioData[i][j] = (float)data[j].value[i];
-			}
+				LPAlead temp;
+				temp = mDoc->mMon->mList.GetNext(pos);
+				int fID = temp->lFirstID;
+				int sID = temp->lSecondID;
 
+				for (int j=0; j<size; j++)
+				{
+					//audioData[i][j] = (float)data[j].value[i];				
+					float fData;
+					float sData;
+					if (fID <= 2)
+						fData = BASELINE;
+					else
+						fData = (float)data[j].value[fID - 3];
+					if (sID <= 2)
+						sData = BASELINE;
+					else
+						sData = (float)data[j].value[sID - 3];
+					audioData[i][j] = (sData - fData) + BASELINE;
+				}
+			}
+			if (monNum < MONTAGE_NUM)
+			{
+				for (int i=monNum; i<MONTAGE_NUM; i++)
+					for (int j=0; j<size; j++)
+					{
+						audioData[i][j] = 0;
+					}
+			}
 			f.process (size, audioData);
 
 			for (int j=0; j<size; j++)
 			{
-				for (int i=0; i<LEAD_NUMBER; i++)				
+				for (int i=0; i<MONTAGE_NUM; i++)				
 				{
 					output[j].value[i] = (uint16_t)audioData[i][j];
 					output[j].time = data[j].time;				
@@ -108,7 +133,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 				}
 			}
 			
-			for (int i=0; i<LEAD_NUMBER; i++)
+			for (int i=0; i<MONTAGE_NUM; i++)
 			{
 				delete [] audioData[i];
 			}
@@ -122,7 +147,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 		nfft = (float)SAMPLE_RATE/fre_step;
 		float NC = (float)nfft/2.0 + 1.0;
 
-		RawDataType* output = mDoc->TemporaryData->checkPopData(nfft);
+		PrimaryDataType* output = mDoc->TemporaryData->checkPopData(nfft);
 		size =  mDoc->TemporaryData->rLen;
 		
 		if (size > 0 && output != NULL)
@@ -131,10 +156,10 @@ UINT DSP::DSPThread(LPVOID pParam)
 			mDoc->TemporaryData->LRPos = (mDoc->TemporaryData->LRPos + dataLen - size + 100) % dataLen;
 			int isinverse = 0;
 			kiss_fft_cfg st;
-			kiss_fft_cpx * buf[LEAD_NUMBER];
-			kiss_fft_cpx * bufout[LEAD_NUMBER];
+			kiss_fft_cpx * buf[MONTAGE_NUM];
+			kiss_fft_cpx * bufout[MONTAGE_NUM];
 
-			for (int i=0; i<LEAD_NUMBER; i++)
+			for (int i=0; i<MONTAGE_NUM; i++)
 			{
 				buf[i] = (kiss_fft_cpx*)malloc(sizeof(kiss_fft_cpx) * nfft );
 				bufout[i] = (kiss_fft_cpx*)malloc(sizeof(kiss_fft_cpx) * nfft );
@@ -142,7 +167,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 			st = kiss_fft_alloc( nfft ,isinverse ,0,0);
 			
 			// Add value for input buf, then convert to frequency
-			for (int j=0; j<LEAD_NUMBER; j++)
+			for (int j=0; j<MONTAGE_NUM; j++)
 			{
 				for (int i=0; i<nfft; i++)
 				{
@@ -168,7 +193,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 				SecondaryDataType temp;
 				float fre = i * fre_step;
 				temp.fre = fre;
-				for (int j=0; j<LEAD_NUMBER; j++)	
+				for (int j=0; j<MONTAGE_NUM; j++)	
 				{
 					if (fre < HighFre)
 					{
@@ -190,7 +215,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 				};
 			}
 			free(st);
-			for (int i=0; i<LEAD_NUMBER; i++)
+			for (int i=0; i<MONTAGE_NUM; i++)
 			{
 				free(buf[i]);
 				free(bufout[i]);

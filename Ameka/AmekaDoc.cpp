@@ -64,8 +64,8 @@ CAmekaDoc::CAmekaDoc()
 {
 	// TODO: add one-time construction code here
 	dataBuffer = new amekaData<RawDataType>(BUFFER_LEN);
-	PrimaryData = new amekaData<RawDataType>(BUFFER_LEN);
-	TemporaryData = new amekaData<RawDataType>(BUFFER_LEN);
+	PrimaryData = new amekaData<PrimaryDataType>(BUFFER_LEN);
+	TemporaryData = new amekaData<PrimaryDataType>(BUFFER_LEN);
 	SecondaryData = new amekaData<SecondaryDataType>(BUFFER_LEN);
 	mDSP.HPFFre = 0.5;
 	mDSP.LPFFre = 30;

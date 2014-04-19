@@ -293,7 +293,7 @@ UINT CAmekaView::graphHandle(LPVOID pParam)
 	CAmekaView* pnt = (CAmekaView *)pParam;
 	CDC* pDC = pnt->GetDC();
 	pnt->setParentDoc(pnt->GetDocument());
-	pnt->dataBuffer = (RawDataType*)malloc(pnt->bufLen*sizeof(RawDataType));
+	pnt->dataBuffer = (PrimaryDataType*)malloc(pnt->bufLen*sizeof(PrimaryDataType));
 	int ret;
 	CPen pen2(PS_SOLID, 1, CUSTOM_PEN1);
 	while(1)
@@ -349,7 +349,7 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	//RawDataType* data = new RawDataType[dataNum];
 	uint16_t buflen = 0;
 	float maxWidth;
-	RawDataType* data;
+	PrimaryDataType* data;
 	
 	if (pDC == NULL)
 		return -1;

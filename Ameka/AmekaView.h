@@ -67,8 +67,8 @@ public:
 private:
 	uint16_t crtPos;
 	float distance;
-	RawDataType* dataBuffer;
-	RawDataType prePos;
+	PrimaryDataType* dataBuffer;
+	PrimaryDataType prePos;
 	SecondaryDataType preBar;
 	uint16_t count;
 	uint16_t bufLen;
