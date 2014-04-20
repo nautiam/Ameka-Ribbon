@@ -82,6 +82,8 @@ CAmekaView::CAmekaView()
 	graphData.sampleRate = SAMPLE_RATE;
 	InitializeCriticalSection(&csess);
 	onPhotic = FALSE;
+	preTimePos = 0;
+	onDrawTime = FALSE;
 }
 
 CAmekaView::~CAmekaView()
@@ -209,6 +211,15 @@ void CAmekaView::OnDraw(CDC* pDC)
 					tmp = 0;
 				//MemDC.SetPixel(0, tmp, CUSTOM_PEN);
 				MemDC.LineTo(ceil(crtPos - distance*(j+1)), tmp);
+				if (dataBuffer[j+1].isDraw)
+				{
+					CPen* tmpPen = MemDC.SelectObject(&silverPen);
+					MemDC.MoveTo(ceil(crtPos - distance*(j+1)), 0);
+					MemDC.LineTo(ceil(crtPos - distance*(j+1)), rect.Height() - FOOT_RANGE);
+					MemDC.SelectObject(tmpPen);
+
+					drawTime(dataBuffer[j+1].time, ceil(crtPos - distance*(j+1)));
+				}
 				j++;
 			}
 		}
@@ -234,6 +245,15 @@ void CAmekaView::OnDraw(CDC* pDC)
 					tmp = 0;
 				//MemDC.SetPixel(0, tmp, CUSTOM_PEN);
 				MemDC.LineTo(ceil(maxWidth-distance*(j+1)), tmp);
+				if (dataBuffer[j+1].isDraw)
+				{
+					CPen* tmpPen = MemDC.SelectObject(&silverPen);
+					MemDC.MoveTo(ceil(maxWidth-distance*(j+1)), 0);
+					MemDC.LineTo(ceil(maxWidth-distance*(j+1)), rect.Height() - FOOT_RANGE);
+					MemDC.SelectObject(tmpPen);;
+
+					drawTime(dataBuffer[j+1].time, ceil(maxWidth-distance*(j+1)));
+				}
 				j++;
 			}
 		}
@@ -469,7 +489,7 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	//erase current position
 	CBrush brush;
 	brush.CreateSolidBrush(RGB(255,255,255));
-	CRect mrect(0,0,rect.Width(),rect.Height());
+	CRect mrect(0, 0, rect.Width(), rect.Height());
 	MemDC.FillRect(mrect,&brush);
 	
 	CPen silverPen(PS_SOLID, 1, RGB(0xC0, 0xC0, 0xC0));
@@ -495,27 +515,21 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	MemDC.SelectObject(tmpPen);
 
 	channelNum = this->GetDocument()->mMon->mList.GetCount();
-	CFont txtFont;
-	txtFont.CreatePointFont(50, _T("Arial"), &MemDC);
-	MemDC.SelectObject(&txtFont);
+
 	//draw all point to current bitmap
 	for(int i = 0; i < channelNum;i++)
 	{
 		if (data[0].isDraw)
 		{
+			preTimePos = crtPos;
+			onDrawTime = TRUE;
+
 			CPen* tmpPen = MemDC.SelectObject(&silverPen);
-			MemDC.MoveTo((distance), 0);
-			MemDC.LineTo((distance), rect.Height() - FOOT_RANGE);
+			MemDC.MoveTo(0, 0);
+			MemDC.LineTo(0, rect.Height() - FOOT_RANGE);
 			MemDC.SelectObject(tmpPen);
-			CRect txtRect(0, rect.Height() - FOOT_RANGE + 1, drawW,rect.Height());
-			
-			time_t tim = data[0].time;
-			struct tm timeinfo;
-			time (&tim);
-			localtime_s (&timeinfo, &tim);
-			CString s;
-			s.Format(_T("%d:%d:%d"), timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
-			MemDC.DrawTextW(s, txtRect, 0);
+
+			drawTime(data[0].time, crtPos);
 		}
 		tmp = (((rect.Height() - FOOT_RANGE)*i)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)prePos.value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
 		if (tmp > (rect.Height() - FOOT_RANGE))
@@ -538,19 +552,15 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 		{
 			if (data[j].isDraw)
 			{
+				preTimePos = crtPos + ceil(j*distance);
+				onDrawTime = TRUE;
+
 				CPen* tmpPen = MemDC.SelectObject(&silverPen);
 				MemDC.MoveTo((j*distance), 0);
 				MemDC.LineTo((j*distance), rect.Height() - FOOT_RANGE);
-				MemDC.SelectObject(tmpPen);
-				CRect txtRect(0, rect.Height() - FOOT_RANGE + 1, drawW,rect.Height());
-			
-				time_t tim = data[j].time;
-				struct tm timeinfo;
-				time (&tim);
-				localtime_s (&timeinfo, &tim);
-				CString s;
-				s.Format(_T("%d:%d:%d"), timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
-				MemDC.DrawTextW(s, txtRect, 0);
+				MemDC.SelectObject(tmpPen);;
+
+				drawTime(data[j].time, crtPos + ceil(j*distance));
 			}
 			tmp = (((rect.Height() - FOOT_RANGE)*i)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)data[j-1].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
 			if (tmp > (rect.Height() - FOOT_RANGE))
@@ -573,8 +583,11 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	//CBrush* pOldBrush1 = MemDC.SelectObject(&brushS);
 	MemDC.FillRect(CRect(ceil(distance * buflen), 0, ceil(distance * buflen) + SBAR_W, rect.Height() - FOOT_RANGE),&brushS);
 
-	pDC->BitBlt(crtPos, 0, ceil(distance * buflen) + SBAR_W, rect.Height(), &MemDC, 0, 0, SRCCOPY);
-	
+	if (onDrawTime || (crtPos  < (preTimePos + MONNAME_BAR/2 + 1) && crtPos > preTimePos))
+		pDC->BitBlt(crtPos, 0, ceil(distance * buflen) + SBAR_W, rect.Height() - FOOT_RANGE, &MemDC, 0, 0, SRCCOPY);
+	else
+		pDC->BitBlt(crtPos, 0, ceil(distance * buflen) + SBAR_W, rect.Height(), &MemDC, 0, 0, SRCCOPY);
+	onDrawTime = FALSE;
 	prePos = data[buflen-1];
 	
 	crtPos += ceil(distance*buflen);
@@ -595,6 +608,34 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	//delete bitmap;
 	return 0;
 	
+}
+
+void CAmekaView::drawTime(time_t x_time, uint16_t x_pos)
+{
+	CDC* pDC = this->GetDC();
+	if (!pDC)
+		return;
+	CRect rect;
+	this->GetClientRect(&rect);
+
+	CRect* txtRect;
+	if (x_pos - MONNAME_BAR/2 - 1 > MONNAME_BAR)
+		txtRect = new CRect(x_pos - MONNAME_BAR/2 - 1, rect.Height() - FOOT_RANGE + 1, x_pos + MONNAME_BAR/2 + 1, rect.Height());
+	else
+		txtRect = new CRect(MONNAME_BAR, rect.Height() - FOOT_RANGE + 1, x_pos + MONNAME_BAR/2 + 1, rect.Height());
+	CFont txtFont;
+	txtFont.CreatePointFont(70, _T("Arial"), pDC);
+	pDC->SelectObject(&txtFont);
+
+	//draw time
+	time_t tim = x_time;
+	struct tm timeinfo;
+	time (&tim);
+	localtime_s (&timeinfo, &tim);
+	CString s;
+	s.Format(_T("%02d:%02d:%02d"), timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+	pDC->DrawTextW(s, txtRect, 0);
+	delete txtRect;
 }
 
 int CAmekaView::drawBarGraph( void )

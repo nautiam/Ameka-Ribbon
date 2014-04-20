@@ -59,6 +59,7 @@ public:
 	int amekaDrawPos(CDC* pDC);			//for draw current position only	
 	void setParentDoc(CAmekaDoc* doc);
 	int drawBarGraph( void );
+	void drawTime(time_t x_time, uint16_t x_pos);
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
@@ -80,6 +81,8 @@ private:
 	static const uint16_t m_Amp = amp;
 	CRITICAL_SECTION csess;
 	CAmekaDoc* mDoc;
+	int preTimePos;
+	bool onDrawTime;
 protected:
 
 // Generated message map functions
