@@ -57,6 +57,18 @@ UINT DSP::DSPThread(LPVOID pParam)
 		Sleep(5);
 		if ((mDoc->isRecord == TRUE) && (mDoc->isOpenFile == FALSE))
 		{
+			// Try to remove old record file
+			try
+			{
+				CFile::Remove(mDoc->recordFileName);
+			}
+			catch (CFileException* pEx)
+			{
+				//AfxMessageBox(L"File cannot be removed");
+				pEx->Delete();
+			}
+
+			// Create new record file
 			CTime temp = CTime::GetCurrentTime();
 			mDoc->recordFileName = temp.Format("record-%H%M%S.dat");
 			if (!mDoc->object.Open(mDoc->recordFileName, CFile::modeCreate | CFile::modeReadWrite))
@@ -72,15 +84,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 		{
 			mDoc->object.Close();
 			mDoc->isOpenFile = FALSE;
-			try
-			{
-				CFile::Remove(mDoc->recordFileName);
-			}
-			catch (CFileException* pEx)
-			{
-				AfxMessageBox(L"File cannot be removed");
-				pEx->Delete();
-			}
+			
 			/*if (mDoc->isSave != TRUE)
 			{
 				try
@@ -196,7 +200,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 					output[j].time = oldtime;
 					output[j].isDraw = TRUE;
 					count = 0;
-					LOG(DEBUG) << output[j].time;
+					//LOG(DEBUG) << output[j].time;
 					//oldtime = data[j].time;
 				}
 				else

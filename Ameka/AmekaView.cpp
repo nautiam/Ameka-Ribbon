@@ -629,11 +629,13 @@ void CAmekaView::drawTime(time_t x_time, uint16_t x_pos)
 
 	//draw time
 	time_t tim = x_time;
-	struct tm timeinfo;
+	/*struct tm timeinfo;
 	time (&tim);
-	localtime_s (&timeinfo, &tim);
+	localtime_s (&timeinfo, &tim);*/
+	CTime temp(tim);
 	CString s;
-	s.Format(_T("%02d:%02d:%02d"), timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+	s = temp.Format("%H:%M:%S");
+	//s.Format(_T("%02d:%02d:%02d"), timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
 	pDC->DrawTextW(s, txtRect, 0);
 	delete txtRect;
 }
