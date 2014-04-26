@@ -38,6 +38,12 @@ public:
 	amekaData<PrimaryDataType>* TemporaryData; // Temporary Data is used to calculate photic
 	amekaData<SecondaryDataType>* SecondaryData;
 	CWinThread* thrd;
+	CFile object;
+	CString recordFileName;
+	CString saveFileName;
+	bool isOpenFile;
+	bool isRecord;
+	bool isSave;
 	//UINT genData(LPVOID pParam);
 	//AmekaData<RawDataType>* dataBuffer;
 // Operations

@@ -297,7 +297,6 @@ int ReadThread::Run()
         else if(m_serialIO->m_bState == S_CONNECTED)
         {
 			counter++;
-			//LOG(INFO) << counter;
 			if (counter >= READ_TIMEOUT)
 			{
 				m_serialIO->m_bState = S_NOCONNECTED;

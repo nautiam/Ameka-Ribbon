@@ -69,10 +69,14 @@ CAmekaDoc::CAmekaDoc()
 	SecondaryData = new amekaData<SecondaryDataType>(BUFFER_LEN);
 	mDSP.HPFFre = 0.5;
 	mDSP.LPFFre = 30;
-	mDSP.SampleRate = 200;
-	this->m_dspProcess = AfxBeginThread(DSP::DSPThread, (LPVOID)this);
-	//thrd = AfxBeginThread(genData, (LPVOID)this);
+	mDSP.SampleRate = SAMPLE_RATE;
 	mDSP.epocLength = 1.6;
+	isOpenFile = FALSE;
+	isRecord = TRUE;
+	isSave = FALSE;
+	//saveFileName = "temp.dat";
+	this->m_dspProcess = AfxBeginThread(DSP::DSPThread, (LPVOID)this);
+	//thrd = AfxBeginThread(genData, (LPVOID)this);	
 }
 
 CAmekaDoc::~CAmekaDoc()
@@ -92,6 +96,41 @@ CAmekaDoc::~CAmekaDoc()
 
 	POSITION pos = theApp.docList.Find(this);
 	theApp.docList.RemoveAt(pos);
+	if (isOpenFile == TRUE)
+	{
+		uint16_t buffer[4] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
+		object.Write(buffer, sizeof(buffer));
+		/*CString temp;
+		temp.Format(L"mDSP.HPFFre: %f", mDSP.HPFFre);
+		object.Write(temp, temp.GetLength());*/
+		object.Close();
+		isOpenFile = FALSE;
+		/*if (isSave != TRUE)
+		{
+			try
+			{
+			   CFile::Remove(recordFileName);
+			}
+			catch (CFileException* pEx)
+			{
+			   TRACE(_T("File %20s cannot be removed\n"), recordFileName);
+			   pEx->Delete();
+			}
+		}
+		else
+		{
+			try
+			{
+				CFile::Rename(recordFileName, saveFileName);
+			}
+			catch(CFileException* pEx )
+			{
+				TRACE(_T("File %20s not found, cause = %d\n"), recordFileName, pEx->m_cause);
+				pEx->Delete();
+			}
+			mDoc->isSave = FALSE;
+		}*/
+	}
 }
 
 BOOL CAmekaDoc::OnNewDocument()

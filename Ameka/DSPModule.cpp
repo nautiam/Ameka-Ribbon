@@ -46,11 +46,68 @@ UINT DSP::DSPThread(LPVOID pParam)
 	CAmekaDoc* mDoc = (CAmekaDoc*)(pParam);
 	uint16_t numSamples = 2000;
 	time_t oldtime = 0;
+	CTime t = CTime::GetCurrentTime();
+	oldtime = t.GetTime();
+	int count = 0;
 	Dsp::SmoothedFilterDesign <Dsp::Butterworth::Design::BandPass <4>, MONTAGE_NUM, Dsp::DirectFormII> f (50);
 	Dsp::Params params;
+	
 	while (1)
 	{
 		Sleep(5);
+		if ((mDoc->isRecord == TRUE) && (mDoc->isOpenFile == FALSE))
+		{
+			CTime temp = CTime::GetCurrentTime();
+			mDoc->recordFileName = temp.Format("record-%H%M%S.dat");
+			if (!mDoc->object.Open(mDoc->recordFileName, CFile::modeCreate | CFile::modeReadWrite))
+			{
+				AfxMessageBox(L"File cannot be created");
+			}
+			else
+			{
+				mDoc->isOpenFile = TRUE;
+			}
+		}
+		else if ((mDoc->isRecord == FALSE) && (mDoc->isOpenFile == TRUE))
+		{
+			mDoc->object.Close();
+			mDoc->isOpenFile = FALSE;
+			try
+			{
+				CFile::Remove(mDoc->recordFileName);
+			}
+			catch (CFileException* pEx)
+			{
+				AfxMessageBox(L"File cannot be removed");
+				pEx->Delete();
+			}
+			/*if (mDoc->isSave != TRUE)
+			{
+				try
+				{
+				   CFile::Remove(mDoc->recordFileName);
+				}
+				catch (CFileException* pEx)
+				{
+				   AfxMessageBox(L"File cannot be removed");
+				   pEx->Delete();
+				}
+			}
+			else
+			{
+				try
+				{
+					CFile::Rename(mDoc->recordFileName, mDoc->saveFileName);
+				}
+				catch(CFileException* pEx )
+				{
+					AfxMessageBox(L"File cannot be saved");
+					pEx->Delete();
+				}				
+				mDoc->isSave = FALSE;
+			}*/
+		}
+
 		float HighFre = mDoc->mDSP.HPFFre;
 		float LowFre = mDoc->mDSP.LPFFre;
 		float sampleRate = mDoc->mDSP.SampleRate;
@@ -61,13 +118,30 @@ UINT DSP::DSPThread(LPVOID pParam)
 		params[2] = CenterFre; // center frequency
 		params[3] = BandWidth; // band width
 		f.setParams (params);
-		//AfxMessageBox(mDoc->mMon->mName);
 
 		RawDataType* data = mDoc->dataBuffer->checkPopData(5);
 		int size =  mDoc->dataBuffer->rLen;
 		
 		if (size > 0 && data != NULL)
 		{
+			if ((mDoc->isRecord == TRUE) && (mDoc->isOpenFile == TRUE))
+			{
+				uint16_t buffer[20];
+				buffer[0] = 0x0;
+				buffer[1] = 0x0;
+				for (int i=0; i<5; i++)
+				{
+					RawDataType temp;
+					temp = data[i];
+					for (int j=0; j<LEAD_NUMBER; j++)
+					{
+						buffer[j+2] = data[i].value[j];
+					}
+					buffer[18] = data[i].time >> 16;
+					buffer[19] = data[i].time;
+					mDoc->object.Write(buffer, sizeof(buffer));
+				}
+			}
 			float* audioData[MONTAGE_NUM];
 			PrimaryDataType* output = new PrimaryDataType[size];
 			
@@ -77,7 +151,6 @@ UINT DSP::DSPThread(LPVOID pParam)
 			}
 
 			int monNum =  mDoc->mMon->mList.GetCount();
-			//LOG(DEBUG) << monNum;
 			POSITION pos;
 			pos = mDoc->mMon->mList.GetHeadPosition();
 			for (int i=0; i<monNum; i++)
@@ -115,14 +188,20 @@ UINT DSP::DSPThread(LPVOID pParam)
 
 			for (int j=0; j<size; j++)
 			{
-				output[j].time = data[j].time;
-				if (data[j].time - oldtime)
+				count++;
+				//output[j].time = data[j].time;
+				if (count >= SAMPLE_RATE)
 				{
+					oldtime++;
+					output[j].time = oldtime;
 					output[j].isDraw = TRUE;
-					oldtime = data[j].time;
+					count = 0;
+					LOG(DEBUG) << output[j].time;
+					//oldtime = data[j].time;
 				}
 				else
 				{
+					output[j].time = 0;
 					output[j].isDraw = FALSE;
 				}
 				for (int i=0; i<MONTAGE_NUM; i++)				
@@ -149,7 +228,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 			{
 				delete [] audioData[i];
 			}
-			delete [] data;			
+			delete [] data;
 			delete [] output;
 		}		
 
