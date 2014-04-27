@@ -78,13 +78,29 @@ UINT DSP::DSPThread(LPVOID pParam)
 			else
 			{
 				mDoc->isOpenFile = TRUE;
+				uint16_t temp[40];
+				for (int i=0; i<40; i++)
+				{
+					temp[i] = 0xFF;
+				}
+				mDoc->object.Write(temp, sizeof(temp));
 			}
 		}
 		else if ((mDoc->isRecord == FALSE) && (mDoc->isOpenFile == TRUE))
 		{
+			uint16_t buffer[4] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
+			mDoc->object.Write(buffer, sizeof(buffer));
+			mDoc->object.SeekToBegin();
+			uint16_t temp[5];
+			temp[0] = (uint16_t)(mDoc->mDSP.HPFFre * 10);
+			temp[1] = (uint16_t)(mDoc->mDSP.LPFFre * 10);
+			temp[2] = (uint16_t)(mDoc->mDSP.epocLength * 10);
+			mDoc->object.Write(temp, sizeof(temp));
+			CString name;
+			int nLen = mDoc->mMon->mName.GetLength()*sizeof(TCHAR);
+			mDoc->object.Write(mDoc->mMon->mName.GetBuffer(), nLen);
 			mDoc->object.Close();
 			mDoc->isOpenFile = FALSE;
-			
 			/*if (mDoc->isSave != TRUE)
 			{
 				try

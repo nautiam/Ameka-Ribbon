@@ -97,6 +97,15 @@ CAmekaDoc::~CAmekaDoc()
 	{
 		uint16_t buffer[4] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
 		object.Write(buffer, sizeof(buffer));
+		object.SeekToBegin();
+		uint16_t temp[5];
+		temp[0] = (uint16_t)(mDSP.HPFFre * 10);
+		temp[1] = (uint16_t)(mDSP.LPFFre * 10);
+		temp[2] = (uint16_t)(mDSP.epocLength * 10);
+		object.Write(temp, sizeof(temp));
+		CString name;
+		int nLen = mMon->mName.GetLength()*sizeof(TCHAR);
+		object.Write(mMon->mName.GetBuffer(), nLen);
 		object.Close();
 		isOpenFile = FALSE;				
 	}
