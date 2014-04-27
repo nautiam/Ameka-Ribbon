@@ -16,7 +16,6 @@
 #include "AmekaUserConfig.h"
 #include "DSPModule.h"
 
-#define arrLen 4096
 
 #pragma once
 

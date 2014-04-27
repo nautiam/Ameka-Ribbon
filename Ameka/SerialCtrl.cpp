@@ -575,7 +575,7 @@ CSerialIO::CSerialIO(CString strPortName,CString strBaudRate)
     m_bState = S_UNINITTIALZED;
     m_bPacketOK = FALSE;
     m_bSendPacket = FALSE;
-	RawData = new amekaData<RawDataType>(1000);
+	//RawData = new amekaData<RawDataType>(1000);
 	m_recvBuffer = new amekaData<char>(MAX_RECV_BUFFER);
 	Init();	
 }
@@ -677,15 +677,37 @@ BOOL CSerialIO::Init()
 }
 void CSerialIO::UnInit()
 {
-	if(m_readProcess)
-		m_readProcess->SuspendThread();
-    if(m_writeProcess)
-		m_writeProcess->SuspendThread();
+	DWORD exit_code= NULL;
+	if (m_readProcess != NULL)
+	{
+		GetExitCodeThread(m_readProcess->m_hThread, &exit_code);
+		if(exit_code == STILL_ACTIVE)
+		{
+			::TerminateThread(m_readProcess->m_hThread, 0);
+			CloseHandle(m_readProcess->m_hThread);
+		}
+		m_readProcess->m_hThread = NULL;
+		m_readProcess = NULL;
+	}
+	if (m_writeProcess != NULL)
+	{
+		GetExitCodeThread(m_writeProcess->m_hThread, &exit_code);
+		if(exit_code == STILL_ACTIVE)
+		{
+			::TerminateThread(m_writeProcess->m_hThread, 0);
+			CloseHandle(m_writeProcess->m_hThread);
+		}
+		m_writeProcess->m_hThread = NULL;
+		m_writeProcess = NULL;
+	}
+
 	if (ResetEvent(m_WriteEvent) == 0)
 	{
 		LOG(ERROR) << "System Error: Reset com event has problem";
 	}
     m_serialCtrl.ClosePort();
+
+	delete m_recvBuffer;
 }
 
 void CSerialIO::Write(char *outPacket,int outLength)

@@ -169,7 +169,10 @@ void loadSetting(const char* fileName)
 				if (e->Attribute("Name") != NULL)
 					theApp.mElec[iCount].eName = e->Attribute("Name");
 				if (e->Attribute("point1") != NULL && e->Attribute("point2") != NULL)
-					theApp.mElec[iCount].ePos = new CPoint(atoi(e->Attribute("point1")),atoi(e->Attribute("point2")));
+				{
+					theApp.mElec[iCount].ePos.x = atoi(e->Attribute("point1"));
+					theApp.mElec[iCount].ePos.y = atoi(e->Attribute("point2"));
+				}
 				iCount++;
 			}
 			break;
@@ -198,7 +201,7 @@ CPoint* getElecPoint(uint16_t num)
 {
 	for (int i = 0; i < theApp.elecNum; i++)
 		if (theApp.mElec[i].eID == num)
-			return theApp.mElec[i].ePos;
+			return &theApp.mElec[i].ePos;
 	return NULL;
 };
 

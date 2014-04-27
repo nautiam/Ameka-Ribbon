@@ -21,7 +21,7 @@
 typedef struct _Aelectrode {
 	uint16_t eID;
 	CString eName;
-	CPoint* ePos;
+	CPoint ePos;
 } *LPAelectrode, Aelectrode;
 
 typedef struct _Color{
@@ -137,7 +137,7 @@ private:
 template<class T>
 amekaData<T>::amekaData(uint16_t len)
 {
-	arrData = (T*)malloc(len*sizeof(T));
+	arrData = new T[len];
 	dataLen = len;
 	crtWPos = 0;
 	LRPos = 0;
@@ -211,7 +211,7 @@ T* amekaData<T>::popAll()
 		rLen = 0;
 		return NULL;
 	}
-	data = (T*)malloc(len*sizeof(T));
+	data = new T[len];
 	for (int i = 0; i < len; i++)
 	{
 		data[i] = arrData[LRPos%dataLen];

@@ -84,6 +84,7 @@ CAmekaView::CAmekaView()
 	onPhotic = FALSE;
 	preTimePos = 0;
 	onDrawTime = FALSE;
+	dataBuffer = NULL;
 }
 
 CAmekaView::~CAmekaView()
@@ -115,6 +116,8 @@ CAmekaView::~CAmekaView()
 		this->pPhoticThread = NULL;
 	}
 	DeleteCriticalSection(&csess);
+	if (dataBuffer)
+		delete [] dataBuffer;
 }
 
 BOOL CAmekaView::PreCreateWindow(CREATESTRUCT& cs)
@@ -180,7 +183,7 @@ void CAmekaView::OnDraw(CDC* pDC)
 	{
 		EnterCriticalSection(&csess);
 		distance = (float)graphData.paperSpeed*(float)graphData.dotPmm/graphData.sampleRate;
-		uint16_t numPos = ceil(crtPos/distance);
+		uint16_t numPos = crtPos/distance;
 		uint16_t firstPos;
 
 		if (!isCountFull)
@@ -197,28 +200,28 @@ void CAmekaView::OnDraw(CDC* pDC)
 			j = 0;
 			while(crtPos - distance*(j+1) > MONNAME_BAR)
 			{
-				tmp = ceil((rect.Height() - FOOT_RANGE)*i/channelNum) + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)dataBuffer[(count-1+bufLen-j)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
+				tmp = ((rect.Height() - FOOT_RANGE)*i/channelNum) + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)dataBuffer[(count-1+bufLen-j)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
 				if (tmp > (rect.Height() - FOOT_RANGE))
 					tmp = rect.Height() - FOOT_RANGE;
 				if (tmp < 0)
 					tmp = 0;
 				//MemDC.SetPixel(0, tmp, CUSTOM_PEN);
-				MemDC.MoveTo(ceil(crtPos - distance*j), tmp);
-				tmp = ceil((rect.Height() - FOOT_RANGE)*i/channelNum) + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)dataBuffer[(count-1+bufLen-j-1)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
+				MemDC.MoveTo((crtPos - distance*j), tmp);
+				tmp = ((rect.Height() - FOOT_RANGE)*i/channelNum) + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)dataBuffer[(count-1+bufLen-j-1)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
 				if (tmp > (rect.Height() - FOOT_RANGE))
 					tmp = rect.Height() - FOOT_RANGE;
 				if (tmp < 0)
 					tmp = 0;
 				//MemDC.SetPixel(0, tmp, CUSTOM_PEN);
-				MemDC.LineTo(ceil(crtPos - distance*(j+1)), tmp);
+				MemDC.LineTo((crtPos - distance*(j+1)), tmp);
 				if (dataBuffer[j+1].isDraw)
 				{
 					CPen* tmpPen = MemDC.SelectObject(&silverPen);
-					MemDC.MoveTo(ceil(crtPos - distance*(j+1)), 0);
-					MemDC.LineTo(ceil(crtPos - distance*(j+1)), rect.Height() - FOOT_RANGE);
+					MemDC.MoveTo((crtPos - distance*(j+1)), 0);
+					MemDC.LineTo((crtPos - distance*(j+1)), rect.Height() - FOOT_RANGE);
 					MemDC.SelectObject(tmpPen);
 
-					drawTime(dataBuffer[j+1].time, ceil(crtPos - distance*(j+1)));
+					drawTime(dataBuffer[j+1].time, (crtPos - distance*(j+1)));
 				}
 				j++;
 			}
@@ -231,28 +234,28 @@ void CAmekaView::OnDraw(CDC* pDC)
 			{
 				if (firstPos == 0)
 					break;
-				tmp = ceil((rect.Height() - FOOT_RANGE)*i/channelNum) + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)dataBuffer[(firstPos+bufLen-j)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
+				tmp = ((rect.Height() - FOOT_RANGE)*i/channelNum) + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)dataBuffer[(firstPos+bufLen-j)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
 				if (tmp > rect.Height() - FOOT_RANGE)
 					tmp = rect.Height() - FOOT_RANGE;
 				if (tmp < 0)
 					tmp = 0;
 				//MemDC.SetPixel(0, tmp, CUSTOM_PEN);
-				MemDC.MoveTo(ceil(maxWidth-distance*j), tmp);
-				tmp = ceil((rect.Height() - FOOT_RANGE)*i/channelNum) + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)dataBuffer[(firstPos+bufLen-j-1)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
+				MemDC.MoveTo((maxWidth-distance*j), tmp);
+				tmp = ((rect.Height() - FOOT_RANGE)*i/channelNum) + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)dataBuffer[(firstPos+bufLen-j-1)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
 				if (tmp > rect.Height() - FOOT_RANGE)
 					tmp = rect.Height() - FOOT_RANGE;
 				if (tmp < 0)
 					tmp = 0;
 				//MemDC.SetPixel(0, tmp, CUSTOM_PEN);
-				MemDC.LineTo(ceil(maxWidth-distance*(j+1)), tmp);
+				MemDC.LineTo((maxWidth-distance*(j+1)), tmp);
 				if (dataBuffer[j+1].isDraw)
 				{
 					CPen* tmpPen = MemDC.SelectObject(&silverPen);
-					MemDC.MoveTo(ceil(maxWidth-distance*(j+1)), 0);
-					MemDC.LineTo(ceil(maxWidth-distance*(j+1)), rect.Height() - FOOT_RANGE);
+					MemDC.MoveTo((maxWidth-distance*(j+1)), 0);
+					MemDC.LineTo((maxWidth-distance*(j+1)), rect.Height() - FOOT_RANGE);
 					MemDC.SelectObject(tmpPen);;
 
-					drawTime(dataBuffer[j+1].time, ceil(maxWidth-distance*(j+1)));
+					drawTime(dataBuffer[j+1].time, (maxWidth-distance*(j+1)));
 				}
 				j++;
 			}
@@ -338,7 +341,6 @@ UINT CAmekaView::graphHandle(LPVOID pParam)
 	pnt->setParentDoc(pnt->GetDocument());
 	pnt->dataBuffer = (PrimaryDataType*)malloc(pnt->bufLen*sizeof(PrimaryDataType));
 	int ret;
-	CPen pen2(PS_SOLID, 1, CUSTOM_PEN1);
 	while(1)
 	{
 		//ret = pnt->amekaDrawPos(&pnt->bmp);
@@ -350,7 +352,6 @@ UINT CAmekaView::graphHandle(LPVOID pParam)
 			*/
 		::Sleep(timeSleep);
 	}
-	DeleteObject(&pen2);
 	DeleteObject(pDC);
 	return 0;
 }
@@ -395,7 +396,10 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	PrimaryDataType* data;
 	
 	if (pDC == NULL)
+	{
+		delete bitmap;
 		return -1;
+	}
 	
 	CRect rect;
     GetClientRect(&rect);
@@ -424,7 +428,10 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	}
 	buflen = this->mDoc->PrimaryData->rLen;
 	if ((buflen <= 0) || (data == NULL))
+	{
+		delete bitmap;
 		return -2;
+	}
 	
 	
 	if (isNull)
@@ -552,7 +559,7 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 		{
 			if (data[j].isDraw)
 			{
-				preTimePos = crtPos + ceil(j*distance);
+				preTimePos = crtPos + j*distance;
 				onDrawTime = TRUE;
 
 				CPen* tmpPen = MemDC.SelectObject(&silverPen);
@@ -560,7 +567,7 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 				MemDC.LineTo((j*distance), rect.Height() - FOOT_RANGE);
 				MemDC.SelectObject(tmpPen);;
 
-				drawTime(data[j].time, crtPos + ceil(j*distance));
+				drawTime(data[j].time, crtPos + j*distance);
 			}
 			tmp = (((rect.Height() - FOOT_RANGE)*i)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)data[j-1].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
 			if (tmp > (rect.Height() - FOOT_RANGE))
@@ -581,16 +588,16 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	//draw scan bar
 	CBrush brushS(CUSTOM_PEN);
 	//CBrush* pOldBrush1 = MemDC.SelectObject(&brushS);
-	MemDC.FillRect(CRect(ceil(distance * buflen), 0, ceil(distance * buflen) + SBAR_W, rect.Height() - FOOT_RANGE),&brushS);
+	MemDC.FillRect(CRect(distance * buflen, 0, distance * buflen + SBAR_W, rect.Height() - FOOT_RANGE),&brushS);
 
 	if (onDrawTime || (crtPos  < (preTimePos + MONNAME_BAR/2 + 1) && crtPos > preTimePos))
-		pDC->BitBlt(crtPos, 0, ceil(distance * buflen) + SBAR_W, rect.Height() - FOOT_RANGE, &MemDC, 0, 0, SRCCOPY);
+		pDC->BitBlt(crtPos, 0, distance * buflen + SBAR_W, rect.Height() - FOOT_RANGE, &MemDC, 0, 0, SRCCOPY);
 	else
-		pDC->BitBlt(crtPos, 0, ceil(distance * buflen) + SBAR_W, rect.Height(), &MemDC, 0, 0, SRCCOPY);
+		pDC->BitBlt(crtPos, 0, distance * buflen + SBAR_W, rect.Height(), &MemDC, 0, 0, SRCCOPY);
 	onDrawTime = FALSE;
 	prePos = data[buflen-1];
 	
-	crtPos += ceil(distance*buflen);
+	crtPos += distance*buflen;
 
 	//free all resource
 	
@@ -637,7 +644,10 @@ void CAmekaView::drawTime(time_t x_time, uint16_t x_pos)
 	s = temp.Format("%H:%M:%S");
 	//s.Format(_T("%02d:%02d:%02d"), timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
 	pDC->DrawTextW(s, txtRect, 0);
+	DeleteObject(txtRect);
 	delete txtRect;
+	DeleteObject(&txtFont);
+	DeleteObject(pDC);
 }
 
 int CAmekaView::drawBarGraph( void )
@@ -767,24 +777,24 @@ int CAmekaView::drawBarGraph( void )
 };
 
 CAmekaView * CAmekaView::GetView()
-   {
-      CMDIChildWnd * pChild =
-          ((CMDIFrameWnd*)(AfxGetApp()->m_pMainWnd))->MDIGetActive();
+{
+    CMDIChildWnd * pChild =
+        ((CMDIFrameWnd*)(AfxGetApp()->m_pMainWnd))->MDIGetActive();
 
-      if ( !pChild )
-          return NULL;
+    if ( !pChild )
+        return NULL;
 
-      CView * pView = pChild->GetActiveView();
+    CView * pView = pChild->GetActiveView();
 
-      if ( !pView )
-         return NULL;
+    if ( !pView )
+        return NULL;
 
-      // Fail if view is of wrong kind
-      if ( ! pView->IsKindOf( RUNTIME_CLASS(CAmekaView) ) )
-         return NULL;
+    // Fail if view is of wrong kind
+    if ( ! pView->IsKindOf( RUNTIME_CLASS(CAmekaView) ) )
+        return NULL;
 
-      return (CAmekaView *) pView;
-   }
+    return (CAmekaView *) pView;
+}
 
 void CAmekaView::OnFilePrintPreview()
 {

@@ -82,6 +82,8 @@ BEGIN_MESSAGE_MAP(CAmekaApp, CWinAppEx)
 	ON_COMMAND(MN_PortOpen, &CAmekaApp::OnPortOpen)
 	ON_COMMAND(MN_Scan, &CAmekaApp::OnScan)
 	ON_COMMAND(MN_Lan, &CAmekaApp::OnLan)
+	ON_COMMAND(MN_Recording, &CAmekaApp::OnRecording)
+	ON_COMMAND(MN_StopRec, &CAmekaApp::OnStoprec)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------//
@@ -306,9 +308,26 @@ int CAmekaApp::ExitInstance()
 	//TODO: handle additional resources you may have added
 	Gdiplus::GdiplusShutdown(m_gdiplusToken);
 	AfxOleTerm(FALSE);
-	if (theApp.pIO)
-		theApp.pIO->~CSerialIO();
+	if (this->pIO)
+	{
+		delete pIO;
+	}
 	delete dataBuffer;
+	delete mnLan;
+	delete [] mElec;
+	POSITION pos = monList.GetHeadPosition();
+	while(pos)
+	{
+		LPAmontage mon = monList.GetNext(pos);
+		POSITION pos1 = mon->mList.GetHeadPosition();
+		while(pos1)
+		{
+			delete mon->mList.GetNext(pos1);
+		}
+		mon->mList.RemoveAll();
+		delete mon;
+	}
+	monList.RemoveAll();
 	return CWinAppEx::ExitInstance();
 }
 
@@ -916,7 +935,7 @@ class CMontageDlg : public CDialogEx
 {
 public:
 	CMontageDlg();
-
+	~CMontageDlg();
 // Dialog Data
 	enum { IDD = DLG_Montage};
 
@@ -946,7 +965,14 @@ public:
 CMontageDlg::CMontageDlg() : CDialogEx(CMontageDlg::IDD)
 {
 }
-
+CMontageDlg::~CMontageDlg()
+{
+	if (crtMon)
+	{
+		delete crtMon;
+		crtMon = NULL;
+	}
+}
 void CMontageDlg::DrawMontage(CDC* dc, LPAmontage mMon)
 {
 	CDC memDC;
@@ -968,11 +994,11 @@ void CMontageDlg::DrawMontage(CDC* dc, LPAmontage mMon)
 	for (int i = 0; i < theApp.elecNum; i++)
 	{
 		SolidBrush blackBrush(Gdiplus::Color(255, 0, 0, 0));
-		graphics.FillEllipse(&blackBrush, theApp.mElec[i].ePos->x - POINT_RAD, theApp.mElec[i].ePos->y - POINT_RAD, 2 * POINT_RAD, 2 * POINT_RAD);
+		graphics.FillEllipse(&blackBrush, theApp.mElec[i].ePos.x - POINT_RAD, theApp.mElec[i].ePos.y - POINT_RAD, 2 * POINT_RAD, 2 * POINT_RAD);
 
 		// Initialize arguments.
 		Gdiplus::Font myFont(L"Arial", 8);
-		PointF origin(theApp.mElec[i].ePos->x + 2, theApp.mElec[i].ePos->y - 2);
+		PointF origin(theApp.mElec[i].ePos.x + 2, theApp.mElec[i].ePos.y - 2);
 		graphics.DrawString(theApp.mElec[i].eName, theApp.mElec[i].eName.GetLength(),
 			&myFont,
 			origin,
@@ -2012,4 +2038,43 @@ void CAmekaApp::OnLan()
 }
 
 
- 
+
+
+void CAmekaApp::OnRecording()
+{
+	// TODO: Add your command handler code here.
+	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
+	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
+	CMFCRibbonButton* pRec = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_Recording));
+	if (!pRec)
+		return;
+
+	if (pDoc)
+	{
+		if (!pDoc->isRecord)
+		{
+			pDoc->isRecord = TRUE;
+		}
+	}
+}
+
+
+void CAmekaApp::OnStoprec()
+{
+	// TODO: Add your command handler code here
+	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
+	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
+	CMFCRibbonButton* pStopRec = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_StopRec));
+	if (!pStopRec)
+		return;
+
+	if (pDoc)
+	{
+		if (pDoc->isRecord)
+		{
+			pDoc->isRecord = FALSE;
+		}
+	}
+}

@@ -63,7 +63,7 @@ END_MESSAGE_MAP()
 CAmekaDoc::CAmekaDoc()
 {
 	// TODO: add one-time construction code here
-	dataBuffer = new amekaData<RawDataType>(BUFFER_LEN);
+	//dataBuffer = new amekaData<RawDataType>(BUFFER_LEN);
 	PrimaryData = new amekaData<PrimaryDataType>(BUFFER_LEN);
 	TemporaryData = new amekaData<PrimaryDataType>(BUFFER_LEN);
 	SecondaryData = new amekaData<SecondaryDataType>(BUFFER_LEN);
@@ -81,9 +81,6 @@ CAmekaDoc::CAmekaDoc()
 
 CAmekaDoc::~CAmekaDoc()
 {
-	delete dataBuffer;
-	delete PrimaryData;
-	delete SecondaryData;
 	DWORD exit_code = NULL;
 	GetExitCodeThread(this->m_dspProcess->m_hThread, &exit_code);
 
@@ -103,16 +100,20 @@ CAmekaDoc::~CAmekaDoc()
 		object.Close();
 		isOpenFile = FALSE;				
 	}
+	delete dataBuffer;
+	delete PrimaryData;
+	delete SecondaryData;
+	delete TemporaryData;
 	// Try to remove old record file whatever it is created or not
-	try
-	{
-		CFile::Remove(recordFileName);
-	}
-	catch (CFileException* pEx)
-	{
-		//AfxMessageBox(L"File cannot be removed");
-		pEx->Delete();
-	}
+	//try
+	//{
+	//	CFile::Remove(recordFileName);
+	//}
+	//catch (CFileException* pEx)
+	//{
+	//	//AfxMessageBox(L"File cannot be removed");
+	//	pEx->Delete();
+	//}
 }
 
 BOOL CAmekaDoc::OnNewDocument()
@@ -122,7 +123,7 @@ BOOL CAmekaDoc::OnNewDocument()
 
 	// TODO: add reinitialization code here
 	// (SDI documents will reuse this document)
-	dataBuffer = new amekaData<RawDataType>(arrLen);
+	dataBuffer = new amekaData<RawDataType>(BUFFER_LEN);
 	theApp.docList.AddTail(this);
 
 	POSITION pos =  theApp.monList.GetHeadPosition();

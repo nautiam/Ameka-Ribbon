@@ -421,10 +421,6 @@ void CMainFrame::OnScalerate()
 		pView->graphData.scaleRate = atoi((LPCSTR)(CStringA)item);
 		pView->OnDraw(pView->GetDC());
     }
-    else
-    {
-        MessageBox(_T("Please select one item from droplist of Combo Box."), _T("Combo Box Item"), MB_OK);
-    }
 }
 
 
@@ -442,12 +438,7 @@ void CMainFrame::OnSpeedrate()
 		pView->graphData.paperSpeed = atoi((LPCSTR)(CStringA)item);
 		pView->OnDraw(pView->GetDC());
     }
-    else
-    {
-        MessageBox(_T("Please select one item from droplist of Combo Box."), _T("Combo Box Item"), MB_OK);
-    }
 }
-
 
 void CMainFrame::OnMonlist()
 {
@@ -489,10 +480,6 @@ void CMainFrame::OnLp()
 		pView->GetDocument()->mDSP.LPFFre = atoi((LPCSTR)(CStringA)item);
 		pView->OnDraw(pView->GetDC());
     }
-    else
-    {
-        MessageBox(_T("Please select one item from droplist of Combo Box."), _T("Combo Box Item"), MB_OK);
-    }
 }
 
 
@@ -509,9 +496,5 @@ void CMainFrame::OnHp()
 		CAmekaView* pView = CAmekaView::GetView();
 		pView->GetDocument()->mDSP.HPFFre = atoi((LPCSTR)(CStringA)item);
 		pView->OnDraw(pView->GetDC());
-    }
-    else
-    {
-        MessageBox(_T("Please select one item from droplist of Combo Box."), _T("Combo Box Item"), MB_OK);
     }
 }
