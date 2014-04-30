@@ -63,7 +63,7 @@ END_MESSAGE_MAP()
 CAmekaDoc::CAmekaDoc()
 {
 	// TODO: add one-time construction code here
-	//dataBuffer = new amekaData<RawDataType>(BUFFER_LEN);
+	dataBuffer = new amekaData<RawDataType>(BUFFER_LEN);
 	PrimaryData = new amekaData<PrimaryDataType>(BUFFER_LEN);
 	TemporaryData = new amekaData<PrimaryDataType>(BUFFER_LEN);
 	SecondaryData = new amekaData<SecondaryDataType>(BUFFER_LEN);
@@ -98,16 +98,40 @@ CAmekaDoc::~CAmekaDoc()
 		uint16_t buffer[4] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
 		object.Write(buffer, sizeof(buffer));
 		object.SeekToBegin();
-		uint16_t temp[5];
+		uint16_t temp[8];
 		temp[0] = (uint16_t)(mDSP.HPFFre * 10);
 		temp[1] = (uint16_t)(mDSP.LPFFre * 10);
 		temp[2] = (uint16_t)(mDSP.epocLength * 10);
+		temp[3] = mDSP.SampleRate;
+		temp[4] = (uint16_t)(counter);
+		temp[5] = (uint16_t)(counter >> 16);
+		temp[6] = (uint16_t)(counter >> 32);
+		temp[7] = (uint16_t)(counter >> 48);
 		object.Write(temp, sizeof(temp));
+
+		int temp_mon[65];
+		int monNum =  mMon->mList.GetCount();
+		temp_mon[64] = monNum;
+		POSITION pos;
+		pos = mMon->mList.GetHeadPosition();
+		if (monNum > 32)
+			monNum = 32;
+		for (int i=0; i<monNum; i++)
+		{
+			LPAlead temp;
+			temp = mMon->mList.GetNext(pos);
+			int fID = temp->lFirstID;
+			int sID = temp->lSecondID;
+			temp_mon[i*2] = fID;
+			temp_mon[i*2 + 1] = sID;
+		}
+		object.Write(temp_mon, sizeof(temp_mon));
+
 		CString name;
 		int nLen = mMon->mName.GetLength()*sizeof(TCHAR);
 		object.Write(mMon->mName.GetBuffer(), nLen);
 		object.Close();
-		isOpenFile = FALSE;				
+		isOpenFile = FALSE;
 	}
 	delete dataBuffer;
 	delete PrimaryData;

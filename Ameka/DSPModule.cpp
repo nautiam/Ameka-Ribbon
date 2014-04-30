@@ -78,8 +78,9 @@ UINT DSP::DSPThread(LPVOID pParam)
 			else
 			{
 				mDoc->isOpenFile = TRUE;
-				uint16_t temp[40];
-				for (int i=0; i<40; i++)
+				mDoc->counter = 0;
+				uint16_t temp[100];
+				for (int i=0; i<100; i++)
 				{
 					temp[i] = 0xFF;
 				}
@@ -91,16 +92,40 @@ UINT DSP::DSPThread(LPVOID pParam)
 			uint16_t buffer[4] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
 			mDoc->object.Write(buffer, sizeof(buffer));
 			mDoc->object.SeekToBegin();
-			uint16_t temp[5];
+			uint16_t temp[8];
 			temp[0] = (uint16_t)(mDoc->mDSP.HPFFre * 10);
 			temp[1] = (uint16_t)(mDoc->mDSP.LPFFre * 10);
 			temp[2] = (uint16_t)(mDoc->mDSP.epocLength * 10);
+			temp[3] = mDoc->mDSP.SampleRate;
+			temp[4] = (uint16_t)(mDoc->counter);
+			temp[5] = (uint16_t)(mDoc->counter >> 16);
+			temp[6] = (uint16_t)(mDoc->counter >> 32);
+			temp[7] = (uint16_t)(mDoc->counter >> 48);
 			mDoc->object.Write(temp, sizeof(temp));
-			CString name;
+
+			int temp_mon[65];
+			int monNum =  mDoc->mMon->mList.GetCount();
+			temp_mon[64] = monNum;
+			POSITION pos;
+			pos = mDoc->mMon->mList.GetHeadPosition();
+			if (monNum > 32)
+				monNum = 32;
+			for (int i=0; i<monNum; i++)
+			{
+				LPAlead temp;
+				temp = mDoc->mMon->mList.GetNext(pos);
+				int fID = temp->lFirstID;
+				int sID = temp->lSecondID;
+				temp_mon[i*2] = fID;
+				temp_mon[i*2 + 1] = sID;
+			}
+			mDoc->object.Write(temp_mon, sizeof(temp_mon));
+
 			int nLen = mDoc->mMon->mName.GetLength()*sizeof(TCHAR);
 			mDoc->object.Write(mDoc->mMon->mName.GetBuffer(), nLen);
 			mDoc->object.Close();
 			mDoc->isOpenFile = FALSE;
+			mDoc->counter = 0;
 			/*if (mDoc->isSave != TRUE)
 			{
 				try
@@ -147,18 +172,19 @@ UINT DSP::DSPThread(LPVOID pParam)
 			if ((mDoc->isRecord == TRUE) && (mDoc->isOpenFile == TRUE))
 			{
 				uint16_t buffer[20];
-				buffer[0] = 0x0;
-				buffer[1] = 0x0;
+				buffer[18] = 0x0;
+				buffer[19] = 0x0;
 				for (int i=0; i<5; i++)
 				{
 					RawDataType temp;
 					temp = data[i];
 					for (int j=0; j<LEAD_NUMBER; j++)
 					{
-						buffer[j+2] = data[i].value[j];
+						buffer[j] = data[i].value[j];
 					}
-					buffer[18] = data[i].time >> 16;
-					buffer[19] = data[i].time;
+					buffer[16] = data[i].time;
+					buffer[17] = data[i].time >> 16;
+					mDoc->counter++;
 					mDoc->object.Write(buffer, sizeof(buffer));
 				}
 			}
@@ -335,5 +361,232 @@ UINT DSP::DSPThread(LPVOID pParam)
 			delete [] output;			
 		}
 	}
+	return 0;
+}
+
+UINT DSP::ProcessRecordDataThread(LPVOID pParam)
+{
+	uint16_t stdCfrmData[2] = {0x0, 0x0};
+	CAmekaDoc* mDoc = (CAmekaDoc*)(pParam);
+	CString fileName;
+	fileName = mDoc->saveFileName;
+
+	uint16_t temp[8];
+	
+	if (!mDoc->object.Open(fileName, CFile::modeRead))
+	{
+		AfxMessageBox(L"File cannot be opened");
+	}
+
+	mDoc->object.Read(temp, sizeof(temp));
+	mDoc->mDSP.HPFFre = (float)(temp[0]) / 10.0;
+	mDoc->mDSP.LPFFre = (float)(temp[1]) / 10.0;
+	mDoc->mDSP.epocLength = (float)(temp[2]) / 10.0;
+	uint64_t counter = 0;
+	counter = (uint64_t)(temp[3]) | (uint64_t)(temp[4] << 16) | (uint64_t)(temp[5] << 32) | (uint64_t)(temp[6] << 48);
+	mDoc->counter = counter;
+	int temp_mon[65];
+	mDoc->object.Read(temp_mon, sizeof(temp_mon));
+	int monNum = temp_mon[64];
+	POSITION pos;
+	pos = mDoc->mMon->mList.GetHeadPosition();
+	if (monNum > 32)
+		monNum = 32;
+	for (int i=0; i<monNum; i++)
+	{
+		Alead temp;
+		temp.lFirstID = temp_mon[i*2];
+		temp.lSecondID = temp_mon[i*2 + 1];
+		mDoc->mMon->mList.AddTail(&temp);		
+	}
+
+	mDoc->object.Read(mDoc->mMon->mName.GetBuffer(), 40);
+	mDoc->mMon->mName.ReleaseBuffer();
+	// Khoi tao vung nho cho PrimaryData va SecondaryData
+	mDoc->dataBuffer = new amekaData<RawDataType>(counter);
+	mDoc->PrimaryData = new amekaData<PrimaryDataType>(counter);
+	mDoc->SecondaryData = new amekaData<SecondaryDataType>(counter);
+
+	// Doc du lieu tu file va ghi vao rawdata buffer
+	amekaData<uint16_t>* m_recvBuffer;
+	m_recvBuffer = new amekaData<uint16_t>(20);
+	uint16_t buffer;
+	while (mDoc->object.Read(&buffer, sizeof(buffer)) != NULL)
+	{
+		m_recvBuffer->pushData(buffer);
+		if ((m_recvBuffer->get(19) == stdCfrmData[1]) && (m_recvBuffer->get(18) == stdCfrmData[0]))
+		{
+			RawDataType temp;
+			for (int i=0; i<LEAD_NUMBER; i++)
+			{
+				temp.value[i] = m_recvBuffer->get(i);
+				temp.time = (time_t)(m_recvBuffer->get(16)) | (time_t)(m_recvBuffer->get(17) << 16);
+			}
+			mDoc->dataBuffer->pushData(temp);
+		}
+	}
+	delete m_recvBuffer;
+
+	//Xu ly du lieu Primary Data
+	time_t oldtime = 0;
+	mDoc->dataBuffer->LRPos = 0; //Dam bao con tro doc o dau mang
+	oldtime = mDoc->dataBuffer->popData()->time;
+	mDoc->dataBuffer->LRPos = 0; //Tra con tro doc ve dau mang
+	uint16_t count = 0;
+	Dsp::SmoothedFilterDesign <Dsp::Butterworth::Design::BandPass <4>, MONTAGE_NUM, Dsp::DirectFormII> f (50);
+	Dsp::Params params;
+	float HighFre = mDoc->mDSP.HPFFre;
+	float LowFre = mDoc->mDSP.LPFFre;
+	float sampleRate = mDoc->mDSP.SampleRate;
+	float CenterFre = sqrt(HighFre*LowFre);
+	float BandWidth = LowFre - HighFre;
+	params[0] = sampleRate; // sample rate
+	params[1] = 4; // order
+	params[2] = CenterFre; // center frequency
+	params[3] = BandWidth; // band width
+	f.setParams (params);
+
+	float* audioData[MONTAGE_NUM];
+		
+	for (int i=0; i<MONTAGE_NUM; i++)
+	{
+		audioData[i] = new float[counter];
+	}
+
+	pos = mDoc->mMon->mList.GetHeadPosition();
+	for (int i=0; i<monNum; i++)
+	{
+		LPAlead temp;
+		temp = mDoc->mMon->mList.GetNext(pos);
+		int fID = temp->lFirstID;
+		int sID = temp->lSecondID;
+
+		for (int j=0; j<counter; j++)
+		{
+			float fData;
+			float sData;
+			if (fID <= 2)
+				fData = BASELINE;
+			else
+				fData = (float)mDoc->dataBuffer->popData()->value[fID - 3];
+			if (sID <= 2)
+				sData = BASELINE;
+			else
+				sData = (float)mDoc->dataBuffer->popData()->value[sID - 3];
+			audioData[i][j] = (sData - fData) + BASELINE;
+		}
+	}
+	if (monNum < MONTAGE_NUM)
+	{
+		for (int i=monNum; i<MONTAGE_NUM; i++)
+			for (int j=0; j<counter; j++)
+			{
+				audioData[i][j] = 0;
+			}
+	}
+	f.process (counter, audioData);
+
+	for (int j=0; j<counter; j++)
+	{
+		count++;
+		PrimaryDataType temp;
+		if (count >= SAMPLE_RATE)
+		{
+			oldtime++;			
+			temp.time = oldtime;
+			temp.isDraw = TRUE;
+			count = 0;
+		}
+		else
+		{
+			temp.time = 0;
+			temp.isDraw = FALSE;
+		}
+		for (int i=0; i<MONTAGE_NUM; i++)				
+		{
+			temp.value[i] = (uint16_t)audioData[i][j];					
+		}
+		mDoc->PrimaryData->pushData(temp);
+	}
+
+	for (int i=0; i<MONTAGE_NUM; i++)
+	{
+		delete [] audioData[i];
+	}
+
+	//Xu ly du lieu Secondary Data
+	float epocLength = mDoc->mDSP.epocLength;
+	float fre_step = FRE_STEP;
+	int nfft;
+	nfft = (float)SAMPLE_RATE/fre_step;
+	float NC = (float)nfft/2.0 + 1.0;
+
+	// Dam bao file record co so mau lon hon so mau dau vao cua pho
+	if (mDoc->PrimaryData->crtWPos >= nfft)
+		mDoc->PrimaryData->LRPos = mDoc->PrimaryData->crtWPos - nfft;
+
+	PrimaryDataType* output = mDoc->PrimaryData->checkPopData(nfft);
+	uint16_t size =  mDoc->PrimaryData->rLen;
+		
+	if (size > 0 && output != NULL)
+	{
+		int dataLen = mDoc->PrimaryData->dataLen;
+		mDoc->PrimaryData->LRPos = (mDoc->PrimaryData->LRPos + dataLen - size + 100) % dataLen;
+		int isinverse = 0;
+		kiss_fft_cfg st;
+		kiss_fft_cpx * buf[MONTAGE_NUM];
+		kiss_fft_cpx * bufout[MONTAGE_NUM];
+
+		for (int i=0; i<MONTAGE_NUM; i++)
+		{
+			buf[i] = (kiss_fft_cpx*)malloc(sizeof(kiss_fft_cpx) * nfft );
+			bufout[i] = (kiss_fft_cpx*)malloc(sizeof(kiss_fft_cpx) * nfft );
+		}
+		st = kiss_fft_alloc( nfft ,isinverse ,0,0);
+			
+		// Add value for input buf, then convert to frequency
+		for (int j=0; j<MONTAGE_NUM; j++)
+		{
+			for (int i=0; i<nfft; i++)
+			{
+				buf[j][i].r = output[i].value[j];
+				buf[j][i].i = 0;
+			}
+			kiss_fft( st , buf[j] ,bufout[j]);
+			convert_to_freq(bufout[j], nfft);
+			complex_abs(bufout[j], NC);
+		}
+
+		// Print output to file
+		for (int i=0; i<(int)NC; i++)
+		{
+			SecondaryDataType temp;
+			float fre = i * fre_step;
+			temp.fre = fre;
+			for (int j=0; j<MONTAGE_NUM; j++)	
+			{
+				if (fre < HighFre)
+				{
+					temp.value[j] = 0;
+				}
+				else
+				{
+					temp.value[j] = bufout[j][i].r;
+				}
+			mDoc->SecondaryData->pushData(temp);
+			}
+		}
+		free(st);
+		for (int i=0; i<MONTAGE_NUM; i++)
+		{
+			free(buf[i]);
+			free(bufout[i]);
+		}
+		delete [] output;
+	}
+	mDoc->PrimaryData->LRPos = 0; //Tra ve con tro doc o dau mang
+
+	mDoc->object.Close();
+
 	return 0;
 }

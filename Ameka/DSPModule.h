@@ -8,6 +8,7 @@
 class DSP {
 public:
 	static UINT DSPThread(LPVOID pParam);
+	static UINT ProcessRecordDataThread(LPVOID pParam);
 };
 
 #endif
