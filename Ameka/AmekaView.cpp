@@ -48,6 +48,9 @@
 
 #define FACTOR 0.667
 
+#define X_TOOLTIP 200
+#define Y_TOOLTIP 80
+
 // CAmekaView
 
 IMPLEMENT_DYNCREATE(CAmekaView, CView)
@@ -60,6 +63,7 @@ BEGIN_MESSAGE_MAP(CAmekaView, CView)
 	ON_WM_CONTEXTMENU()
 	ON_WM_RBUTTONUP()
 	ON_WM_ERASEBKGND()
+	ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 // CAmekaView construction/destruction
@@ -85,6 +89,8 @@ CAmekaView::CAmekaView()
 	preTimePos = 0;
 	onDrawTime = FALSE;
 	dataBuffer = NULL;
+
+	m_Tips.Create(CSize(X_TOOLTIP, Y_TOOLTIP));
 }
 
 CAmekaView::~CAmekaView()
@@ -860,4 +866,44 @@ CAmekaDoc* CAmekaView::GetDocument() const // non-debug version is inline
 BOOL CAmekaView::OnEraseBkgnd(CDC* pDC)
 {
 	return TRUE;
+}
+
+
+void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+
+	CView::OnMouseMove(nFlags, point);
+
+	if (!isNull && !isRunning)
+	{
+		int X = GetSystemMetrics( SM_CXSCREEN );
+		int Y = GetSystemMetrics( SM_CYSCREEN );
+
+		CPoint ptLog = point;
+		ClientToScreen(&ptLog);
+		CString strTemp;
+		strTemp.Format(L"Mouse Pos: X = %d Y = %d ", point.x, point.y);
+		// show tool tip in mouse move
+		int xPos, yPos;
+		if (ptLog.x + X_TOOLTIP + 5 > X)
+		{
+			xPos = X - X_TOOLTIP - 5;
+		}
+		else
+		{
+			xPos = ptLog.x + 5;
+		}
+		if (ptLog.y + Y_TOOLTIP + 5 > Y)
+		{
+			yPos = Y - Y_TOOLTIP - 5;
+		}
+		else
+		{
+			yPos = ptLog.y + 5;
+		}
+		m_Tips.ShowTips(xPos, yPos, strTemp);
+
+		CView::OnMouseMove(nFlags, point);
+	}
 }

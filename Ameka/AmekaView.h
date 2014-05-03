@@ -17,6 +17,7 @@
 
 #include "AmekaDoc.h"
 #include "SerialCtrl.h"
+#include "C_ColorToolTip.h"
 
 #define baseLine 16383
 #define amp 812
@@ -83,6 +84,8 @@ private:
 	CAmekaDoc* mDoc;
 	int preTimePos;
 	bool onDrawTime;
+
+	C_ColorToolTip m_Tips;
 protected:
 
 // Generated message map functions
@@ -93,6 +96,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 };
 
 #ifndef _DEBUG  // debug version in AmekaView.cpp

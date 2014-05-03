@@ -109,6 +109,7 @@
     <ClInclude Include="AmekaView.h" />
     <ClInclude Include="ChildFrm.h" />
     <ClInclude Include="CommModule.h" />
+    <ClInclude Include="C_ColorToolTip.h" />
     <ClInclude Include="DSPModule.h" />
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="EnvSetupModule.h" />
@@ -133,6 +134,7 @@
     <ClCompile Include="AmekaUserConfig.cpp" />
     <ClCompile Include="AmekaView.cpp" />
     <ClCompile Include="ChildFrm.cpp" />
+    <ClCompile Include="C_ColorToolTip.cpp" />
     <ClCompile Include="DSPModule.cpp" />
     <ClCompile Include="dsp_filters.cpp" />
     <ClCompile Include="GraphModule.cpp" />
