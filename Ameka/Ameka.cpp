@@ -865,6 +865,8 @@ void CAmekaApp::OnDemo()
 		CAmekaView *pView = CAmekaView::GetView();
 		if (!pView->isRunning)
 		{
+			pView->resetData();
+			pView->OnDraw(pView->GetDC());
 			pView->pThread = AfxBeginThread(pView->graphHandle, (LPVOID)pView);
 			pView->isRunning = true;
 		}

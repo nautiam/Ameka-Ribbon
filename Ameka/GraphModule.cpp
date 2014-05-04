@@ -2,17 +2,6 @@
 #include "GraphModule.h"
 #include "AmekaUserConfig.h"
 
-
-void GraphModule::amekaDrawWholeGraph(CBitmap* bitmap)
-{
-	//TBD
-}
-
-void GraphModule::amekaDistanceCal(uint8_t a)
-{
-	//TBD
-}
-
 void ArrowTo(HDC hDC, int x, int y, ARROWSTRUCT *pA) {
 
 	POINT ptTo = {x, y};
@@ -81,3 +70,4 @@ void ArrowTo(HDC hDC, const POINT *lpTo, ARROWSTRUCT *pA) {
 		MoveToEx(hDC, aptPoly[0].x, aptPoly[0].y, NULL);
 	}
 }
+

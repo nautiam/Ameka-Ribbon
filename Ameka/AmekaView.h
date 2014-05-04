@@ -22,6 +22,28 @@
 #define baseLine 16383
 #define amp 812
 
+#define timeSleep 25
+#define dataNum 8
+
+#define CUSTOM_SCANBAR RGB(92,64,51)
+#define CUSTOM_PEN RGB(72,61,139)
+#define CUSTOM_PEN1 RGB(192,192,192)
+#define CUSTOM_BARCOLOR RGB(41,102,0)
+#define CUSTOM_BARBACK RGB(255,255,200)
+#define MONNAME_BAR 35
+#define SBAR_W 4
+#define FOOT_RANGE 12
+
+#define CODE_ERR_PDC_NULL -1
+#define CODE_SUCCESS 0
+#define CODE_ERR_OTHER -2
+
+#define FACTOR 0.667
+
+#define X_TOOLTIP 200
+#define Y_TOOLTIP 80
+#define CHECK_RANGE 5
+
 class CAmekaView : public CView
 {
 protected: // create from serialization only
@@ -61,29 +83,35 @@ public:
 	void setParentDoc(CAmekaDoc* doc);
 	int drawBarGraph( void );
 	void drawTime(time_t x_time, uint16_t x_pos);
+	uint16_t getDataFromPos(CPoint mousePos, float crtPos, CAmekaView* pView);
+	void resetData();
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
 private:
-	uint16_t crtPos;
-	float distance;
 	PrimaryDataType* dataBuffer;
-	PrimaryDataType prePos;
-	SecondaryDataType preBar;
 	uint16_t count;
+	uint8_t channelNum;
 	uint16_t bufLen;
+	static const uint16_t m_BaseLine = baseLine;
+	static const uint16_t m_Amp = amp;
+
+	float crtPos;
+	float distance;
+	PrimaryDataType prePos;
+
+	SecondaryDataType preBar;
 	bool isCountFull;
 	bool isNull;
 	static const uint16_t maxRange = 8192;
-	uint8_t channelNum;
-	static const uint16_t m_BaseLine = baseLine;
-	static const uint16_t m_Amp = amp;
 	CRITICAL_SECTION csess;
 	CAmekaDoc* mDoc;
 	int preTimePos;
 	bool onDrawTime;
+	bool isResize;
+	uint16_t lastDistance;
 
 	C_ColorToolTip m_Tips;
 protected:
