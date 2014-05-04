@@ -95,7 +95,7 @@ void C_ColorToolTip::OnPaint()
 	dc.SetBkMode(TRANSPARENT);
 	dc.Draw3dRect(rtWin, m_clrFrameColor, m_clrFrameColor);
 	dc.SetTextColor(m_clrText);                
-	dc.DrawText(m_strTips, rtWin,  DT_CENTER |DT_VCENTER | DT_SINGLELINE);	
+	dc.DrawText(m_strTips, rtWin,  DT_CENTER |DT_VCENTER);	
 }
 
 

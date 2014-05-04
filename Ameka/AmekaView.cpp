@@ -772,8 +772,9 @@ int CAmekaView::drawBarGraph( void )
 	return 0;
 };
 
-uint16_t CAmekaView::getDataFromPos(CPoint mousePos, float crtPos, CAmekaView* pView)
+uint16_t* CAmekaView::getDataFromPos(CPoint mousePos, float crtPos, CAmekaView* pView)
 {
+	uint16_t* result = new uint16_t[2];
 	CRect rect;
 	this->GetWindowRect(&rect);
 	int maxWidth = rect.Width();
@@ -813,22 +814,32 @@ uint16_t CAmekaView::getDataFromPos(CPoint mousePos, float crtPos, CAmekaView* p
 			val = abs(mousePos.y - tmp);
 		}
 	}
+
+	result[0] = posNum;
+	result[1] = pos;
+	return result;
+}
+
+uint16_t* CAmekaView::getMaxMin(uint16_t* inputData)
+{
+	uint16_t* result = new uint16_t[2];
 	//find low and high range
 	int lowVal, highVal;
-	if (posNum > this->count)
+
+	if (inputData[0] > this->count)
 	{
-		if ((posNum - CHECK_RANGE ) > this->count )
+		if ((inputData[0] - CHECK_RANGE ) > this->count )
 		{
-			lowVal = posNum - CHECK_RANGE;
+			lowVal = inputData[0] - CHECK_RANGE;
 		}
 		else
 		{
 			lowVal = this->count;
 		}
 
-		if ((posNum + CHECK_RANGE)%this->bufLen < this->count - 1)
+		if ((inputData[0] + CHECK_RANGE)%this->bufLen < this->count - 1)
 		{
-			highVal = posNum + CHECK_RANGE + this->bufLen;
+			highVal = inputData[0] + CHECK_RANGE + this->bufLen;
 		}
 		else
 		{
@@ -837,18 +848,18 @@ uint16_t CAmekaView::getDataFromPos(CPoint mousePos, float crtPos, CAmekaView* p
 	}
 	else
 	{
-		if ((posNum - CHECK_RANGE + this->bufLen ) > this->count )
+		if ((inputData[0] - CHECK_RANGE + this->bufLen ) > this->count )
 		{
-			lowVal = posNum - CHECK_RANGE + this->bufLen;
+			lowVal = inputData[0] - CHECK_RANGE + this->bufLen;
 		}
 		else
 		{
 			lowVal = this->count;
 		}
 
-		if ((posNum + CHECK_RANGE) < this->count - 1)
+		if ((inputData[0] + CHECK_RANGE) < this->count - 1)
 		{
-			highVal = posNum + CHECK_RANGE + this->bufLen;
+			highVal = inputData[0] + CHECK_RANGE + this->bufLen;
 		}
 		else
 		{
@@ -857,21 +868,22 @@ uint16_t CAmekaView::getDataFromPos(CPoint mousePos, float crtPos, CAmekaView* p
 	}
 	//find max and min position in range
 	uint16_t maxVal = 0;
-	uint16_t minVal = this->dataBuffer[lowVal%this->bufLen].value[pos];
+	uint16_t minVal = this->dataBuffer[lowVal%this->bufLen].value[inputData[1]];
 	for (int i = lowVal; i < highVal; i++)
 	{
-		if (this->dataBuffer[i%this->bufLen].value[pos] < minVal)
+		if (this->dataBuffer[i%this->bufLen].value[inputData[1]] < minVal)
 		{
-			minVal = i;
+			minVal = this->dataBuffer[i%this->bufLen].value[inputData[1]];
 		}
-		if (this->dataBuffer[i%this->bufLen].value[pos] > maxVal)
+		if (this->dataBuffer[i%this->bufLen].value[inputData[1]] > maxVal)
 		{
-			maxVal = i;
+			maxVal = this->dataBuffer[i%this->bufLen].value[inputData[1]];
 		}
 	}
 
-
-	return this->dataBuffer[posNum%bufLen].value[pos];
+	result[0] = minVal;
+	result[1] = maxVal;
+	return result;
 }
 
 CAmekaView * CAmekaView::GetView()
@@ -974,8 +986,17 @@ void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
 
 		CPoint ptLog = point;
 		ClientToScreen(&ptLog);
+		uint16_t* posResult = this->getDataFromPos(point, crtPos, this);
+		uint16_t tmpData[2];
+		tmpData[0] = posResult[0];
+		tmpData[1] = posResult[1];
+		uint16_t* valResult = getMaxMin(tmpData);
+		uint16_t fuck[2];
+		fuck[0] = valResult[0];
+		fuck[1] = valResult[1];
+
 		CString strTemp;
-		strTemp.Format(L"Data value: %d", getDataFromPos(point, crtPos, this));
+		strTemp.Format(L"Data value: %d\r\nMix value: %d\r\nMax value: %d", this->dataBuffer[posResult[0]].value[posResult[1]], fuck[0], fuck[1]);
 		// show tool tip in mouse move
 		int xPos, yPos;
 		if (ptLog.x + X_TOOLTIP + 5 > X)

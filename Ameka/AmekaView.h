@@ -83,8 +83,9 @@ public:
 	void setParentDoc(CAmekaDoc* doc);
 	int drawBarGraph( void );
 	void drawTime(time_t x_time, uint16_t x_pos);
-	uint16_t getDataFromPos(CPoint mousePos, float crtPos, CAmekaView* pView);
+	uint16_t* getDataFromPos(CPoint mousePos, float crtPos, CAmekaView* pView);
 	void resetData();
+	uint16_t* getMaxMin(uint16_t* inputData);
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
