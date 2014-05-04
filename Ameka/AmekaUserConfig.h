@@ -125,6 +125,7 @@ public:
 	int pushData(T data);	
 	T* popData();
 	T get(uint16_t index);
+	T* getMultiData(uint16_t num);
 	T* popAll();
 	T* popData(uint16_t num);
 	T* checkPopData(uint16_t num);
@@ -279,6 +280,28 @@ T amekaData<T>::get(uint16_t index)
 	return arrData[(index + crtWPos)%dataLen];
 };
 
+template<class T>
+T* amekaData<T>::getMultiData(uint16_t num)
+{
+	//EnterCriticalSection(&csess);
+	int old_LRPos = LRPos;
+	T* data = new T[num];
+	for (int i = 0; i < num; i++)
+	{
+		if (isEmpty())
+		{
+			rLen = i;
+			return data;
+		}
+		data[i] = arrData[LRPos%dataLen];
+		LRPos = (LRPos+1)%dataLen;
+	}
+	//LRPos = (LRPos+num)%dataLen;
+	rLen = num;
+	LRPos = old_LRPos;
+	//LeaveCriticalSection(&csess);
+	return data;
+};
 
 template<class T>
 amekaData<T>::~amekaData(void)
