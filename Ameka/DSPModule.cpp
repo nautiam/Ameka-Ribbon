@@ -433,7 +433,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 {
 	uint16_t stdCfrmData[2] = {0x0, 0x0};
-	CAmekaDoc* mDoc = (CAmekaDoc*)(pParam);
+ 	CAmekaDoc* mDoc = (CAmekaDoc*)(pParam);
 	CString fileName;
 	fileName = mDoc->saveFileName;
 
@@ -455,6 +455,7 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	mDoc->object.Read(temp_mon, sizeof(temp_mon));
 	int monNum = temp_mon[64];
 	POSITION pos;
+	mDoc->mMon->mList.RemoveAll();
 	pos = mDoc->mMon->mList.GetHeadPosition();
 	if (monNum > 32)
 		monNum = 32;
@@ -470,6 +471,8 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	mDoc->mMon->mName.ReleaseBuffer();
 	// Khoi tao vung nho cho PrimaryData va SecondaryData
 	//mDoc->dataBuffer = new amekaData<RawDataType>(counter);
+	if (mDoc->PrimaryData)
+		delete mDoc->PrimaryData;
 	mDoc->PrimaryData = new amekaData<PrimaryDataType>(counter);
 	//mDoc->SecondaryData = new amekaData<SecondaryDataType>(counter);
 

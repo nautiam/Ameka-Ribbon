@@ -32,6 +32,7 @@ public:
 	DSPData mDSP;
 	CList<LPAelectrode, LPAelectrode> mElec;
 	CWinThread*  m_dspProcess;
+	CWinThread*  m_processRec;
 	amekaData<RawDataType>* dataBuffer;
 	amekaData<PrimaryDataType>* PrimaryData;
 	amekaData<PrimaryDataType>* TemporaryData; // Temporary Data is used to calculate photic

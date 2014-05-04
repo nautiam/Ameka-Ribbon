@@ -91,7 +91,7 @@ public:
 	afx_msg void OnFileClose();
 	afx_msg void OnLan();
 	afx_msg void OnRecording();
-	afx_msg void OnStoprec();
+//	afx_msg void OnStoprec();
 };
 
 extern CAmekaApp theApp;

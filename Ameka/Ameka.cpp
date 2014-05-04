@@ -83,7 +83,7 @@ BEGIN_MESSAGE_MAP(CAmekaApp, CWinAppEx)
 	ON_COMMAND(MN_Scan, &CAmekaApp::OnScan)
 	ON_COMMAND(MN_Lan, &CAmekaApp::OnLan)
 	ON_COMMAND(MN_Recording, &CAmekaApp::OnRecording)
-	ON_COMMAND(MN_StopRec, &CAmekaApp::OnStoprec)
+//	ON_COMMAND(MN_StopRec, &CAmekaApp::OnStoprec)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------//
@@ -891,6 +891,24 @@ void CAmekaApp::OnStop()
 		pView->pThread->m_hThread = NULL;
 		pView->pThread = NULL;
 		pView->isRunning = false;
+	}
+
+	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
+	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
+	CMFCRibbonButton* pStopRec = DYNAMIC_DOWNCAST(
+		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_StopDemo));
+	if (!pStopRec)
+		return;
+
+	if (pDoc)
+	{
+		if (pDoc->isRecord)
+		{
+			pDoc->isRecord = FALSE;
+			Sleep(100);
+			pDoc->saveFileName = pDoc->recordFileName;
+			pDoc->m_processRec = AfxBeginThread(DSP::ProcessRecordDataThread, (LPVOID)pDoc);
+		}
 	}
 }
 
@@ -2044,6 +2062,9 @@ void CAmekaApp::OnLan()
 
 void CAmekaApp::OnRecording()
 {
+	if (theApp.docList.IsEmpty())
+		return;
+
 	// TODO: Add your command handler code here.
 	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
 	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
@@ -2059,24 +2080,36 @@ void CAmekaApp::OnRecording()
 			pDoc->isRecord = TRUE;
 		}
 	}
-}
 
-
-void CAmekaApp::OnStoprec()
-{
-	// TODO: Add your command handler code here
-	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
-	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
-	CMFCRibbonButton* pStopRec = DYNAMIC_DOWNCAST(
-		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_StopRec));
-	if (!pStopRec)
-		return;
-
-	if (pDoc)
+	//if ((theApp.pIO != NULL) && (theApp.pIO->m_bState == S_CONNECTED))
 	{
-		if (pDoc->isRecord)
+		CAmekaView *pView = CAmekaView::GetView();
+		if (!pView->isRunning)
 		{
-			pDoc->isRecord = FALSE;
+			pView->resetData();
+			pView->OnDraw(pView->GetDC());
+			pView->pThread = AfxBeginThread(pView->graphHandle, (LPVOID)pView);
+			pView->isRunning = true;
 		}
 	}
 }
+
+
+//void CAmekaApp::OnStoprec()
+//{
+//	// TODO: Add your command handler code here
+//	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
+//	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
+//	CMFCRibbonButton* pStopRec = DYNAMIC_DOWNCAST(
+//		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_StopRec));
+//	if (!pStopRec)
+//		return;
+//
+//	if (pDoc)
+//	{
+//		if (pDoc->isRecord)
+//		{
+//			pDoc->isRecord = FALSE;
+//		}
+//	}
+//}
