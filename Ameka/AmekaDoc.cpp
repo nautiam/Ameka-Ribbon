@@ -75,6 +75,18 @@ CAmekaDoc::CAmekaDoc()
 	isRecord = FALSE;
 	isSave = FALSE;
 	m_dspProcess = NULL;
+
+	onReadSuccess = CreateEvent( 
+		NULL,               // default security attributes
+		TRUE,               // manual-reset event
+		FALSE,              // initial state is nonsignaled
+		TEXT("WriteEvent")  // object name
+		); 
+	if (onReadSuccess == NULL) 
+    { 
+        printf("CreateEvent failed (%d)\n", GetLastError());
+        return;
+    }
 	//saveFileName = "temp.dat";
 	//thrd = AfxBeginThread(genData, (LPVOID)this);	
 }

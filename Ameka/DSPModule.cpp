@@ -5,6 +5,7 @@
 #include "DSPModule.h"
 #include "kiss_fft.h"
 #include "AmekaUserConfig.h"
+#include "AmekaView.h"
 
 static void convert_to_freq(kiss_fft_cpx *cout, int n) {
 	const float NC = n/2.0 + 1;
@@ -473,8 +474,17 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	mDoc->mMon->mName.ReleaseBuffer();
 	// Khoi tao vung nho cho PrimaryData va SecondaryData
 	//mDoc->dataBuffer = new amekaData<RawDataType>(counter);
+	/*CAmekaView* mView = CAmekaView::GetView();
+	if (!mView)
+		return -1;*/
+
 	if (mDoc->PrimaryData)
+	{
+		//EnterCriticalSection(&mView->csess);
 		delete mDoc->PrimaryData;
+		//LeaveCriticalSection(&mView->csess);
+	}
+	//EnterCriticalSection(&mView->csess);
 	mDoc->PrimaryData = new amekaData<PrimaryDataType>(counter);
 	//mDoc->SecondaryData = new amekaData<SecondaryDataType>(counter);
 	
@@ -669,7 +679,13 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 
 	// Dam bao file record co so mau lon hon so mau dau vao cua pho
 	if (mDoc->PrimaryData->crtWPos < nfft)
+	{
+		mDoc->PrimaryData->LRPos = 0; //Tra ve con tro doc o dau mang
+		mDoc->object.Close();
+
+		SetEvent(mDoc->onReadSuccess);
 		return 0;
+	}
 		//mDoc->PrimaryData->LRPos = mDoc->PrimaryData->crtWPos - nfft;
 	photic_processing(fre_step, HighFre, mDoc->PrimaryData, mDoc->SecondaryData);
 
@@ -733,8 +749,9 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	//	delete [] output;
 	//}
 	mDoc->PrimaryData->LRPos = 0; //Tra ve con tro doc o dau mang
-
 	mDoc->object.Close();
 
+	SetEvent(mDoc->onReadSuccess);
+	//LeaveCriticalSection(&mView->csess);
 	return 0;
 }

@@ -71,6 +71,7 @@ CAmekaView::CAmekaView()
 	dataBuffer = NULL;
 	isResize = FALSE;
 	lastDistance = 0;
+	isDrawRec = FALSE;
 	m_Tips.Create(CSize(X_TOOLTIP, Y_TOOLTIP));
 }
 
@@ -119,14 +120,20 @@ BOOL CAmekaView::PreCreateWindow(CREATESTRUCT& cs)
 
 void CAmekaView::OnDraw(CDC* pDC)
 {
-	CBitmap Wbmp;
 	CAmekaDoc* pDoc = GetDocument();
-	float maxWidth;
-
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return;
+	//check if draw record data
+	if (isDrawRec)
+	{
+		drawRecData(pDC);
+		return;
+	}
 
+	CBitmap Wbmp;
+	float maxWidth;
+	
 	//CView::OnDraw(pDC);
 	CDC MemDC;
 	MemDC.CreateCompatibleDC(pDC);
@@ -324,6 +331,175 @@ void CAmekaView::OnDraw(CDC* pDC)
 
 // CAmekaView printing
 
+CAmekaView * CAmekaView::GetView()
+{
+    CMDIChildWnd * pChild =
+        ((CMDIFrameWnd*)(AfxGetApp()->m_pMainWnd))->MDIGetActive();
+
+    if ( !pChild )
+        return NULL;
+
+    CView * pView = pChild->GetActiveView();
+
+    if ( !pView )
+        return NULL;
+
+    // Fail if view is of wrong kind
+    if ( ! pView->IsKindOf( RUNTIME_CLASS(CAmekaView) ) )
+        return NULL;
+
+    return (CAmekaView *) pView;
+}
+
+void CAmekaView::OnFilePrintPreview()
+{
+#ifndef SHARED_HANDLERS
+	AFXPrintPreview(this);
+#endif
+}
+
+BOOL CAmekaView::OnPreparePrinting(CPrintInfo* pInfo)
+{
+	// default preparation
+	return DoPreparePrinting(pInfo);
+}
+
+void CAmekaView::OnBeginPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
+{
+	// TODO: add extra initialization before printing
+}
+
+void CAmekaView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
+{
+	// TODO: add cleanup after printing
+}
+
+void CAmekaView::OnRButtonUp(UINT /* nFlags */, CPoint point)
+{
+	ClientToScreen(&point);
+	OnContextMenu(this, point);
+}
+
+void CAmekaView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
+{
+#ifndef SHARED_HANDLERS
+	theApp.GetContextMenuManager()->ShowPopupMenu(IDR_POPUP_EDIT, point.x, point.y, this, TRUE);
+#endif
+}
+
+
+// CAmekaView diagnostics
+
+#ifdef _DEBUG
+void CAmekaView::AssertValid() const
+{
+	CView::AssertValid();
+}
+
+void CAmekaView::Dump(CDumpContext& dc) const
+{
+	CView::Dump(dc);
+}
+
+CAmekaDoc* CAmekaView::GetDocument() const // non-debug version is inline
+{
+	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CAmekaDoc)));
+	return (CAmekaDoc*)m_pDocument;
+}
+#endif //_DEBUG
+
+
+// CAmekaView message handlers
+
+
+BOOL CAmekaView::OnEraseBkgnd(CDC* pDC)
+{
+	return TRUE;
+}
+
+
+void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+
+	CView::OnMouseMove(nFlags, point);
+
+	if (!isNull && !isRunning)
+	{
+		int X = GetSystemMetrics( SM_CXSCREEN );
+		int Y = GetSystemMetrics( SM_CYSCREEN );
+
+		CPoint ptLog = point;
+		ClientToScreen(&ptLog);
+		uint16_t* posResult = this->getDataFromPos(point, crtPos, this);
+		uint16_t tmpData[2];
+		tmpData[0] = posResult[0];
+		tmpData[1] = posResult[1];
+		uint16_t* valResult = getMaxMin(tmpData);
+		uint16_t fuck[2];
+		fuck[0] = valResult[0];
+		fuck[1] = valResult[1];
+
+		CString strTemp;
+		strTemp.Format(L"Data value: %d\r\nMix value: %d\r\nMax value: %d", this->dataBuffer[posResult[0]].value[posResult[1]], fuck[0], fuck[1]);
+		// show tool tip in mouse move
+		int xPos, yPos;
+		if (ptLog.x + X_TOOLTIP + 5 > X)
+		{
+			xPos = X - X_TOOLTIP - 5;
+		}
+		else
+		{
+			xPos = ptLog.x + 5;
+		}
+		if (ptLog.y + Y_TOOLTIP + 5 > Y)
+		{
+			yPos = Y - Y_TOOLTIP - 5;
+		}
+		else
+		{
+			yPos = ptLog.y + 5;
+		}
+		m_Tips.ShowTips(xPos, yPos, strTemp);
+
+		CView::OnMouseMove(nFlags, point);
+	}
+	else
+	{
+		m_Tips.HideTips();
+	}
+}
+
+void CAmekaView::resetData()
+{
+
+	isRunning = FALSE;
+	crtPos = MONNAME_BAR;
+	isNull = TRUE;
+	isCountFull = FALSE;
+	pThread = NULL;
+	delete [] dataBuffer;
+	dataBuffer = NULL;
+	pPhoticThread = NULL;
+	count = 0;
+	preTimePos = 0;
+	onDrawTime = FALSE;
+}
+
+void CAmekaView::OnInitialUpdate( )
+{
+	CScrollView::OnInitialUpdate();
+
+	CRect rect;
+	GetClientRect(&rect);
+
+	CSize sizeTotal;
+	// TODO: calculate the total size of this view
+	sizeTotal.cx = rect.Width();
+	sizeTotal.cy = rect.Height();
+	SetScrollSizes(MM_TEXT, sizeTotal);
+}	
+
 //graph thread
 UINT CAmekaView::graphHandle(LPVOID pParam)
 {
@@ -343,6 +519,7 @@ UINT CAmekaView::graphHandle(LPVOID pParam)
 			*/
 		::Sleep(timeSleep);
 	}
+	
 	DeleteObject(pDC);
 	return 0;
 }
@@ -886,157 +1063,32 @@ uint16_t* CAmekaView::getMaxMin(uint16_t* inputData)
 	return result;
 }
 
-CAmekaView * CAmekaView::GetView()
+void CAmekaView::drawRecData(CDC* pDC)
 {
-    CMDIChildWnd * pChild =
-        ((CMDIFrameWnd*)(AfxGetApp()->m_pMainWnd))->MDIGetActive();
+	CDC MemDC;
+	CBitmap bmp;
+	CRect rect;
 
-    if ( !pChild )
-        return NULL;
-
-    CView * pView = pChild->GetActiveView();
-
-    if ( !pView )
-        return NULL;
-
-    // Fail if view is of wrong kind
-    if ( ! pView->IsKindOf( RUNTIME_CLASS(CAmekaView) ) )
-        return NULL;
-
-    return (CAmekaView *) pView;
-}
-
-void CAmekaView::OnFilePrintPreview()
-{
-#ifndef SHARED_HANDLERS
-	AFXPrintPreview(this);
-#endif
-}
-
-BOOL CAmekaView::OnPreparePrinting(CPrintInfo* pInfo)
-{
-	// default preparation
-	return DoPreparePrinting(pInfo);
-}
-
-void CAmekaView::OnBeginPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
-{
-	// TODO: add extra initialization before printing
-}
-
-void CAmekaView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
-{
-	// TODO: add cleanup after printing
-}
-
-void CAmekaView::OnRButtonUp(UINT /* nFlags */, CPoint point)
-{
-	ClientToScreen(&point);
-	OnContextMenu(this, point);
-}
-
-void CAmekaView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
-{
-#ifndef SHARED_HANDLERS
-	theApp.GetContextMenuManager()->ShowPopupMenu(IDR_POPUP_EDIT, point.x, point.y, this, TRUE);
-#endif
-}
-
-
-// CAmekaView diagnostics
-
-#ifdef _DEBUG
-void CAmekaView::AssertValid() const
-{
-	CView::AssertValid();
-}
-
-void CAmekaView::Dump(CDumpContext& dc) const
-{
-	CView::Dump(dc);
-}
-
-CAmekaDoc* CAmekaView::GetDocument() const // non-debug version is inline
-{
-	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CAmekaDoc)));
-	return (CAmekaDoc*)m_pDocument;
-}
-#endif //_DEBUG
-
-
-// CAmekaView message handlers
-
-
-BOOL CAmekaView::OnEraseBkgnd(CDC* pDC)
-{
-	return TRUE;
-}
-
-
-void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
-{
-	// TODO: Add your message handler code here and/or call default
-
-	CView::OnMouseMove(nFlags, point);
-
-	if (!isNull && !isRunning)
+	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
+	if (!pDoc)
 	{
-		int X = GetSystemMetrics( SM_CXSCREEN );
-		int Y = GetSystemMetrics( SM_CYSCREEN );
-
-		CPoint ptLog = point;
-		ClientToScreen(&ptLog);
-		uint16_t* posResult = this->getDataFromPos(point, crtPos, this);
-		uint16_t tmpData[2];
-		tmpData[0] = posResult[0];
-		tmpData[1] = posResult[1];
-		uint16_t* valResult = getMaxMin(tmpData);
-		uint16_t fuck[2];
-		fuck[0] = valResult[0];
-		fuck[1] = valResult[1];
-
-		CString strTemp;
-		strTemp.Format(L"Data value: %d\r\nMix value: %d\r\nMax value: %d", this->dataBuffer[posResult[0]].value[posResult[1]], fuck[0], fuck[1]);
-		// show tool tip in mouse move
-		int xPos, yPos;
-		if (ptLog.x + X_TOOLTIP + 5 > X)
-		{
-			xPos = X - X_TOOLTIP - 5;
-		}
-		else
-		{
-			xPos = ptLog.x + 5;
-		}
-		if (ptLog.y + Y_TOOLTIP + 5 > Y)
-		{
-			yPos = Y - Y_TOOLTIP - 5;
-		}
-		else
-		{
-			yPos = ptLog.y + 5;
-		}
-		m_Tips.ShowTips(xPos, yPos, strTemp);
-
-		CView::OnMouseMove(nFlags, point);
+		return;
 	}
-	else
-	{
-		m_Tips.HideTips();
-	}
-}
 
-void CAmekaView::resetData()
-{
+	GetClientRect(&rect);
 
-	isRunning = FALSE;
-	crtPos = MONNAME_BAR;
-	isNull = TRUE;
-	isCountFull = FALSE;
-	pThread = NULL;
-	delete [] dataBuffer;
-	dataBuffer = NULL;
-	pPhoticThread = NULL;
-	count = 0;
-	preTimePos = 0;
-	onDrawTime = FALSE;
+	CSize sizeTotal;
+	// TODO: calculate the total size of this view
+	EnterCriticalSection(&csess);
+	distance = (float)graphData.paperSpeed*(float)graphData.dotPmm/graphData.sampleRate;
+	LeaveCriticalSection(&csess);
+
+	sizeTotal.cx = pDoc->counter* distance;
+	sizeTotal.cy = rect.Height();
+	SetScrollSizes(MM_TEXT, sizeTotal);
+
+	/*MemDC.CreateCompatibleDC(pDC);
+	bmp.CreateCompatibleBitmap(pDC, rect.Width(), rect.Height());
+	*/
+	//isDrawRec = FALSE;
 }

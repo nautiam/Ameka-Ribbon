@@ -894,7 +894,6 @@ void CAmekaApp::OnStop()
 		pView->pThread->m_hThread = NULL;
 		pView->pThread = NULL;
 		pView->isRunning = false;
-
 	}
 
 	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
@@ -959,6 +958,17 @@ void CAmekaApp::OnStop()
 			pDoc->m_dspProcess = NULL;
 
 			pDoc->m_processRec = AfxBeginThread(DSP::ProcessRecordDataThread, (LPVOID)pDoc);
+			if (WaitForSingleObject(pDoc->onReadSuccess, INFINITE) == WAIT_OBJECT_0)
+			{
+				AfxMessageBox(L"Load file success");
+				ResetEvent(pDoc->onReadSuccess);
+				pView->isDrawRec = TRUE;
+				pView->OnDraw(pView->GetDC());
+			}
+			else
+			{
+				AfxMessageBox(L"Load file failed");
+			}
 			//}
 			
 		}

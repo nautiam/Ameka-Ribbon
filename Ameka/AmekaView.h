@@ -44,7 +44,7 @@
 #define Y_TOOLTIP 80
 #define CHECK_RANGE 5
 
-class CAmekaView : public CView
+class CAmekaView : public CScrollView
 {
 protected: // create from serialization only
 	CAmekaView();
@@ -67,6 +67,7 @@ public:
 public:
 	virtual void OnDraw(CDC* pDC);  // overridden to draw this view
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+	virtual void OnInitialUpdate( );
 protected:
 	virtual BOOL OnPreparePrinting(CPrintInfo* pInfo);
 	virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
@@ -86,11 +87,15 @@ public:
 	uint16_t* getDataFromPos(CPoint mousePos, float crtPos, CAmekaView* pView);
 	void resetData();
 	uint16_t* getMaxMin(uint16_t* inputData);
+	void drawRecData(CDC* pDC);
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
+public:
+	BOOL isDrawRec;
+	CRITICAL_SECTION csess;
 private:
 	PrimaryDataType* dataBuffer;
 	uint16_t count;
@@ -107,13 +112,13 @@ private:
 	bool isCountFull;
 	bool isNull;
 	static const uint16_t maxRange = 8192;
-	CRITICAL_SECTION csess;
+
 	CAmekaDoc* mDoc;
 	int preTimePos;
 	bool onDrawTime;
 	bool isResize;
 	uint16_t lastDistance;
-
+	
 	C_ColorToolTip m_Tips;
 protected:
 
