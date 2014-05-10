@@ -31,8 +31,6 @@
 #define new DEBUG_NEW
 #endif
 
-#define BUFFER_LEN 4096
-
 // CAmekaDoc
 
 IMPLEMENT_DYNCREATE(CAmekaDoc, CDocument)
@@ -64,7 +62,7 @@ CAmekaDoc::CAmekaDoc()
 {
 	// TODO: add one-time construction code here
 	dataBuffer = new amekaData<RawDataType>(BUFFER_LEN);
-	PrimaryData = new amekaData<PrimaryDataType>(BUFFER_LEN);
+	PrimaryData = NULL;
 	TemporaryData = new amekaData<PrimaryDataType>(BUFFER_LEN);
 	SecondaryData = new amekaData<SecondaryDataType>(BUFFER_LEN);
 	mDSP.HPFFre = 0.5;

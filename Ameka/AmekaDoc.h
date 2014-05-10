@@ -16,6 +16,7 @@
 #include "AmekaUserConfig.h"
 #include "DSPModule.h"
 
+#define BUFFER_LEN 4096
 
 #pragma once
 

@@ -910,6 +910,16 @@ void CAmekaApp::OnStop()
 
 			/*if (WaitForSingleObject(pDoc->CloseFileEvent, INFINITE) == WAIT_OBJECT_0)
 			{*/
+			exit_code = NULL;
+			GetExitCodeThread(pDoc->m_dspProcess->m_hThread, &exit_code);
+			if(exit_code == STILL_ACTIVE)
+			{
+				::TerminateThread(pDoc->m_dspProcess->m_hThread, 0);
+				CloseHandle(pDoc->m_dspProcess->m_hThread);
+			}
+			pDoc->m_dspProcess->m_hThread = NULL;
+			pDoc->m_dspProcess = NULL;
+
 			pDoc->saveFileName = pDoc->recordFileName;
 			uint16_t buffer[4] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
 			pDoc->object.Write(buffer, sizeof(buffer));
@@ -949,18 +959,10 @@ void CAmekaApp::OnStop()
 			pDoc->isOpenFile = FALSE;
 			pDoc->counter = 0;
 
-			GetExitCodeThread(pDoc->m_dspProcess->m_hThread, &exit_code);
-			if(exit_code == STILL_ACTIVE)
-			{
-				::TerminateThread(pDoc->m_dspProcess->m_hThread, 0);
-				CloseHandle(pDoc->m_dspProcess->m_hThread);
-			}
-			pDoc->m_dspProcess = NULL;
-
-			pDoc->m_processRec = AfxBeginThread(DSP::ProcessRecordDataThread, (LPVOID)pDoc);
+			AfxBeginThread(DSP::ProcessRecordDataThread, (LPVOID)pDoc);
 			if (WaitForSingleObject(pDoc->onReadSuccess, INFINITE) == WAIT_OBJECT_0)
 			{
-				AfxMessageBox(L"Load file success");
+				//AfxMessageBox(L"Load file success");
 				ResetEvent(pDoc->onReadSuccess);
 				pView->isDrawRec = TRUE;
 				pView->OnDraw(pView->GetDC());
@@ -1182,7 +1184,7 @@ void CMontageDlg::OnMonListSelChange()
 				tmp = getElecName(lead->lFirstID) + "   ->   " + getElecName(lead->lSecondID);
 				mon_list.AddString(tmp);
 			}
-			crtMon = mon;
+			memcpy(crtMon, mon, sizeof(Amontage));
 			this->OnPaint();
 			this->Invalidate();
 			this->UpdateWindow();
@@ -1260,8 +1262,10 @@ void CMontageDlg::OnBnClickedMonsave()
 			return;
 		}
 	}
-	theApp.monList.AddTail(crtMon);
-	mon_lName.AddString(crtMon->mName);
+	LPAmontage saveMon = new Amontage();
+	memcpy(saveMon, crtMon, sizeof(Amontage));
+	theApp.monList.AddTail(saveMon);
+	mon_lName.AddString(saveMon->mName);
 }
 
 void CMontageDlg::DoDataExchange(CDataExchange* pDX)
@@ -2147,6 +2151,7 @@ void CAmekaApp::OnRecording()
 	//if ((theApp.pIO != NULL) && (theApp.pIO->m_bState == S_CONNECTED))
 	{
 		CAmekaView *pView = CAmekaView::GetView();
+		pView->isDrawRec = FALSE;
 		if (!pView->isRunning)
 		{
 			pDoc->m_dspProcess = AfxBeginThread(DSP::DSPThread, (LPVOID)pDoc);

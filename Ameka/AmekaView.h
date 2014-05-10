@@ -131,6 +131,7 @@ protected:
 public:
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 };
 
 #ifndef _DEBUG  // debug version in AmekaView.cpp

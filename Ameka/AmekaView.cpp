@@ -44,6 +44,7 @@ BEGIN_MESSAGE_MAP(CAmekaView, CView)
 	ON_WM_RBUTTONUP()
 	ON_WM_ERASEBKGND()
 	ON_WM_MOUSEMOVE()
+	ON_WM_HSCROLL()
 END_MESSAGE_MAP()
 
 // CAmekaView construction/destruction
@@ -424,50 +425,50 @@ void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
 
 	CView::OnMouseMove(nFlags, point);
 
-	if (!isNull && !isRunning)
-	{
-		int X = GetSystemMetrics( SM_CXSCREEN );
-		int Y = GetSystemMetrics( SM_CYSCREEN );
+	//if (!isNull && !isRunning)
+	//{
+	//	int X = GetSystemMetrics( SM_CXSCREEN );
+	//	int Y = GetSystemMetrics( SM_CYSCREEN );
 
-		CPoint ptLog = point;
-		ClientToScreen(&ptLog);
-		uint16_t* posResult = this->getDataFromPos(point, crtPos, this);
-		uint16_t tmpData[2];
-		tmpData[0] = posResult[0];
-		tmpData[1] = posResult[1];
-		uint16_t* valResult = getMaxMin(tmpData);
-		uint16_t fuck[2];
-		fuck[0] = valResult[0];
-		fuck[1] = valResult[1];
+	//	CPoint ptLog = point;
+	//	ClientToScreen(&ptLog);
+	//	uint16_t* posResult = this->getDataFromPos(point, crtPos, this);
+	//	uint16_t tmpData[2];
+	//	tmpData[0] = posResult[0];
+	//	tmpData[1] = posResult[1];
+	//	uint16_t* valResult = getMaxMin(tmpData);
+	//	uint16_t fuck[2];
+	//	fuck[0] = valResult[0];
+	//	fuck[1] = valResult[1];
 
-		CString strTemp;
-		strTemp.Format(L"Data value: %d\r\nMix value: %d\r\nMax value: %d", this->dataBuffer[posResult[0]].value[posResult[1]], fuck[0], fuck[1]);
-		// show tool tip in mouse move
-		int xPos, yPos;
-		if (ptLog.x + X_TOOLTIP + 5 > X)
-		{
-			xPos = X - X_TOOLTIP - 5;
-		}
-		else
-		{
-			xPos = ptLog.x + 5;
-		}
-		if (ptLog.y + Y_TOOLTIP + 5 > Y)
-		{
-			yPos = Y - Y_TOOLTIP - 5;
-		}
-		else
-		{
-			yPos = ptLog.y + 5;
-		}
-		m_Tips.ShowTips(xPos, yPos, strTemp);
+	//	CString strTemp;
+	//	strTemp.Format(L"Data value: %d\r\nMix value: %d\r\nMax value: %d", this->dataBuffer[posResult[0]].value[posResult[1]], fuck[0], fuck[1]);
+	//	// show tool tip in mouse move
+	//	int xPos, yPos;
+	//	if (ptLog.x + X_TOOLTIP + 5 > X)
+	//	{
+	//		xPos = X - X_TOOLTIP - 5;
+	//	}
+	//	else
+	//	{
+	//		xPos = ptLog.x + 5;
+	//	}
+	//	if (ptLog.y + Y_TOOLTIP + 5 > Y)
+	//	{
+	//		yPos = Y - Y_TOOLTIP - 5;
+	//	}
+	//	else
+	//	{
+	//		yPos = ptLog.y + 5;
+	//	}
+	//	m_Tips.ShowTips(xPos, yPos, strTemp);
 
-		CView::OnMouseMove(nFlags, point);
-	}
-	else
-	{
-		m_Tips.HideTips();
-	}
+	//	CView::OnMouseMove(nFlags, point);
+	//}
+	//else
+	//{
+	//	m_Tips.HideTips();
+	//}
 }
 
 void CAmekaView::resetData()
@@ -1083,12 +1084,102 @@ void CAmekaView::drawRecData(CDC* pDC)
 	distance = (float)graphData.paperSpeed*(float)graphData.dotPmm/graphData.sampleRate;
 	LeaveCriticalSection(&csess);
 
-	sizeTotal.cx = pDoc->counter* distance;
+	sizeTotal.cx = pDoc->counter*distance;
 	sizeTotal.cy = rect.Height();
 	SetScrollSizes(MM_TEXT, sizeTotal);
 
-	/*MemDC.CreateCompatibleDC(pDC);
-	bmp.CreateCompatibleBitmap(pDC, rect.Width(), rect.Height());
-	*/
+	MemDC.CreateCompatibleDC(pDC);
+	uint32_t maxWidth;
+	if (distance*pDoc->counter + MONNAME_BAR > rect.Width())
+		maxWidth = distance*pDoc->counter + MONNAME_BAR + 2;
+	else
+		maxWidth = rect.Width() + 2;
+
+	bmp.CreateCompatibleBitmap(pDC, maxWidth, rect.Height());
+	MemDC.SelectObject(&bmp);
+
+	MemDC.FillRect(CRect(0, 0, maxWidth, rect.Height()), WHITE_BRUSH);
+	
+
+	float crtPercent = (float)GetDeviceScrollPosition().x/GetTotalSize().cx;
+	uint16_t arrPos = (uint16_t)(crtPercent*pDoc->counter);
+	//uint16_t screenPosNum = (rect.Width() - MONNAME_BAR)/distance;
+
+	//draw foot line
+	CPen silverPen(PS_SOLID, 1, RGB(0xC0, 0xC0, 0xC0));
+	CPen* oldPen = MemDC.SelectObject(&silverPen);
+	MemDC.MoveTo(MONNAME_BAR + 1, rect.Height() - FOOT_RANGE);
+	MemDC.LineTo(maxWidth, rect.Height() - FOOT_RANGE);
+	MemDC.SelectObject(oldPen);
+	DeleteObject(&silverPen);
+
+	CFont txtFont;
+	txtFont.CreatePointFont(70, _T("Arial"), &MemDC);
+	MemDC.SelectObject(&txtFont);
+	//draw lead name
+	POSITION pos = this->GetDocument()->mMon->mList.GetHeadPosition();
+	int leadNum = this->GetDocument()->mMon->mList.GetCount();
+	for (int i = 0; i < leadNum; i++)
+	{
+		LPAlead lead = this->GetDocument()->mMon->mList.GetNext(pos);
+		CString leadTxt;
+		CRect txtRect(0, i*(rect.Height() - FOOT_RANGE)/leadNum + 1, MONNAME_BAR,(i + 1)*(rect.Height() - FOOT_RANGE)/leadNum - 1);
+		leadTxt = getElecName(lead->lSecondID) + "-" + getElecName(lead->lFirstID);
+		MemDC.DrawTextW(leadTxt, txtRect, 0);
+		CPen silverPen(PS_SOLID, 1, RGB(0xC0, 0xC0, 0xC0));
+		//CPen* oldPen = MemDC.SelectObject(&silverPen);
+		MemDC.MoveTo(0, (i + 1)*(rect.Height() - FOOT_RANGE)/leadNum);
+		MemDC.LineTo(MONNAME_BAR, (i + 1)*(rect.Height() - FOOT_RANGE)/leadNum);
+		//MemDC.SelectObject(oldPen);
+		//DeleteObject(&silverPen);
+	}
+	CPen thick_pen(PS_SOLID, 2, CUSTOM_PEN);
+	oldPen = MemDC.SelectObject(&thick_pen);
+
+	MemDC.MoveTo(MONNAME_BAR + 1, 0);
+	MemDC.LineTo(MONNAME_BAR + 1, rect.Height());
+
+	MemDC.SelectObject(oldPen);
+	DeleteObject(&thick_pen);
+
+	//uint16_t maxPos = (arrPos + screenPosNum) <= pDoc->counter?(arrPos + screenPosNum):pDoc->counter;
+	channelNum = this->GetDocument()->mMon->mList.GetCount();
+
+	for (int i = 0; i < pDoc->counter - 1; i++)
+	{
+		for (int j = 0; j < channelNum; j++)
+		{
+			int tmp = (((rect.Height() - FOOT_RANGE)*j)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)pDoc->PrimaryData->get(i-1).value[j]-m_BaseLine)/m_Amp)*graphData.scaleRate);
+			if (tmp > (rect.Height() - FOOT_RANGE))
+			tmp = rect.Height() - FOOT_RANGE;
+			if (tmp < 0)
+				tmp = 0;
+			//MemDC.SetPixel((distance*j),tmp ,CUSTOM_PEN);
+			MemDC.MoveTo(MONNAME_BAR + 2 + (distance*i), tmp);		//draw 16 channel
+			tmp = (((rect.Height() - FOOT_RANGE)*j)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)pDoc->PrimaryData->get(i).value[j]-m_BaseLine)/m_Amp)*graphData.scaleRate);
+			if (tmp > (rect.Height() - FOOT_RANGE))
+			tmp = rect.Height() - FOOT_RANGE;
+			if (tmp < 0)
+				tmp = 0;
+			//MemDC.SetPixel((distance*(j+1)),tmp ,CUSTOM_PEN);
+			MemDC.LineTo(MONNAME_BAR + 2 + (distance*(i + 1)), tmp);	//
+		}
+	}
+
+	pDC->BitBlt(0, 0, distance*pDoc->counter, rect.Height(), &MemDC, 0, 0, SRCCOPY);
+
+	DeleteObject(&bmp);
+	DeleteObject(&txtFont);
+	MemDC.DeleteDC();
 	//isDrawRec = FALSE;
+}
+
+void CAmekaView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	// TODO: Add your message handler code here and/or call default
+
+	CScrollView::OnHScroll(nSBCode, nPos, pScrollBar);
+	//ScrollToDevicePosition(CPoint(0, 0));
+
+	//OnDraw(this->GetDC());
 }

@@ -111,6 +111,14 @@ void photic_processing(float fre_step, float HighFre, amekaData<PrimaryDataType>
 UINT DSP::DSPThread(LPVOID pParam)
 {
 	CAmekaDoc* mDoc = (CAmekaDoc*)(pParam);
+	
+	if(mDoc->PrimaryData)
+	{
+		delete mDoc->PrimaryData;
+		mDoc->PrimaryData = NULL;
+	}
+	mDoc->PrimaryData = new amekaData<PrimaryDataType>(BUFFER_LEN);
+
 	uint16_t numSamples = 2000;
 	time_t oldtime = 0;
 	CTime t = CTime::GetCurrentTime();
@@ -458,30 +466,36 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	mDoc->object.Read(temp_mon, sizeof(temp_mon));
 	int monNum = temp_mon[64];
 	POSITION pos;
-	mDoc->mMon->mList.RemoveAll();
 	pos = mDoc->mMon->mList.GetHeadPosition();
+	while(pos)
+	{
+		delete mDoc->mMon->mList.GetNext(pos);
+	}
+	mDoc->mMon->mList.RemoveAll();
 	if (monNum > 32)
 		monNum = 32;
 	for (int i=0; i<monNum; i++)
 	{
-		Alead temp;
-		temp.lFirstID = temp_mon[i*2];
-		temp.lSecondID = temp_mon[i*2 + 1];
-		mDoc->mMon->mList.AddTail(&temp);		
+		LPAlead temp = new Alead();
+		temp->lFirstID = temp_mon[i*2];
+		temp->lSecondID = temp_mon[i*2 + 1];
+		mDoc->mMon->mList.AddTail(temp);		
 	}
-
+	/*
 	mDoc->object.Read(mDoc->mMon->mName.GetBuffer(), 44);
-	mDoc->mMon->mName.ReleaseBuffer();
+	mDoc->mMon->mName.ReleaseBuffer();*/
 	// Khoi tao vung nho cho PrimaryData va SecondaryData
 	//mDoc->dataBuffer = new amekaData<RawDataType>(counter);
 	/*CAmekaView* mView = CAmekaView::GetView();
 	if (!mView)
 		return -1;*/
+	pos = mDoc->mMon->mList.GetHeadPosition();
 
 	if (mDoc->PrimaryData)
 	{
 		//EnterCriticalSection(&mView->csess);
 		delete mDoc->PrimaryData;
+		mDoc->PrimaryData = NULL;
 		//LeaveCriticalSection(&mView->csess);
 	}
 	//EnterCriticalSection(&mView->csess);
@@ -601,7 +615,8 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 			}
 		}
 	}
-	delete m_recvBuffer;	
+	delete m_recvBuffer;
+	m_recvBuffer = NULL;
 	
 	if (raw_cnt > 0)
 	{
@@ -665,6 +680,7 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 		//delete m_rawData;
 	}	
 	delete m_rawData;
+	m_rawData = NULL;
 	for (int i=0; i<MONTAGE_NUM; i++)
 	{
 		delete [] audioData[i];
