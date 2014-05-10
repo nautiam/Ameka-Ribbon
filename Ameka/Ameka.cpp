@@ -863,8 +863,10 @@ void CAmekaApp::OnDemo()
 	//if ((theApp.pIO != NULL) && (theApp.pIO->m_bState == S_CONNECTED))
 	{
 		CAmekaView *pView = CAmekaView::GetView();
+		CAmekaDoc *pDoc = CAmekaDoc::GetDoc();
 		if (!pView->isRunning)
 		{
+			pDoc->m_dspProcess = AfxBeginThread(DSP::DSPThread, (LPVOID)pDoc);
 			pView->resetData();
 			pView->OnDraw(pView->GetDC());
 			pView->pThread = AfxBeginThread(pView->graphHandle, (LPVOID)pView);
@@ -879,6 +881,7 @@ void CAmekaApp::OnStop()
 	CAmekaView *pView = CAmekaView::GetView();
 	if (theApp.docList.IsEmpty())
 		return;
+	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
 	DWORD exit_code= NULL;
 	if (pView->pThread != NULL && pView->isRunning)
 	{
@@ -891,9 +894,9 @@ void CAmekaApp::OnStop()
 		pView->pThread->m_hThread = NULL;
 		pView->pThread = NULL;
 		pView->isRunning = false;
+
 	}
 
-	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
 	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
 	CMFCRibbonButton* pStopRec = DYNAMIC_DOWNCAST(
 		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_StopDemo));
@@ -905,9 +908,59 @@ void CAmekaApp::OnStop()
 		if (pDoc->isRecord)
 		{
 			pDoc->isRecord = FALSE;
-			Sleep(100);
+
+			/*if (WaitForSingleObject(pDoc->CloseFileEvent, INFINITE) == WAIT_OBJECT_0)
+			{*/
 			pDoc->saveFileName = pDoc->recordFileName;
+			uint16_t buffer[4] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
+			pDoc->object.Write(buffer, sizeof(buffer));
+			pDoc->object.SeekToBegin();
+			uint16_t temp[8];
+			temp[0] = (uint16_t)(pDoc->mDSP.HPFFre * 10);
+			temp[1] = (uint16_t)(pDoc->mDSP.LPFFre * 10);
+			temp[2] = (uint16_t)(pDoc->mDSP.epocLength * 10);
+			temp[3] = pDoc->mDSP.SampleRate;
+			temp[4] = (uint16_t)(pDoc->counter);
+			temp[5] = (uint16_t)(pDoc->counter >> 16);
+			temp[6] = (uint16_t)(pDoc->counter >> 32);
+			temp[7] = (uint16_t)(pDoc->counter >> 48);
+			pDoc->object.Write(temp, sizeof(temp));
+
+			int temp_mon[65];
+			int monNum =  pDoc->mMon->mList.GetCount();
+			temp_mon[64] = monNum;
+			POSITION pos;
+			pos = pDoc->mMon->mList.GetHeadPosition();
+			if (monNum > 32)
+				monNum = 32;
+			for (int i=0; i<monNum; i++)
+			{
+				LPAlead temp;
+				temp = pDoc->mMon->mList.GetNext(pos);
+				int fID = temp->lFirstID;
+				int sID = temp->lSecondID;
+				temp_mon[i*2] = fID;
+				temp_mon[i*2 + 1] = sID;
+			}
+			pDoc->object.Write(temp_mon, sizeof(temp_mon));
+
+			int nLen = pDoc->mMon->mName.GetLength()*sizeof(TCHAR);
+			pDoc->object.Write(pDoc->mMon->mName.GetBuffer(), nLen);
+			pDoc->object.Close();
+			pDoc->isOpenFile = FALSE;
+			pDoc->counter = 0;
+
+			GetExitCodeThread(pDoc->m_dspProcess->m_hThread, &exit_code);
+			if(exit_code == STILL_ACTIVE)
+			{
+				::TerminateThread(pDoc->m_dspProcess->m_hThread, 0);
+				CloseHandle(pDoc->m_dspProcess->m_hThread);
+			}
+			pDoc->m_dspProcess = NULL;
+
 			pDoc->m_processRec = AfxBeginThread(DSP::ProcessRecordDataThread, (LPVOID)pDoc);
+			//}
+			
 		}
 	}
 }
@@ -2086,6 +2139,7 @@ void CAmekaApp::OnRecording()
 		CAmekaView *pView = CAmekaView::GetView();
 		if (!pView->isRunning)
 		{
+			pDoc->m_dspProcess = AfxBeginThread(DSP::DSPThread, (LPVOID)pDoc);
 			pView->resetData();
 			pView->OnDraw(pView->GetDC());
 			pView->pThread = AfxBeginThread(pView->graphHandle, (LPVOID)pView);

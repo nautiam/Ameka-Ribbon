@@ -74,22 +74,25 @@ CAmekaDoc::CAmekaDoc()
 	isOpenFile = FALSE;
 	isRecord = FALSE;
 	isSave = FALSE;
+	m_dspProcess = NULL;
 	//saveFileName = "temp.dat";
-	this->m_dspProcess = AfxBeginThread(DSP::DSPThread, (LPVOID)this);
 	//thrd = AfxBeginThread(genData, (LPVOID)this);	
 }
 
 CAmekaDoc::~CAmekaDoc()
 {
-	DWORD exit_code = NULL;
-	GetExitCodeThread(this->m_dspProcess->m_hThread, &exit_code);
-
-	if(exit_code == STILL_ACTIVE)
+	if (m_dspProcess)
 	{
-		::TerminateThread(this->m_dspProcess->m_hThread, 0);
-		CloseHandle(this->m_dspProcess->m_hThread);
+		DWORD exit_code = NULL;
+		GetExitCodeThread(this->m_dspProcess->m_hThread, &exit_code);
+
+		if(exit_code == STILL_ACTIVE)
+		{
+			::TerminateThread(this->m_dspProcess->m_hThread, 0);
+			CloseHandle(this->m_dspProcess->m_hThread);
+		}
+		m_dspProcess = NULL;
 	}
-	m_dspProcess = NULL;
 
 	POSITION pos = theApp.docList.Find(this);
 	theApp.docList.RemoveAt(pos);

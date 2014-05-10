@@ -192,6 +192,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 			mDoc->object.Close();
 			mDoc->isOpenFile = FALSE;
 			mDoc->counter = 0;
+			//mDoc->CloseFileEvent = CreateEvent( NULL, FALSE, TRUE, NULL );
 			/*if (mDoc->isSave != TRUE)
 			{
 				try
@@ -448,8 +449,9 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	mDoc->mDSP.HPFFre = (float)(temp[0]) / 10.0;
 	mDoc->mDSP.LPFFre = (float)(temp[1]) / 10.0;
 	mDoc->mDSP.epocLength = (float)(temp[2]) / 10.0;
+	mDoc->mDSP.SampleRate = temp[3];
 	uint64_t counter = 0;
-	counter = (uint64_t)(temp[3]) | (uint64_t)(temp[4] << 16) | (uint64_t)(temp[5] << 32) | (uint64_t)(temp[6] << 48);
+	counter = (uint64_t)(temp[4]) | (uint64_t)(temp[5] << 16) | (uint64_t)(temp[6] << 32) | (uint64_t)(temp[7] << 48);
 	mDoc->counter = counter;
 	int temp_mon[65];
 	mDoc->object.Read(temp_mon, sizeof(temp_mon));
@@ -467,7 +469,7 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 		mDoc->mMon->mList.AddTail(&temp);		
 	}
 
-	mDoc->object.Read(mDoc->mMon->mName.GetBuffer(), 40);
+	mDoc->object.Read(mDoc->mMon->mName.GetBuffer(), 44);
 	mDoc->mMon->mName.ReleaseBuffer();
 	// Khoi tao vung nho cho PrimaryData va SecondaryData
 	//mDoc->dataBuffer = new amekaData<RawDataType>(counter);
@@ -475,8 +477,8 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 		delete mDoc->PrimaryData;
 	mDoc->PrimaryData = new amekaData<PrimaryDataType>(counter);
 	//mDoc->SecondaryData = new amekaData<SecondaryDataType>(counter);
-
-	//Xu ly du lieu Primary Data
+	
+	// Xu ly du lieu Primary Data
 	// Thiet lap tham so cho dsp
 	time_t oldtime = 0;
 	mDoc->dataBuffer->LRPos = 0; //Dam bao con tro doc o dau mang
@@ -510,12 +512,15 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	m_rawData = new RawDataType[1024];
 
 	uint16_t raw_cnt = 0;
-	uint16_t buffer;
-	while (mDoc->object.Read(&buffer, sizeof(uint16_t)) != NULL)
+	uint16_t buffer[1];
+	while (mDoc->object.Read(buffer, sizeof(buffer)) != NULL)
 	{
-		m_recvBuffer->pushData(buffer);
+		m_recvBuffer->pushData(buffer[0]);
+		
 		if ((m_recvBuffer->get(19) == stdCfrmData[1]) && (m_recvBuffer->get(18) == stdCfrmData[0]))
 		{
+			/*for (int i=0; i<20; i++)
+			getval[i] = m_recvBuffer->get(i);*/
 			RawDataType temp;
 			for (int i=0; i<LEAD_NUMBER; i++)
 			{
@@ -586,12 +591,11 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 			}
 		}
 	}
-	delete m_recvBuffer;
-	delete m_rawData;
+	delete m_recvBuffer;	
 	
 	if (raw_cnt > 0)
 	{
-		m_rawData = new RawDataType[raw_cnt];
+		//m_rawData = new RawDataType[raw_cnt];
 		pos = mDoc->mMon->mList.GetHeadPosition();
 		for (int i=0; i<monNum; i++)
 		{
@@ -648,9 +652,9 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 			mDoc->PrimaryData->pushData(temp);
 		}		
 		raw_cnt = 0;
-		delete m_rawData;
+		//delete m_rawData;
 	}	
-
+	delete m_rawData;
 	for (int i=0; i<MONTAGE_NUM; i++)
 	{
 		delete [] audioData[i];

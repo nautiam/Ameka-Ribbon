@@ -44,6 +44,7 @@ public:
 	bool isOpenFile;
 	bool isRecord;
 	bool isSave;
+	HANDLE CloseFileEvent;
 	uint64_t counter; // Dem so mau duoc ghi vao file
 	//UINT genData(LPVOID pParam);
 	//AmekaData<RawDataType>* dataBuffer;
