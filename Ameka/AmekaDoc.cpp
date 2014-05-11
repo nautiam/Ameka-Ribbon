@@ -73,6 +73,7 @@ CAmekaDoc::CAmekaDoc()
 	isRecord = FALSE;
 	isSave = FALSE;
 	m_dspProcess = NULL;
+	eventID = 0;
 
 	onReadSuccess = CreateEvent( 
 		NULL,               // default security attributes
@@ -108,8 +109,8 @@ CAmekaDoc::~CAmekaDoc()
 	theApp.docList.RemoveAt(pos);
 	if (isOpenFile == TRUE)
 	{
-		uint16_t buffer[4] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
-		object.Write(buffer, sizeof(buffer));
+		/*uint16_t buffer[4] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
+		object.Write(buffer, sizeof(buffer));*/
 		object.SeekToBegin();
 		uint16_t temp[8];
 		temp[0] = (uint16_t)(mDSP.HPFFre * 10);

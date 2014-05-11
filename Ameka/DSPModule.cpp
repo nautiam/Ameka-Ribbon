@@ -112,7 +112,7 @@ void photic_processing(float fre_step, LPVOID pParam)
 void dsp_processing(LPVOID pParam)
 {
 	CAmekaDoc* mDoc = (CAmekaDoc*)(pParam);
-	uint16_t stdCfrmData[2] = {0x0, 0x0};
+	uint16_t stdCfrmData[2] = {0xFFFF, 0xFFFF};
 	time_t oldtime = 0;
 	uint16_t count = 0;
 	
@@ -140,7 +140,7 @@ void dsp_processing(LPVOID pParam)
 	// Doc du lieu tu file va ghi vao rawdata buffer
 	RawDataType* m_rawData;
 	amekaData<uint16_t>* m_recvBuffer;
-	m_recvBuffer = new amekaData<uint16_t>(20);
+	m_recvBuffer = new amekaData<uint16_t>(21);
 	m_rawData = new RawDataType[1024];
 	uint16_t monNum = mDoc->mMon->mList.GetCount();
 	uint16_t raw_cnt = 0;
@@ -150,14 +150,15 @@ void dsp_processing(LPVOID pParam)
 	{
 		m_recvBuffer->pushData(buffer[0]);
 		
-		if ((m_recvBuffer->get(19) == stdCfrmData[1]) && (m_recvBuffer->get(18) == stdCfrmData[0]))
+		if ((m_recvBuffer->get(20) == stdCfrmData[1]) && (m_recvBuffer->get(19) == stdCfrmData[0]))
 		{
 			RawDataType temp;
 			for (int i=0; i<LEAD_NUMBER; i++)
 			{
 				temp.value[i] = m_recvBuffer->get(i);
-				temp.time = (time_t)(m_recvBuffer->get(16)) | (time_t)(m_recvBuffer->get(17) << 16);
-				if (oldtime == 0)
+				temp.eventID = m_recvBuffer->get(16);
+				temp.time = (time_t)(m_recvBuffer->get(17)) | (time_t)(m_recvBuffer->get(18) << 16);
+				if (!oldtime)
 					oldtime = temp.time;
 			}
 			m_rawData[raw_cnt] = temp;
@@ -202,18 +203,16 @@ void dsp_processing(LPVOID pParam)
 				{
 					count++;
 					PrimaryDataType temp;
+					temp.eventID = m_rawData[j].eventID;
+					temp.isDraw = FALSE;
 					if (count >= SAMPLE_RATE)
 					{
 						oldtime++;
-						temp.time = oldtime;
 						temp.isDraw = TRUE;
 						count = 0;
 					}
-					else
-					{
-						temp.time = 0;
-						temp.isDraw = FALSE;
-					}
+					temp.time = oldtime;
+
 					for (int i=0; i<MONTAGE_NUM; i++)				
 					{
 						temp.value[i] = (uint16_t)audioData[i][j];					
@@ -266,6 +265,7 @@ void dsp_processing(LPVOID pParam)
 		{
 			count++;
 			PrimaryDataType temp;
+			temp.eventID = m_rawData[j].eventID;
 			if (count >= SAMPLE_RATE)
 			{
 				oldtime++;			
@@ -300,6 +300,19 @@ UINT DSP::DSPThread(LPVOID pParam)
 {
 	CAmekaDoc* mDoc = (CAmekaDoc*)(pParam);
 	
+	// Try to remove old record file
+	if (mDoc->recordFileName)
+	{
+		try
+		{
+			CFile::Remove(mDoc->recordFileName);
+		}
+		catch (CFileException* pEx)
+		{
+			pEx->Delete();
+		}
+	}
+
 	if(mDoc->PrimaryData)
 	{
 		delete mDoc->PrimaryData;
@@ -327,7 +340,6 @@ UINT DSP::DSPThread(LPVOID pParam)
 			}
 			catch (CFileException* pEx)
 			{
-				//AfxMessageBox(L"File cannot be removed");
 				pEx->Delete();
 			}
 
@@ -352,8 +364,8 @@ UINT DSP::DSPThread(LPVOID pParam)
 		}
 		else if ((mDoc->isRecord == FALSE) && (mDoc->isOpenFile == TRUE))
 		{
-			uint16_t buffer[4] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
-			mDoc->object.Write(buffer, sizeof(buffer));
+			/*uint16_t buffer[4] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
+			mDoc->object.Write(buffer, sizeof(buffer));*/
 			mDoc->object.SeekToBegin();
 			uint16_t temp[8];
 			temp[0] = (uint16_t)(mDoc->mDSP.HPFFre * 10);
@@ -389,32 +401,6 @@ UINT DSP::DSPThread(LPVOID pParam)
 			mDoc->object.Close();
 			mDoc->isOpenFile = FALSE;
 			mDoc->counter = 0;
-			//mDoc->CloseFileEvent = CreateEvent( NULL, FALSE, TRUE, NULL );
-			/*if (mDoc->isSave != TRUE)
-			{
-				try
-				{
-				   CFile::Remove(mDoc->recordFileName);
-				}
-				catch (CFileException* pEx)
-				{
-				   AfxMessageBox(L"File cannot be removed");
-				   pEx->Delete();
-				}
-			}
-			else
-			{
-				try
-				{
-					CFile::Rename(mDoc->recordFileName, mDoc->saveFileName);
-				}
-				catch(CFileException* pEx )
-				{
-					AfxMessageBox(L"File cannot be saved");
-					pEx->Delete();
-				}				
-				mDoc->isSave = FALSE;
-			}*/
 		}
 
 		float HighFre = mDoc->mDSP.HPFFre;
@@ -435,9 +421,10 @@ UINT DSP::DSPThread(LPVOID pParam)
 		{
 			if ((mDoc->isRecord == TRUE) && (mDoc->isOpenFile == TRUE))
 			{
-				uint16_t buffer[20];
-				buffer[18] = 0x0;
-				buffer[19] = 0x0;
+				uint16_t tempEventID = mDoc->eventID;
+				uint16_t buffer[21];
+				buffer[19] = 0xFFFF;
+				buffer[20] = 0xFFFF;
 				for (int i=0; i<5; i++)
 				{
 					RawDataType temp;
@@ -446,9 +433,13 @@ UINT DSP::DSPThread(LPVOID pParam)
 					{
 						buffer[j] = data[i].value[j];
 					}
-					buffer[16] = data[i].time;
-					buffer[17] = data[i].time >> 16;
+					buffer[17] = data[i].time;
+					buffer[18] = data[i].time >> 16;
 					mDoc->counter++;
+					buffer[16] = tempEventID;
+					if (tempEventID)
+						tempEventID = 0;
+
 					mDoc->object.Write(buffer, sizeof(buffer));
 				}
 			}
@@ -500,20 +491,17 @@ UINT DSP::DSPThread(LPVOID pParam)
 			{
 				count++;
 				//output[j].time = data[j].time;
+				output[j].isDraw = FALSE;
 				if (count >= SAMPLE_RATE)
 				{
 					oldtime++;
-					output[j].time = oldtime;
 					output[j].isDraw = TRUE;
 					count = 0;
-					//LOG(DEBUG) << output[j].time;
-					//oldtime = data[j].time;
 				}
-				else
-				{
-					output[j].time = 0;
-					output[j].isDraw = FALSE;
-				}
+				output[j].time = oldtime;
+				output[j].eventID = mDoc->eventID;
+				if (mDoc->eventID)
+					mDoc->eventID = 0;
 				for (int i=0; i<MONTAGE_NUM; i++)				
 				{
 					output[j].value[i] = (uint16_t)audioData[i][j];					

@@ -47,7 +47,7 @@ public:
 	bool isSave;
 	HANDLE CloseFileEvent;
 	uint64_t counter; // Dem so mau duoc ghi vao file
-
+	uint16_t eventID;
 	HANDLE onReadSuccess;
 	//UINT genData(LPVOID pParam);
 	//AmekaData<RawDataType>* dataBuffer;
