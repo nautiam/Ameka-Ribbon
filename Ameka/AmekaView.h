@@ -83,12 +83,13 @@ public:
 	int amekaDrawPos(CDC* pDC);			//for draw current position only	
 	void setParentDoc(CAmekaDoc* doc);
 	int drawBarGraph( void );
-	void drawTime(time_t x_time, uint16_t x_pos);
+	void drawTime(CDC* pDC, time_t x_time, uint16_t x_pos);
 	uint16_t* getDataFromPos(CPoint mousePos, float crtPos, CAmekaView* pView);
 	void resetData();
 	uint16_t* getMaxMin(uint16_t* inputData);
 	void drawRecData(CDC* pDC);
 	void drawLeadName(CDC* pDC);
+	void drawEvent(CDC* pDC);
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
@@ -119,6 +120,8 @@ private:
 	bool onDrawTime;
 	bool isResize;
 	uint16_t lastDistance;
+	bool hasEv;
+	uint16_t evPos;
 	
 	C_ColorToolTip m_Tips;
 protected:
@@ -133,6 +136,7 @@ public:
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
 };
 
 #ifndef _DEBUG  // debug version in AmekaView.cpp

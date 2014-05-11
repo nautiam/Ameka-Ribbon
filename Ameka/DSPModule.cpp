@@ -115,7 +115,12 @@ void dsp_processing(LPVOID pParam)
 	uint16_t stdCfrmData[2] = {0xFFFF, 0xFFFF};
 	time_t oldtime = 0;
 	uint16_t count = 0;
-	
+	if (!mDoc->object.Open(mDoc->saveFileName, CFile::modeRead))
+	{
+		AfxMessageBox(L"File cannot be opened");
+	}
+	//LONGLONG offset = 0x11000;
+	//mDoc->object.Seek(offset, CFile::begin);
 	Dsp::SmoothedFilterDesign <Dsp::Butterworth::Design::BandPass <4>, MONTAGE_NUM, Dsp::DirectFormII> f (50);
 	Dsp::Params params;
 	float HighFre = mDoc->mDSP.HPFFre;
@@ -284,12 +289,14 @@ void dsp_processing(LPVOID pParam)
 		raw_cnt = 0;
 		//delete m_rawData;
 	}	
+	mDoc->PrimaryData->crtWPos = mDoc->counter;
 	delete m_rawData;
 	m_rawData = NULL;
 	for (int i=0; i<MONTAGE_NUM; i++)
 	{
 		delete [] audioData[i];
 	}
+	mDoc->object.Close();
 }
 
 
@@ -680,6 +687,7 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	//mDoc->dataBuffer->LRPos = 0; //Dam bao con tro doc o dau mang
 	//oldtime = mDoc->dataBuffer->popData()->time;
 	//mDoc->dataBuffer->LRPos = 0; //Tra con tro doc ve dau mang
+	mDoc->object.Close();
 	dsp_processing(pParam);
 	//uint16_t stdCfrmData[2] = {0x0, 0x0};
 	//time_t oldtime = 0;
@@ -874,7 +882,7 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	if (mDoc->PrimaryData->crtWPos < nfft)
 	{
 		mDoc->PrimaryData->LRPos = 0; //Tra ve con tro doc o dau mang
-		mDoc->object.Close();
+		//mDoc->object.Close();
 
 		SetEvent(mDoc->onReadSuccess);
 		return 0;
@@ -942,7 +950,7 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	//	delete [] output;
 	//}
 	mDoc->PrimaryData->LRPos = 0; //Tra ve con tro doc o dau mang
-	mDoc->object.Close();
+	//mDoc->object.Close();
 
 	SetEvent(mDoc->onReadSuccess);
 	//LeaveCriticalSection(&mView->csess);

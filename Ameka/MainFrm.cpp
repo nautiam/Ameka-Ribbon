@@ -15,6 +15,7 @@
 #include "stdafx.h"
 #include "Ameka.h"
 #include "AmekaView.h"
+#include "DSPModule.h"
 
 #include "MainFrm.h"
 #include <vector>
@@ -154,7 +155,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			pLP->AddItem(cs,count++);
 		}
 	}
-	pLP->SetEditText(L"15");
+	pLP->SetEditText(L"30");
 	//Set items for HighPassFilter
 	count = 0;
 	CMFCRibbonComboBox* pHP = DYNAMIC_DOWNCAST(
@@ -168,7 +169,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			pHP->AddItem(cs,count++);
 		}
 	}
-	pHP->SetEditText(L"3");
+	pHP->SetEditText(L"0.5");
 
 	//create montage list
 	count = 0;
@@ -418,7 +419,9 @@ void CMainFrame::OnScalerate()
     {
         CString item=pScale->GetItem(nCurSel);
 		CAmekaView* pView = CAmekaView::GetView();
+		EnterCriticalSection(&pView->csess);
 		pView->graphData.scaleRate = atoi((LPCSTR)(CStringA)item);
+		LeaveCriticalSection(&pView->csess);
 		pView->OnDraw(pView->GetDC());
     }
 }
@@ -435,7 +438,9 @@ void CMainFrame::OnSpeedrate()
     {
         CString item=pScale->GetItem(nCurSel);
 		CAmekaView* pView = CAmekaView::GetView();
+		EnterCriticalSection(&pView->csess);
 		pView->graphData.paperSpeed = atoi((LPCSTR)(CStringA)item);
+		LeaveCriticalSection(&pView->csess);
 		pView->OnDraw(pView->GetDC());
     }
 }
@@ -477,7 +482,13 @@ void CMainFrame::OnLp()
     {
         CString item=pLP->GetItem(nCurSel);
 		CAmekaView* pView = CAmekaView::GetView();
+		EnterCriticalSection(&pView->csess);
 		pView->GetDocument()->mDSP.LPFFre = atoi((LPCSTR)(CStringA)item);
+		LeaveCriticalSection(&pView->csess);
+		if (pView->isDrawRec)
+		{
+			dsp_processing(pView->GetDocument());
+		}
 		pView->OnDraw(pView->GetDC());
     }
 }
@@ -494,7 +505,13 @@ void CMainFrame::OnHp()
     {
         CString item=pHP->GetItem(nCurSel);
 		CAmekaView* pView = CAmekaView::GetView();
+		EnterCriticalSection(&pView->csess);
 		pView->GetDocument()->mDSP.HPFFre = atoi((LPCSTR)(CStringA)item);
+		LeaveCriticalSection(&pView->csess);
+		if (pView->isDrawRec)
+		{
+			dsp_processing(pView->GetDocument());
+		}
 		pView->OnDraw(pView->GetDC());
     }
 }

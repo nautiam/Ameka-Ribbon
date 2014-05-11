@@ -883,6 +883,7 @@ void CAmekaApp::OnStop()
 	if (theApp.docList.IsEmpty())
 		return;
 	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
+
 	DWORD exit_code= NULL;
 	if (pView->pThread != NULL && pView->isRunning)
 	{
@@ -896,6 +897,9 @@ void CAmekaApp::OnStop()
 		pView->pThread = NULL;
 		pView->isRunning = false;
 	}
+
+	if (!pDoc->isRecord)
+		return;
 
 	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
 	CMFCRibbonButton* pStopRec = DYNAMIC_DOWNCAST(
@@ -1424,6 +1428,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 
+	CEdit ev_1;
+	CEdit ev_2;
 };
 
 CTabEventDlg::CTabEventDlg() : CDialogEx(CTabEventDlg::IDD)
@@ -1440,6 +1446,8 @@ int CTabEventDlg::OnInitDialog()
 void CTabEventDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_EDIT1, ev_1);
+	DDX_Control(pDX, IDC_EDIT6, ev_2);
 }
 
 BEGIN_MESSAGE_MAP(CTabEventDlg, CDialogEx)
