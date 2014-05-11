@@ -34,6 +34,7 @@
 #include "GraphModule.h"
 #include "AmekaLan.h"
 #include "afxcolorbutton.h"
+#include "LoaddingDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -959,9 +960,12 @@ void CAmekaApp::OnStop()
 			pDoc->isOpenFile = FALSE;
 			pDoc->counter = 0;
 
-			AfxBeginThread(DSP::ProcessRecordDataThread, (LPVOID)pDoc);
+			CLoaddingDlg dlg;
+			dlg.Create(DLG_Loading, NULL);
+			dlg.ShowWindow(SW_NORMAL);
 			if (WaitForSingleObject(pDoc->onReadSuccess, INFINITE) == WAIT_OBJECT_0)
 			{
+
 				//AfxMessageBox(L"Load file success");
 				ResetEvent(pDoc->onReadSuccess);
 				pView->isDrawRec = TRUE;
@@ -969,10 +973,9 @@ void CAmekaApp::OnStop()
 			}
 			else
 			{
-				AfxMessageBox(L"Load file failed");
+
 			}
-			//}
-			
+			dlg.ShowWindow(SW_HIDE); 
 		}
 	}
 }

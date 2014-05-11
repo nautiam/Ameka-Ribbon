@@ -87,6 +87,12 @@
     <ClInclude Include="kiss_fft.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="C_ColorToolTip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LoaddingDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Ameka.cpp">
@@ -138,6 +144,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="kiss_fft.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C_ColorToolTip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LoaddingDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

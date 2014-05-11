@@ -57,6 +57,8 @@
 #define DLG_Opt_Rec                     324
 #define DLG_Opt_Event                   325
 #define DLG_Print                       326
+#define IDD_DIALOG1                     328
+#define DLG_Loading                     328
 #define IDC_COMBO1                      1000
 #define IDC_CHECK1                      1001
 #define IDC_CHECK2                      1002
@@ -133,6 +135,7 @@
 #define photic_Color                    1064
 #define photic_Width                    1065
 #define photic_WRate                    1066
+#define LOAD_Progress                   1067
 #define ID_WRITE_PASTEASHYPERLINK       32770
 #define MN_Open                         32771
 #define MN_Close                        32772
@@ -164,8 +167,8 @@
 #define MN_LP                           32800
 #define MN_MonList                      32809
 #define ID_BUTTON2                      32810
-#define MN_Lan                          32813
 #define MN_StopRec                      32811
+#define MN_Lan                          32813
 #define MN_PortName                     32816
 #define MN_Baud                         32817
 #define MN_PortOpen                     32818
@@ -175,9 +178,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        328
+#define _APS_NEXT_RESOURCE_VALUE        329
 #define _APS_NEXT_COMMAND_VALUE         32820
-#define _APS_NEXT_CONTROL_VALUE         1067
+#define _APS_NEXT_CONTROL_VALUE         1068
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

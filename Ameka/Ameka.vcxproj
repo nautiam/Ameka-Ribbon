@@ -115,6 +115,7 @@
     <ClInclude Include="EnvSetupModule.h" />
     <ClInclude Include="GraphModule.h" />
     <ClInclude Include="kiss_fft.h" />
+    <ClInclude Include="LoaddingDlg.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="RecordingModule.h" />
     <ClInclude Include="Resource.h" />
@@ -139,6 +140,7 @@
     <ClCompile Include="dsp_filters.cpp" />
     <ClCompile Include="GraphModule.cpp" />
     <ClCompile Include="kiss_fft.cpp" />
+    <ClCompile Include="LoaddingDlg.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="SerialCtrl.cpp" />
     <ClCompile Include="stdafx.cpp">

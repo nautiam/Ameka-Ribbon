@@ -88,6 +88,7 @@ public:
 	void resetData();
 	uint16_t* getMaxMin(uint16_t* inputData);
 	void drawRecData(CDC* pDC);
+	void drawLeadName(CDC* pDC);
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;

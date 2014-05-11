@@ -506,6 +506,15 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
 END
 
+DLG_Loading DIALOGEX 0, 0, 159, 59
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_BORDER
+EXSTYLE WS_EX_TOPMOST | WS_EX_TRANSPARENT
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Ðang ðoòc tâòp tin. Vui loÌng ðõòi!",IDC_STATIC,7,14,98,8
+    CONTROL         "",LOAD_Progress,"msctls_progress32",WS_BORDER,7,31,145,12
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -670,6 +679,16 @@ BEGIN
 
     DLG_Print, DIALOG
     BEGIN
+    END
+
+    DLG_Loading, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 152
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 52
+        HORZGUIDE, 22
+        HORZGUIDE, 43
     END
 END
 #endif    // APSTUDIO_INVOKED
