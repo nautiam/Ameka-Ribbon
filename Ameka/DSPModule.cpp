@@ -42,19 +42,20 @@ static float get_peak_frequence(const kiss_fft_cpx *cout, int nfft, float start_
 	return get_peak_pos(cout, nfft, start_pos) * sample_hz / nfft;
 }
 
-void photic_processing(float fre_step, float HighFre, amekaData<PrimaryDataType>* PrimaryData, amekaData<SecondaryDataType>* SecondaryData)
+void photic_processing(float fre_step, LPVOID pParam)
 {
+	CAmekaDoc* mDoc = (CAmekaDoc*)(pParam);
 	int nfft;
 	nfft = (float)SAMPLE_RATE/fre_step;
 	float NC = (float)nfft/2.0 + 1.0;
 
-	PrimaryDataType* output = PrimaryData->checkPopData(nfft);
-	uint16_t size =  PrimaryData->rLen;
+	PrimaryDataType* output = mDoc->PrimaryData->checkPopData(nfft);
+	uint16_t size =  mDoc->PrimaryData->rLen;
 		
 	if (size > 0 && output != NULL)
 	{
-		int dataLen = PrimaryData->dataLen;
-		PrimaryData->LRPos = (PrimaryData->LRPos + dataLen - size + 100) % dataLen;
+		int dataLen = mDoc->PrimaryData->dataLen;
+		mDoc->PrimaryData->LRPos = (mDoc->PrimaryData->LRPos + dataLen - size + 100) % dataLen;
 		int isinverse = 0;
 		kiss_fft_cfg st;
 		kiss_fft_cpx * buf[MONTAGE_NUM];
@@ -88,7 +89,7 @@ void photic_processing(float fre_step, float HighFre, amekaData<PrimaryDataType>
 			temp.fre = fre;
 			for (int j=0; j<MONTAGE_NUM; j++)	
 			{
-				if (fre < HighFre)
+				if (fre < mDoc->mDSP.HPFFre)
 				{
 					temp.value[j] = 0;
 				}
@@ -96,7 +97,7 @@ void photic_processing(float fre_step, float HighFre, amekaData<PrimaryDataType>
 				{
 					temp.value[j] = bufout[j][i].r;
 				}
-			SecondaryData->pushData(temp);
+			mDoc->SecondaryData->pushData(temp);
 			}
 		}
 		free(st);
@@ -108,6 +109,193 @@ void photic_processing(float fre_step, float HighFre, amekaData<PrimaryDataType>
 		delete [] output;
 	}
 }
+void dsp_processing(LPVOID pParam)
+{
+	CAmekaDoc* mDoc = (CAmekaDoc*)(pParam);
+	uint16_t stdCfrmData[2] = {0x0, 0x0};
+	time_t oldtime = 0;
+	uint16_t count = 0;
+	
+	Dsp::SmoothedFilterDesign <Dsp::Butterworth::Design::BandPass <4>, MONTAGE_NUM, Dsp::DirectFormII> f (50);
+	Dsp::Params params;
+	float HighFre = mDoc->mDSP.HPFFre;
+	float LowFre = mDoc->mDSP.LPFFre;
+	float sampleRate = mDoc->mDSP.SampleRate;
+	float CenterFre = sqrt(HighFre*LowFre);
+	float BandWidth = LowFre - HighFre;
+
+	params[0] = sampleRate; // sample rate
+	params[1] = 4; // order
+	params[2] = CenterFre; // center frequency
+	params[3] = BandWidth; // band width
+	f.setParams (params);
+
+	float* audioData[MONTAGE_NUM];
+		
+	for (int i=0; i<MONTAGE_NUM; i++)
+	{
+		audioData[i] = new float[mDoc->counter];
+	}
+
+	// Doc du lieu tu file va ghi vao rawdata buffer
+	RawDataType* m_rawData;
+	amekaData<uint16_t>* m_recvBuffer;
+	m_recvBuffer = new amekaData<uint16_t>(20);
+	m_rawData = new RawDataType[1024];
+	uint16_t monNum = mDoc->mMon->mList.GetCount();
+	uint16_t raw_cnt = 0;
+	uint16_t buffer[1];
+	POSITION pos;
+	while (mDoc->object.Read(buffer, sizeof(buffer)) != NULL)
+	{
+		m_recvBuffer->pushData(buffer[0]);
+		
+		if ((m_recvBuffer->get(19) == stdCfrmData[1]) && (m_recvBuffer->get(18) == stdCfrmData[0]))
+		{
+			RawDataType temp;
+			for (int i=0; i<LEAD_NUMBER; i++)
+			{
+				temp.value[i] = m_recvBuffer->get(i);
+				temp.time = (time_t)(m_recvBuffer->get(16)) | (time_t)(m_recvBuffer->get(17) << 16);
+				if (oldtime == 0)
+					oldtime = temp.time;
+			}
+			m_rawData[raw_cnt] = temp;
+			raw_cnt++;
+			if (raw_cnt >= 1024)
+			{
+				raw_cnt = 0;
+				pos = mDoc->mMon->mList.GetHeadPosition();
+				for (int i=0; i<monNum; i++)
+				{
+					LPAlead temp;
+					temp = mDoc->mMon->mList.GetNext(pos);
+					int fID = temp->lFirstID;
+					int sID = temp->lSecondID;
+
+					for (int j=0; j<1024; j++)
+					{
+						float fData;
+						float sData;
+						if (fID <= 2)
+							fData = BASELINE;
+						else
+							fData = (float)m_rawData[j].value[fID - 3];
+						if (sID <= 2)
+							sData = BASELINE;
+						else
+							sData = (float)m_rawData[j].value[sID - 3];
+						audioData[i][j] = (sData - fData) + BASELINE;
+					}
+				}
+				if (monNum < MONTAGE_NUM)
+				{
+					for (int i=monNum; i<MONTAGE_NUM; i++)
+						for (int j=0; j<1024; j++)
+						{
+							audioData[i][j] = 0;
+						}
+				}
+				f.process (1024, audioData);
+
+				for (int j=0; j<1024; j++)
+				{
+					count++;
+					PrimaryDataType temp;
+					if (count >= SAMPLE_RATE)
+					{
+						oldtime++;
+						temp.time = oldtime;
+						temp.isDraw = TRUE;
+						count = 0;
+					}
+					else
+					{
+						temp.time = 0;
+						temp.isDraw = FALSE;
+					}
+					for (int i=0; i<MONTAGE_NUM; i++)				
+					{
+						temp.value[i] = (uint16_t)audioData[i][j];					
+					}
+					mDoc->PrimaryData->pushData(temp);
+				}
+			}
+		}
+	}
+	delete m_recvBuffer;
+	m_recvBuffer = NULL;
+	
+	if (raw_cnt > 0)
+	{
+		//m_rawData = new RawDataType[raw_cnt];
+		pos = mDoc->mMon->mList.GetHeadPosition();
+		for (int i=0; i<monNum; i++)
+		{
+			LPAlead temp;
+			temp = mDoc->mMon->mList.GetNext(pos);
+			int fID = temp->lFirstID;
+			int sID = temp->lSecondID;
+
+			for (int j=0; j<raw_cnt; j++)
+			{
+				float fData;
+				float sData;
+				if (fID <= 2)
+					fData = BASELINE;
+				else
+					fData = (float)m_rawData[j].value[fID - 3];
+				if (sID <= 2)
+					sData = BASELINE;
+				else
+					sData = (float)m_rawData[j].value[sID - 3];
+				audioData[i][j] = (sData - fData) + BASELINE;
+			}
+		}
+		if (monNum < MONTAGE_NUM)
+		{
+			for (int i=monNum; i<MONTAGE_NUM; i++)
+				for (int j=0; j<raw_cnt; j++)
+				{
+					audioData[i][j] = 0;
+				}
+		}
+		f.process (raw_cnt, audioData);
+
+		for (int j=0; j<raw_cnt; j++)
+		{
+			count++;
+			PrimaryDataType temp;
+			if (count >= SAMPLE_RATE)
+			{
+				oldtime++;			
+				temp.time = oldtime;
+				temp.isDraw = TRUE;
+				count = 0;
+			}
+			else
+			{
+				temp.time = 0;
+				temp.isDraw = FALSE;
+			}
+			for (int i=0; i<MONTAGE_NUM; i++)				
+			{
+				temp.value[i] = (uint16_t)audioData[i][j];					
+			}
+			mDoc->PrimaryData->pushData(temp);
+		}		
+		raw_cnt = 0;
+		//delete m_rawData;
+	}	
+	delete m_rawData;
+	m_rawData = NULL;
+	for (int i=0; i<MONTAGE_NUM; i++)
+	{
+		delete [] audioData[i];
+	}
+}
+
+
 UINT DSP::DSPThread(LPVOID pParam)
 {
 	CAmekaDoc* mDoc = (CAmekaDoc*)(pParam);
@@ -441,8 +629,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 }
 
 UINT DSP::ProcessRecordDataThread(LPVOID pParam)
-{
-	uint16_t stdCfrmData[2] = {0x0, 0x0};
+{	
  	CAmekaDoc* mDoc = (CAmekaDoc*)(pParam);
 	CString fileName;
 	fileName = mDoc->saveFileName;
@@ -504,187 +691,192 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	
 	// Xu ly du lieu Primary Data
 	// Thiet lap tham so cho dsp
-	time_t oldtime = 0;
-	mDoc->dataBuffer->LRPos = 0; //Dam bao con tro doc o dau mang
-	oldtime = mDoc->dataBuffer->popData()->time;
-	mDoc->dataBuffer->LRPos = 0; //Tra con tro doc ve dau mang
-	uint16_t count = 0;
-	Dsp::SmoothedFilterDesign <Dsp::Butterworth::Design::BandPass <4>, MONTAGE_NUM, Dsp::DirectFormII> f (50);
-	Dsp::Params params;
-	float HighFre = mDoc->mDSP.HPFFre;
-	float LowFre = mDoc->mDSP.LPFFre;
-	float sampleRate = mDoc->mDSP.SampleRate;
-	float CenterFre = sqrt(HighFre*LowFre);
-	float BandWidth = LowFre - HighFre;
-	params[0] = sampleRate; // sample rate
-	params[1] = 4; // order
-	params[2] = CenterFre; // center frequency
-	params[3] = BandWidth; // band width
-	f.setParams (params);
-
-	float* audioData[MONTAGE_NUM];
-		
-	for (int i=0; i<MONTAGE_NUM; i++)
-	{
-		audioData[i] = new float[counter];
-	}
-
-	// Doc du lieu tu file va ghi vao rawdata buffer
-	RawDataType* m_rawData;
-	amekaData<uint16_t>* m_recvBuffer;
-	m_recvBuffer = new amekaData<uint16_t>(20);
-	m_rawData = new RawDataType[1024];
-
-	uint16_t raw_cnt = 0;
-	uint16_t buffer[1];
-	while (mDoc->object.Read(buffer, sizeof(buffer)) != NULL)
-	{
-		m_recvBuffer->pushData(buffer[0]);
-		
-		if ((m_recvBuffer->get(19) == stdCfrmData[1]) && (m_recvBuffer->get(18) == stdCfrmData[0]))
-		{
-			/*for (int i=0; i<20; i++)
-			getval[i] = m_recvBuffer->get(i);*/
-			RawDataType temp;
-			for (int i=0; i<LEAD_NUMBER; i++)
-			{
-				temp.value[i] = m_recvBuffer->get(i);
-				temp.time = (time_t)(m_recvBuffer->get(16)) | (time_t)(m_recvBuffer->get(17) << 16);
-			}
-			//mDoc->dataBuffer->pushData(temp);
-			m_rawData[raw_cnt] = temp;
-			raw_cnt++;
-			if (raw_cnt >= 1024)
-			{
-				raw_cnt = 0;
-				pos = mDoc->mMon->mList.GetHeadPosition();
-				for (int i=0; i<monNum; i++)
-				{
-					LPAlead temp;
-					temp = mDoc->mMon->mList.GetNext(pos);
-					int fID = temp->lFirstID;
-					int sID = temp->lSecondID;
-
-					for (int j=0; j<1024; j++)
-					{
-						float fData;
-						float sData;
-						if (fID <= 2)
-							fData = BASELINE;
-						else
-							fData = (float)m_rawData[j].value[fID - 3];
-						if (sID <= 2)
-							sData = BASELINE;
-						else
-							sData = (float)m_rawData[j].value[sID - 3];
-						audioData[i][j] = (sData - fData) + BASELINE;
-					}
-				}
-				if (monNum < MONTAGE_NUM)
-				{
-					for (int i=monNum; i<MONTAGE_NUM; i++)
-						for (int j=0; j<1024; j++)
-						{
-							audioData[i][j] = 0;
-						}
-				}
-				f.process (1024, audioData);
-
-				for (int j=0; j<1024; j++)
-				{
-					count++;
-					PrimaryDataType temp;
-					if (count >= SAMPLE_RATE)
-					{
-						oldtime++;			
-						temp.time = oldtime;
-						temp.isDraw = TRUE;
-						count = 0;
-					}
-					else
-					{
-						temp.time = 0;
-						temp.isDraw = FALSE;
-					}
-					for (int i=0; i<MONTAGE_NUM; i++)				
-					{
-						temp.value[i] = (uint16_t)audioData[i][j];					
-					}
-					mDoc->PrimaryData->pushData(temp);
-				}
-			}
-		}
-	}
-	delete m_recvBuffer;
-	m_recvBuffer = NULL;
 	
-	if (raw_cnt > 0)
-	{
-		//m_rawData = new RawDataType[raw_cnt];
-		pos = mDoc->mMon->mList.GetHeadPosition();
-		for (int i=0; i<monNum; i++)
-		{
-			LPAlead temp;
-			temp = mDoc->mMon->mList.GetNext(pos);
-			int fID = temp->lFirstID;
-			int sID = temp->lSecondID;
+	//mDoc->dataBuffer->LRPos = 0; //Dam bao con tro doc o dau mang
+	//oldtime = mDoc->dataBuffer->popData()->time;
+	//mDoc->dataBuffer->LRPos = 0; //Tra con tro doc ve dau mang
+	dsp_processing(pParam);
+	//uint16_t stdCfrmData[2] = {0x0, 0x0};
+	//time_t oldtime = 0;
+	//uint16_t count = 0;
+	//Dsp::SmoothedFilterDesign <Dsp::Butterworth::Design::BandPass <4>, MONTAGE_NUM, Dsp::DirectFormII> f (50);
+	//Dsp::Params params;
+	//float HighFre = mDoc->mDSP.HPFFre;
+	//float LowFre = mDoc->mDSP.LPFFre;
+	//float sampleRate = mDoc->mDSP.SampleRate;
+	//float CenterFre = sqrt(HighFre*LowFre);
+	//float BandWidth = LowFre - HighFre;
+	//params[0] = sampleRate; // sample rate
+	//params[1] = 4; // order
+	//params[2] = CenterFre; // center frequency
+	//params[3] = BandWidth; // band width
+	//f.setParams (params);
 
-			for (int j=0; j<raw_cnt; j++)
-			{
-				float fData;
-				float sData;
-				if (fID <= 2)
-					fData = BASELINE;
-				else
-					fData = (float)m_rawData[j].value[fID - 3];
-				if (sID <= 2)
-					sData = BASELINE;
-				else
-					sData = (float)m_rawData[j].value[sID - 3];
-				audioData[i][j] = (sData - fData) + BASELINE;
-			}
-		}
-		if (monNum < MONTAGE_NUM)
-		{
-			for (int i=monNum; i<MONTAGE_NUM; i++)
-				for (int j=0; j<raw_cnt; j++)
-				{
-					audioData[i][j] = 0;
-				}
-		}
-		f.process (raw_cnt, audioData);
+	//float* audioData[MONTAGE_NUM];
+	//	
+	//for (int i=0; i<MONTAGE_NUM; i++)
+	//{
+	//	audioData[i] = new float[counter];
+	//}
 
-		for (int j=0; j<raw_cnt; j++)
-		{
-			count++;
-			PrimaryDataType temp;
-			if (count >= SAMPLE_RATE)
-			{
-				oldtime++;			
-				temp.time = oldtime;
-				temp.isDraw = TRUE;
-				count = 0;
-			}
-			else
-			{
-				temp.time = 0;
-				temp.isDraw = FALSE;
-			}
-			for (int i=0; i<MONTAGE_NUM; i++)				
-			{
-				temp.value[i] = (uint16_t)audioData[i][j];					
-			}
-			mDoc->PrimaryData->pushData(temp);
-		}		
-		raw_cnt = 0;
-		//delete m_rawData;
-	}	
-	delete m_rawData;
-	m_rawData = NULL;
-	for (int i=0; i<MONTAGE_NUM; i++)
-	{
-		delete [] audioData[i];
-	}
+	//// Doc du lieu tu file va ghi vao rawdata buffer
+	//RawDataType* m_rawData;
+	//amekaData<uint16_t>* m_recvBuffer;
+	//m_recvBuffer = new amekaData<uint16_t>(20);
+	//m_rawData = new RawDataType[1024];
+
+	//uint16_t raw_cnt = 0;
+	//uint16_t buffer[1];
+	//while (mDoc->object.Read(buffer, sizeof(buffer)) != NULL)
+	//{
+	//	m_recvBuffer->pushData(buffer[0]);
+	//	
+	//	if ((m_recvBuffer->get(19) == stdCfrmData[1]) && (m_recvBuffer->get(18) == stdCfrmData[0]))
+	//	{
+	//		/*for (int i=0; i<20; i++)
+	//		getval[i] = m_recvBuffer->get(i);*/
+	//		RawDataType temp;
+	//		for (int i=0; i<LEAD_NUMBER; i++)
+	//		{
+	//			temp.value[i] = m_recvBuffer->get(i);
+	//			temp.time = (time_t)(m_recvBuffer->get(16)) | (time_t)(m_recvBuffer->get(17) << 16);
+	//			if (oldtime == 0)
+	//				oldtime = temp.time;
+	//		}
+	//		//mDoc->dataBuffer->pushData(temp);
+	//		m_rawData[raw_cnt] = temp;
+	//		raw_cnt++;
+	//		if (raw_cnt >= 1024)
+	//		{
+	//			raw_cnt = 0;
+	//			pos = mDoc->mMon->mList.GetHeadPosition();
+	//			for (int i=0; i<monNum; i++)
+	//			{
+	//				LPAlead temp;
+	//				temp = mDoc->mMon->mList.GetNext(pos);
+	//				int fID = temp->lFirstID;
+	//				int sID = temp->lSecondID;
+
+	//				for (int j=0; j<1024; j++)
+	//				{
+	//					float fData;
+	//					float sData;
+	//					if (fID <= 2)
+	//						fData = BASELINE;
+	//					else
+	//						fData = (float)m_rawData[j].value[fID - 3];
+	//					if (sID <= 2)
+	//						sData = BASELINE;
+	//					else
+	//						sData = (float)m_rawData[j].value[sID - 3];
+	//					audioData[i][j] = (sData - fData) + BASELINE;
+	//				}
+	//			}
+	//			if (monNum < MONTAGE_NUM)
+	//			{
+	//				for (int i=monNum; i<MONTAGE_NUM; i++)
+	//					for (int j=0; j<1024; j++)
+	//					{
+	//						audioData[i][j] = 0;
+	//					}
+	//			}
+	//			f.process (1024, audioData);
+
+	//			for (int j=0; j<1024; j++)
+	//			{
+	//				count++;
+	//				PrimaryDataType temp;
+	//				if (count >= SAMPLE_RATE)
+	//				{
+	//					oldtime++;
+	//					temp.time = oldtime;
+	//					temp.isDraw = TRUE;
+	//					count = 0;
+	//				}
+	//				else
+	//				{
+	//					temp.time = 0;
+	//					temp.isDraw = FALSE;
+	//				}
+	//				for (int i=0; i<MONTAGE_NUM; i++)				
+	//				{
+	//					temp.value[i] = (uint16_t)audioData[i][j];					
+	//				}
+	//				mDoc->PrimaryData->pushData(temp);
+	//			}
+	//		}
+	//	}
+	//}
+	//delete m_recvBuffer;
+	//m_recvBuffer = NULL;
+	//
+	//if (raw_cnt > 0)
+	//{
+	//	//m_rawData = new RawDataType[raw_cnt];
+	//	pos = mDoc->mMon->mList.GetHeadPosition();
+	//	for (int i=0; i<monNum; i++)
+	//	{
+	//		LPAlead temp;
+	//		temp = mDoc->mMon->mList.GetNext(pos);
+	//		int fID = temp->lFirstID;
+	//		int sID = temp->lSecondID;
+
+	//		for (int j=0; j<raw_cnt; j++)
+	//		{
+	//			float fData;
+	//			float sData;
+	//			if (fID <= 2)
+	//				fData = BASELINE;
+	//			else
+	//				fData = (float)m_rawData[j].value[fID - 3];
+	//			if (sID <= 2)
+	//				sData = BASELINE;
+	//			else
+	//				sData = (float)m_rawData[j].value[sID - 3];
+	//			audioData[i][j] = (sData - fData) + BASELINE;
+	//		}
+	//	}
+	//	if (monNum < MONTAGE_NUM)
+	//	{
+	//		for (int i=monNum; i<MONTAGE_NUM; i++)
+	//			for (int j=0; j<raw_cnt; j++)
+	//			{
+	//				audioData[i][j] = 0;
+	//			}
+	//	}
+	//	f.process (raw_cnt, audioData);
+
+	//	for (int j=0; j<raw_cnt; j++)
+	//	{
+	//		count++;
+	//		PrimaryDataType temp;
+	//		if (count >= SAMPLE_RATE)
+	//		{
+	//			oldtime++;			
+	//			temp.time = oldtime;
+	//			temp.isDraw = TRUE;
+	//			count = 0;
+	//		}
+	//		else
+	//		{
+	//			temp.time = 0;
+	//			temp.isDraw = FALSE;
+	//		}
+	//		for (int i=0; i<MONTAGE_NUM; i++)				
+	//		{
+	//			temp.value[i] = (uint16_t)audioData[i][j];					
+	//		}
+	//		mDoc->PrimaryData->pushData(temp);
+	//	}		
+	//	raw_cnt = 0;
+	//	//delete m_rawData;
+	//}	
+	//delete m_rawData;
+	//m_rawData = NULL;
+	//for (int i=0; i<MONTAGE_NUM; i++)
+	//{
+	//	delete [] audioData[i];
+	//}
 
 	//Xu ly du lieu Secondary Data	
 	float epocLength = mDoc->mDSP.epocLength;
@@ -703,7 +895,7 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 		return 0;
 	}
 		//mDoc->PrimaryData->LRPos = mDoc->PrimaryData->crtWPos - nfft;
-	photic_processing(fre_step, HighFre, mDoc->PrimaryData, mDoc->SecondaryData);
+	photic_processing(fre_step, pParam);
 
 	//PrimaryDataType* output = mDoc->PrimaryData->checkPopData(nfft);
 	//uint16_t size =  mDoc->PrimaryData->rLen;
