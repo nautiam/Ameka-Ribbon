@@ -922,8 +922,8 @@ void CAmekaApp::OnStop()
 			pDoc->m_dspProcess = NULL;
 
 			pDoc->saveFileName = pDoc->recordFileName;
-			uint16_t buffer[4] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
-			pDoc->object.Write(buffer, sizeof(buffer));
+			/*uint16_t buffer[4] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
+			pDoc->object.Write(buffer, sizeof(buffer));*/
 			pDoc->object.SeekToBegin();
 			uint16_t temp[8];
 			temp[0] = (uint16_t)(pDoc->mDSP.HPFFre * 10);

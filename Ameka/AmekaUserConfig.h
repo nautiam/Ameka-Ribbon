@@ -73,12 +73,14 @@ struct GraphData
 struct RawDataType {
 	uint16_t value[LEAD_NUMBER];
 	time_t time;
+	uint16_t eventID;
 };
 
 struct PrimaryDataType {
 	uint16_t value[MONTAGE_NUM];
 	time_t time;
 	bool isDraw;
+	uint16_t eventID;
 };
 
 struct SecondaryDataType {
