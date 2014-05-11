@@ -265,19 +265,16 @@ void dsp_processing(LPVOID pParam)
 		{
 			count++;
 			PrimaryDataType temp;
+			
 			temp.eventID = m_rawData[j].eventID;
+			temp.isDraw = FALSE;
 			if (count >= SAMPLE_RATE)
 			{
-				oldtime++;			
-				temp.time = oldtime;
+				oldtime++;
 				temp.isDraw = TRUE;
 				count = 0;
 			}
-			else
-			{
-				temp.time = 0;
-				temp.isDraw = FALSE;
-			}
+			temp.time = oldtime;
 			for (int i=0; i<MONTAGE_NUM; i++)				
 			{
 				temp.value[i] = (uint16_t)audioData[i][j];					
