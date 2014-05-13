@@ -70,6 +70,8 @@ public:
 	afx_msg void OnMonlist();
 	afx_msg void OnLp();
 	afx_msg void OnHp();
+	afx_msg void OnSave();
+	afx_msg void OnOpen();
 };
 
 

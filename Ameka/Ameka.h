@@ -28,7 +28,7 @@
 
 #define portNo "COM2"
 #define BAUD_RATE "115200"
-#define settingFileName "AmekaSetting.amek"
+#define settingFileName "AmekaSetting.conf"
 
 using namespace std;
 

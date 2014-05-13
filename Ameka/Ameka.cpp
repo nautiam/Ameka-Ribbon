@@ -66,7 +66,7 @@ BEGIN_MESSAGE_MAP(CAmekaApp, CWinAppEx)
 	ON_COMMAND(MN_About, &CAmekaApp::OnAppAbout)
 	// Standard file based document commands
 	ON_COMMAND(MN_New, &CWinAppEx::OnFileNew)
-	ON_COMMAND(MN_Open, &CWinAppEx::OnFileOpen)
+	//ON_COMMAND(MN_Open, &CWinAppEx::OnFileOpen)
 	ON_COMMAND(MN_Close, &CAmekaApp::OnFileClose)
 	ON_COMMAND(MN_Print, &CWinAppEx::OnFilePrintSetup)
 	ON_COMMAND(MN_Setting, &CAmekaApp::OnSetting)

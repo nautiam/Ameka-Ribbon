@@ -540,7 +540,7 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	float maxWidth;
 	PrimaryDataType* data;
 	
-	if (pDC == NULL)
+	if (pDC == NULL || !this->mDoc->PrimaryData)
 	{
 		delete bitmap;
 		return -1;
@@ -1173,8 +1173,11 @@ void CAmekaView::drawLeadName(CDC* pDC)
 	bmp.CreateCompatibleBitmap(pDC, MONNAME_BAR + 2, rect.Height()); 
 	MemDC.SelectObject(&bmp);
 
-	POSITION pos = this->GetDocument()->mMon->mList.GetHeadPosition();
-	int leadNum = this->GetDocument()->mMon->mList.GetCount();
+	CAmekaDoc* pDoc = this->GetDocument();
+	if (!pDoc)
+		return;
+	POSITION pos = pDoc->mMon->mList.GetHeadPosition();
+	int leadNum = pDoc->mMon->mList.GetCount();
 
 	CRect clearRect(0, 0, MONNAME_BAR + 2, rect.Height());
 	MemDC.FillRect(&clearRect, WHITE_BRUSH);
@@ -1184,7 +1187,7 @@ void CAmekaView::drawLeadName(CDC* pDC)
 	MemDC.SelectObject(&txtFont);
 	for (int i = 0; i < leadNum; i++)
 	{
-		LPAlead lead = this->GetDocument()->mMon->mList.GetNext(pos);
+		LPAlead lead = pDoc->mMon->mList.GetNext(pos);
 		CString leadTxt;
 		CRect txtRect(0, i*(rect.Height() - FOOT_RANGE)/leadNum + 1, MONNAME_BAR,(i + 1)*(rect.Height() - FOOT_RANGE)/leadNum - 1);
 		leadTxt = getElecName(lead->lSecondID) + "-" + getElecName(lead->lFirstID);

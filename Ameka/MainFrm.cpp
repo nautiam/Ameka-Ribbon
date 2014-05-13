@@ -16,6 +16,7 @@
 #include "Ameka.h"
 #include "AmekaView.h"
 #include "DSPModule.h"
+#include "LoaddingDlg.h"
 
 #include "MainFrm.h"
 #include <vector>
@@ -43,6 +44,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
 	ON_COMMAND(MN_MonList, &CMainFrame::OnMonlist)
 	ON_COMMAND(MN_LP, &CMainFrame::OnLp)
 	ON_COMMAND(MN_HP, &CMainFrame::OnHp)
+	ON_COMMAND(MN_Save, &CMainFrame::OnSave)
+	ON_COMMAND(MN_Open, &CMainFrame::OnOpen)
 END_MESSAGE_MAP()
 
 // CMainFrame construction/destruction
@@ -514,4 +517,103 @@ void CMainFrame::OnHp()
 		}
 		pView->OnDraw(pView->GetDC());
     }
+}
+
+
+void CMainFrame::OnSave()
+{
+	// TODO: Add your command handler code here
+	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
+	CAmekaView* pView = CAmekaView::GetView();
+
+	//check if not in recording mode
+	if (!pDoc || !pView)
+		return;
+	if (!pView->isDrawRec)
+		return;
+
+	char strFilter[] = { "Ameka Save File (*.amek)|*.amek|" }; 
+	CFileDialog FileDlg(FALSE, CString(".amek"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, CString(strFilter));
+	if (FileDlg.DoModal() == IDOK)  
+	{ 
+		try
+		{
+			CString saveFName = FileDlg.GetPathName();
+			CFile::Rename(pDoc->saveFileName, saveFName);
+			pDoc->saveFileName = saveFName;
+		}
+		catch(CFileException* pEx )
+		{
+			TRACE(_T("File %20s not found, cause = %d\n"), pDoc->saveFileName, 
+			   pEx->m_cause);
+			pEx->Delete();
+		}
+	}
+}
+
+
+void CMainFrame::OnOpen()
+{
+	// TODO: Add your command handler code here
+	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
+	CAmekaView* pView = CAmekaView::GetView();
+
+	//check if not in recording mode
+	if (!pDoc || !pView)
+		return;
+
+	char strFilter[] = { "Ameka Save File (*.amek)|*.amek|" }; 
+	CFileDialog FileDlg(TRUE, CString(".amek"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, CString(strFilter));
+	if (FileDlg.DoModal() == IDOK)  
+	{ 
+		pDoc->saveFileName = FileDlg.GetPathName();
+
+		DWORD exit_code= NULL;
+		if (pView->pThread != NULL && pView->isRunning)
+		{
+			GetExitCodeThread(pView->pThread->m_hThread, &exit_code);
+			if(exit_code == STILL_ACTIVE)
+			{
+				::TerminateThread(pView->pThread->m_hThread, 0);
+				CloseHandle(pView->pThread->m_hThread);
+			}
+			pView->pThread->m_hThread = NULL;
+			pView->pThread = NULL;
+			pView->isRunning = false;
+		}
+
+		if (pDoc->isRecord)
+		{
+			pDoc->isRecord = FALSE;
+
+			/*if (WaitForSingleObject(pDoc->CloseFileEvent, INFINITE) == WAIT_OBJECT_0)
+			{*/
+			exit_code = NULL;
+			GetExitCodeThread(pDoc->m_dspProcess->m_hThread, &exit_code);
+			if(exit_code == STILL_ACTIVE)
+			{
+				::TerminateThread(pDoc->m_dspProcess->m_hThread, 0);
+				CloseHandle(pDoc->m_dspProcess->m_hThread);
+			}
+			pDoc->m_dspProcess->m_hThread = NULL;
+			pDoc->m_dspProcess = NULL;
+		}
+
+		CLoaddingDlg dlg;
+		dlg.Create(DLG_Loading, NULL);
+		dlg.ShowWindow(SW_NORMAL);
+		if (WaitForSingleObject(pDoc->onReadSuccess, INFINITE) == WAIT_OBJECT_0)
+		{
+
+			//AfxMessageBox(L"Load file success");
+			ResetEvent(pDoc->onReadSuccess);
+			pView->isDrawRec = TRUE;
+			pView->OnDraw(pView->GetDC());
+		}
+		else
+		{
+
+		}
+		dlg.ShowWindow(SW_HIDE); 
+	}
 }
