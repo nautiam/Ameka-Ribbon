@@ -147,7 +147,7 @@ void dsp_processing(LPVOID pParam)
 	amekaData<uint16_t>* m_recvBuffer;
 	m_recvBuffer = new amekaData<uint16_t>(21);
 	m_rawData = new RawDataType[1024];
-	uint16_t monNum = mDoc->mMon->mList.GetCount();
+	uint16_t monNum = mDoc->mMon.mList.GetCount();
 	uint16_t raw_cnt = 0;
 	uint16_t buffer[1];
 	POSITION pos;
@@ -171,13 +171,13 @@ void dsp_processing(LPVOID pParam)
 			if (raw_cnt >= 1024)
 			{
 				raw_cnt = 0;
-				pos = mDoc->mMon->mList.GetHeadPosition();
+				//pos = mDoc->mMon.mList.GetHeadPosition();
 				for (int i=0; i<monNum; i++)
 				{
-					LPAlead temp;
-					temp = mDoc->mMon->mList.GetNext(pos);
-					int fID = temp->lFirstID;
-					int sID = temp->lSecondID;
+					Alead temp;
+					temp = mDoc->mMon.mList.GetAt(i);
+					int fID = temp.lFirstID;
+					int sID = temp.lSecondID;
 
 					for (int j=0; j<1024; j++)
 					{
@@ -233,13 +233,13 @@ void dsp_processing(LPVOID pParam)
 	if (raw_cnt > 0)
 	{
 		//m_rawData = new RawDataType[raw_cnt];
-		pos = mDoc->mMon->mList.GetHeadPosition();
+		//pos = mDoc->mMon.mList.GetHeadPosition();
 		for (int i=0; i<monNum; i++)
 		{
-			LPAlead temp;
-			temp = mDoc->mMon->mList.GetNext(pos);
-			int fID = temp->lFirstID;
-			int sID = temp->lSecondID;
+			Alead temp;
+			temp = mDoc->mMon.mList.GetAt(i);
+			int fID = temp.lFirstID;
+			int sID = temp.lSecondID;
 
 			for (int j=0; j<raw_cnt; j++)
 			{
@@ -383,25 +383,25 @@ UINT DSP::DSPThread(LPVOID pParam)
 			mDoc->object.Write(temp, sizeof(temp));
 
 			int temp_mon[65];
-			int monNum =  mDoc->mMon->mList.GetCount();
+			int monNum =  mDoc->mMon.mList.GetCount();
 			temp_mon[64] = monNum;
 			POSITION pos;
-			pos = mDoc->mMon->mList.GetHeadPosition();
+			//pos = mDoc->mMon.mList.GetHeadPosition();
 			if (monNum > 32)
 				monNum = 32;
 			for (int i=0; i<monNum; i++)
 			{
-				LPAlead temp;
-				temp = mDoc->mMon->mList.GetNext(pos);
-				int fID = temp->lFirstID;
-				int sID = temp->lSecondID;
+				Alead temp;
+				temp = mDoc->mMon.mList.GetAt(i);
+				int fID = temp.lFirstID;
+				int sID = temp.lSecondID;
 				temp_mon[i*2] = fID;
 				temp_mon[i*2 + 1] = sID;
 			}
 			mDoc->object.Write(temp_mon, sizeof(temp_mon));
 
-			int nLen = mDoc->mMon->mName.GetLength()*sizeof(TCHAR);
-			mDoc->object.Write(mDoc->mMon->mName.GetBuffer(), nLen);
+			int nLen = mDoc->mMon.mName.GetLength()*sizeof(TCHAR);
+			mDoc->object.Write(mDoc->mMon.mName.GetBuffer(), nLen);
 			mDoc->object.Close();
 			mDoc->isOpenFile = FALSE;
 			mDoc->counter = 0;
@@ -455,15 +455,15 @@ UINT DSP::DSPThread(LPVOID pParam)
 				audioData[i] = new float[size];
 			}
 
-			int monNum =  mDoc->mMon->mList.GetCount();
+			int monNum =  mDoc->mMon.mList.GetCount();
 			POSITION pos;
-			pos = mDoc->mMon->mList.GetHeadPosition();
+			//pos = mDoc->mMon.mList.GetHeadPosition();
 			for (int i=0; i<monNum; i++)
 			{
-				LPAlead temp;
-				temp = mDoc->mMon->mList.GetNext(pos);
-				int fID = temp->lFirstID;
-				int sID = temp->lSecondID;
+				Alead temp;
+				temp = mDoc->mMon.mList.GetAt(i);
+				int fID = temp.lFirstID;
+				int sID = temp.lSecondID;
 
 				for (int j=0; j<size; j++)
 				{
@@ -645,30 +645,30 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	mDoc->object.Read(temp_mon, sizeof(temp_mon));
 	int monNum = temp_mon[64];
 	POSITION pos;
-	pos = mDoc->mMon->mList.GetHeadPosition();
+	/*pos = mDoc->mMon.mList.GetHeadPosition();
 	while(pos)
 	{
-		delete mDoc->mMon->mList.GetNext(pos);
-	}
-	mDoc->mMon->mList.RemoveAll();
+		delete mDoc->mMon.mList.GetNext(pos);
+	}*/
+	mDoc->mMon.mList.RemoveAll();
 	if (monNum > 32)
 		monNum = 32;
 	for (int i=0; i<monNum; i++)
 	{
-		LPAlead temp = new Alead();
-		temp->lFirstID = temp_mon[i*2];
-		temp->lSecondID = temp_mon[i*2 + 1];
-		mDoc->mMon->mList.AddTail(temp);		
+		Alead temp;
+		temp.lFirstID = temp_mon[i*2];
+		temp.lSecondID = temp_mon[i*2 + 1];
+		mDoc->mMon.mList.Add(temp);		
 	}
 	/*
-	mDoc->object.Read(mDoc->mMon->mName.GetBuffer(), 44);
-	mDoc->mMon->mName.ReleaseBuffer();*/
+	mDoc->object.Read(mDoc->mMon.mName.GetBuffer(), 44);
+	mDoc->mMon.mName.ReleaseBuffer();*/
 	// Khoi tao vung nho cho PrimaryData va SecondaryData
 	//mDoc->dataBuffer = new amekaData<RawDataType>(counter);
 	/*CAmekaView* mView = CAmekaView::GetView();
 	if (!mView)
 		return -1;*/
-	pos = mDoc->mMon->mList.GetHeadPosition();
+	//pos = mDoc->mMon.mList.GetHeadPosition();
 
 	if (mDoc->PrimaryData)
 	{
@@ -742,11 +742,11 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	//		if (raw_cnt >= 1024)
 	//		{
 	//			raw_cnt = 0;
-	//			pos = mDoc->mMon->mList.GetHeadPosition();
+	//			pos = mDoc->mMon.mList.GetHeadPosition();
 	//			for (int i=0; i<monNum; i++)
 	//			{
-	//				LPAlead temp;
-	//				temp = mDoc->mMon->mList.GetNext(pos);
+	//				Alead temp;
+	//				temp = mDoc->mMon.mList.GetNext(pos);
 	//				int fID = temp->lFirstID;
 	//				int sID = temp->lSecondID;
 
@@ -806,11 +806,11 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	//if (raw_cnt > 0)
 	//{
 	//	//m_rawData = new RawDataType[raw_cnt];
-	//	pos = mDoc->mMon->mList.GetHeadPosition();
+	//	pos = mDoc->mMon.mList.GetHeadPosition();
 	//	for (int i=0; i<monNum; i++)
 	//	{
-	//		LPAlead temp;
-	//		temp = mDoc->mMon->mList.GetNext(pos);
+	//		Alead temp;
+	//		temp = mDoc->mMon.mList.GetNext(pos);
 	//		int fID = temp->lFirstID;
 	//		int sID = temp->lSecondID;
 

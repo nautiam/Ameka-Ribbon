@@ -29,9 +29,9 @@ protected: // create from serialization only
 
 // Attributes
 public:
-	LPAmontage mMon;
+	Amontage mMon;
 	DSPData mDSP;
-	CList<LPAelectrode, LPAelectrode> mElec;
+	CMyArray<Aelectrode, Aelectrode &> mElec;
 	CWinThread*  m_dspProcess;
 	CWinThread*  m_processRec;
 	amekaData<RawDataType>* dataBuffer;

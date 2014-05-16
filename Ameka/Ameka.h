@@ -48,7 +48,7 @@ public:
 	CString m_sensitivity;
 	CString m_LP;
 	CString m_HP;
-	CList<LPAmontage, LPAmontage> monList;
+	CMyArray<Amontage, Amontage&> monList;
 	CList<CAmekaDoc*, CAmekaDoc*> docList;
 	amekaData<RawDataType>* dataBuffer;
 	//AmekaData<RawDataType>* dataBuffer;

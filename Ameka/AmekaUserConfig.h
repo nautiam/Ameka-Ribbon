@@ -17,34 +17,72 @@
 #define MONTAGE_NUM 32
 #define BASELINE 16383
 
+template <typename T , typename T2>
+class CMyArray : public CArray<T , T2> 
+{
+public:
+
+    // constructors
+
+    CMyArray(){}
+
+    CMyArray(int n) { SetSize(n);}
+
+    CMyArray(int n, const T& t) 
+    { 
+        for (int i=0; i<n; ++i) Add(t); 
+    }
+
+    // copy constructor
+
+    CMyArray (const CMyArray& rhs) { Append(rhs); }
+
+    // copy assignment operator
+
+    CMyArray& operator = (const CMyArray& rhs) 
+    {
+        if (this != &rhs)
+        {
+            RemoveAll();
+            Append(rhs);
+        }
+
+        return *this;
+    }
+
+    // destructor
+
+    ~CMyArray(){}
+};
+
 // Electrode struct
-typedef struct _Aelectrode {
+struct Aelectrode {
 	uint16_t eID;
 	CString eName;
 	CPoint ePos;
-} *LPAelectrode, Aelectrode;
+	/*Aelectrode& operator=( const Aelectrode& rhs ) { return *this; }
+    BOOL operator==( const Aelectrode& rhs ) const { return TRUE; }*/
+};
 
-typedef struct _Color{
-	int R;
-	int G;
-	int B;
-	_Color(int cl1, int cl2, int cl3){R=cl1;G=cl2;B=cl3;};
-} *LPColor, Color;
 // Lead struct
-typedef struct _Alead {
+struct Alead {
 	uint16_t lID;
 	uint16_t lFirstID;
 	uint16_t lSecondID;
+	/*Alead& operator=( const Alead& rhs ) { return *this; }
+    BOOL operator==( const Alead& rhs ) const { return TRUE; }*/
 	//Color color;
-} *LPAlead, Alead;
+};
 // Montage struct
-typedef struct _Amontage {
+struct Amontage {
 public:
 	uint16_t leadNum;
-	CList<LPAlead, LPAlead> mList;
+	CMyArray<Alead, Alead&> mList;
 	uint16_t mID;
 	CString mName;
-} *LPAmontage, Amontage;
+	/*Amontage& operator=( const Amontage& rhs ) { return *this; }
+    BOOL operator==( const Amontage& rhs ) const { return TRUE; }*/
+};
 
 // DSP Engine
 struct DSPData

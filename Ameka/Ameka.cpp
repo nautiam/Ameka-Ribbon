@@ -136,8 +136,8 @@ CAmekaApp::CAmekaApp()
 	}
 	for(TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
 	{
-		LPAmontage mon = new Amontage();
-		mon->mName = elem->Value();
+		Amontage mon;
+		mon.mName = elem->Value();
 		for(TiXmlElement* e = elem->FirstChildElement(); e != NULL; e = e->NextSiblingElement())
 		{
 			CString attr1, attr2;
@@ -145,15 +145,15 @@ CAmekaApp::CAmekaApp()
 			attr2 = e->Attribute("channel2");
 			if (attr1 != "" && attr2 != "")
 			{
-				LPAlead lead = new Alead();
-				lead->lFirstID = atoi((LPCSTR)(CStringA)attr1);
-				lead->lSecondID = atoi((LPCSTR)(CStringA)attr2);
-				mon->mList.AddTail(lead);
+				Alead lead;
+				lead.lFirstID = atoi((LPCSTR)(CStringA)attr1);
+				lead.lSecondID = atoi((LPCSTR)(CStringA)attr2);
+				mon.mList.Add(lead);
 				//delete lead;
 			}
 		}
 		//delete mon;
-		monList.AddTail(mon);
+		monList.Add(mon);
 	}
 	doc.Clear();
 	//init ribbon
@@ -185,7 +185,7 @@ CAmekaApp::CAmekaApp()
 	// support Restart Manager
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_ALL_ASPECTS;
 #ifdef _MANAGED
-	// If the application is built using Common Language Runtime support (/clr):
+	// If the application is built using ComMon Language Runtime support (/clr):
 	//     1) This additional setting is needed for Restart Manager support to work properly.
 	//     2) In your project, you must add a reference to System.Windows.Forms in order to build.
 	System::Windows::Forms::Application::SetUnhandledExceptionMode(System::Windows::Forms::UnhandledExceptionMode::ThrowException);
@@ -211,12 +211,12 @@ BOOL CAmekaApp::InitInstance()
 {
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
-	// InitCommonControlsEx() is required on Windows XP if an application
+	// InitComMonControlsEx() is required on Windows XP if an application
 	// manifest specifies use of ComCtl32.dll version 6 or later to enable
 	// visual styles.  Otherwise, any window creation will fail.
 	INITCOMMONCONTROLSEX InitCtrls;
 	InitCtrls.dwSize = sizeof(InitCtrls);
-	// Set this to include all the common control classes you want to use
+	// Set this to include all the comMon control classes you want to use
 	// in your application.
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
@@ -316,19 +316,19 @@ int CAmekaApp::ExitInstance()
 	delete dataBuffer;
 	delete mnLan;
 	delete [] mElec;
-	POSITION pos = monList.GetHeadPosition();
+	/*POSITION pos = monList.GetHeadPosition();
 	while(pos)
 	{
-		LPAmontage mon = monList.GetNext(pos);
-		POSITION pos1 = mon->mList.GetHeadPosition();
+		Amontage mon = monList.GetNext(pos);
+		POSITION pos1 = mon.mList.GetHeadPosition();
 		while(pos1)
 		{
-			delete mon->mList.GetNext(pos1);
+			delete mon.mList.GetNext(pos1);
 		}
-		mon->mList.RemoveAll();
+		mon.mList.RemoveAll();
 		delete mon;
 	}
-	monList.RemoveAll();
+	monList.RemoveAll();*/
 	return CWinAppEx::ExitInstance();
 }
 
@@ -941,25 +941,25 @@ void CAmekaApp::OnStop()
 			pDoc->object.Write(temp, sizeof(temp));
 
 			int temp_mon[65];
-			int monNum =  pDoc->mMon->mList.GetCount();
+			int monNum =  pDoc->mMon.mList.GetCount();
 			temp_mon[64] = monNum;
 			POSITION pos;
-			pos = pDoc->mMon->mList.GetHeadPosition();
+			//pos = pDoc->mMon.mList.GetHeadPosition();
 			if (monNum > 32)
 				monNum = 32;
 			for (int i=0; i<monNum; i++)
 			{
-				LPAlead temp;
-				temp = pDoc->mMon->mList.GetNext(pos);
-				int fID = temp->lFirstID;
-				int sID = temp->lSecondID;
+				Alead temp;
+				temp = pDoc->mMon.mList.GetAt(i);
+				int fID = temp.lFirstID;
+				int sID = temp.lSecondID;
 				temp_mon[i*2] = fID;
 				temp_mon[i*2 + 1] = sID;
 			}
 			pDoc->object.Write(temp_mon, sizeof(temp_mon));
 
-			int nLen = pDoc->mMon->mName.GetLength()*sizeof(TCHAR);
-			pDoc->object.Write(pDoc->mMon->mName.GetBuffer(), nLen);
+			int nLen = pDoc->mMon.mName.GetLength()*sizeof(TCHAR);
+			pDoc->object.Write(pDoc->mMon.mName.GetBuffer(), nLen);
 			pDoc->object.Close();
 			pDoc->isOpenFile = FALSE;
 			pDoc->counter = 0;
@@ -1027,7 +1027,7 @@ class CMontageDlg : public CDialogEx
 {
 public:
 	CMontageDlg();
-	~CMontageDlg();
+	//~CMontageDlg();
 // Dialog Data
 	enum { IDD = DLG_Montage};
 
@@ -1046,10 +1046,10 @@ public:
 	CComboBox mon_l2;
 	CListBox mon_list;
 	CComboBox mon_lName;
-	LPAmontage crtMon;
+	Amontage crtMon;
 	afx_msg void OnBnClickedMonsave();
 	afx_msg void OnMonListSelChange();
-	void DrawMontage(CDC *dc, LPAmontage mMon);
+	void DrawMontage(CDC *dc, Amontage mMon);
 	afx_msg void OnPaint();
 	afx_msg void OnBnClickeddel();
 };
@@ -1057,15 +1057,15 @@ public:
 CMontageDlg::CMontageDlg() : CDialogEx(CMontageDlg::IDD)
 {
 }
-CMontageDlg::~CMontageDlg()
-{
-	if (crtMon)
-	{
-		delete crtMon;
-		crtMon = NULL;
-	}
-}
-void CMontageDlg::DrawMontage(CDC* dc, LPAmontage mMon)
+//CMontageDlg::~CMontageDlg()
+//{
+//	if (crtMon)
+//	{
+//		delete crtMon;
+//		crtMon = NULL;
+//	}
+//}
+void CMontageDlg::DrawMontage(CDC* dc, Amontage mMon)
 {
 	CDC memDC;
 	CBitmap bmp;
@@ -1097,12 +1097,12 @@ void CMontageDlg::DrawMontage(CDC* dc, LPAmontage mMon)
 			&blackBrush);
 	}
 
-	POSITION pos =  crtMon->mList.GetHeadPosition();
-	while(pos) 
+	//POSITION pos =  crtMon.mList.GetHeadPosition();
+	for (int i = 0; i < crtMon.mList.GetSize(); i++)
 	{
-		LPAlead curr = crtMon->mList.GetNext(pos);
-		CPoint* p1 = getElecPoint(curr->lFirstID);
-		CPoint* p2 = getElecPoint(curr->lSecondID);
+		Alead curr = crtMon.mList.GetAt(i);
+		CPoint* p1 = getElecPoint(curr.lFirstID);
+		CPoint* p2 = getElecPoint(curr.lSecondID);
 		if (p1 != NULL && p2 != NULL)
 		{			
 			AdjustableArrowCap arrowCap(7.0, 4.0, TRUE);
@@ -1138,26 +1138,25 @@ int CMontageDlg::OnInitDialog()
 	mon_list.ResetContent();
 	mon_lName.ResetContent();
 	int count = 0;
-	crtMon = new Amontage();
-	POSITION pos =  theApp.monList.GetHeadPosition();
-	for (int i = 0; i < theApp.monList.GetCount(); i++)
+	//POSITION pos =  theApp.monList.GetHeadPosition();
+	for (int i = 0; i < theApp.monList.GetSize(); i++)
 	{
-		LPAmontage mon =  theApp.monList.GetNext( pos );
+		Amontage mon =  theApp.monList.GetAt( i );
 		
-		POSITION pos1 =  mon->mList.GetHeadPosition();
-		mon_lName.AddString(mon->mName);
+		//POSITION pos1 =  mon.mList.GetHeadPosition();
+		mon_lName.AddString(mon.mName);
 		if (flag != TRUE)
-			memcpy(crtMon,mon,sizeof(Amontage));
-		if (doc != NULL && mon->mName == doc->mMon->mName)
+			crtMon = mon;
+		if (doc != NULL && mon.mName == doc->mMon.mName)
 			flag = TRUE;
 	}
-	mon_lName.SetWindowTextW(crtMon->mName);
-	pos =  crtMon->mList.GetHeadPosition();
-	for (int i = 0; i < crtMon->mList.GetCount(); i++)
+	mon_lName.SetWindowTextW(crtMon.mName);
+	//pos =  crtMon.mList.GetHeadPosition();
+	for (int i = 0; i < crtMon.mList.GetSize(); i++)
 	{
-		LPAlead lead = crtMon->mList.GetNext( pos );
+		Alead lead = crtMon.mList.GetAt( i );
 		CString tmp;
-		tmp = getElecName(lead->lFirstID) + "   ->   " + getElecName(lead->lSecondID);
+		tmp = getElecName(lead.lFirstID) + "   ->   " + getElecName(lead.lSecondID);
 		mon_list.AddString(tmp);
 	}
 
@@ -1177,21 +1176,20 @@ void CMontageDlg::OnMonListSelChange()
 	mon_list.ResetContent();
 	CString tmp;
 	mon_lName.GetLBText(mon_lName.GetCurSel(), tmp);
-	POSITION pos =  theApp.monList.GetHeadPosition();
-	for (int i = 0; i < theApp.monList.GetCount(); i++)
+	//POSITION pos =  theApp.monList.GetHeadPosition();
+	for (int i = 0; i < theApp.monList.GetSize(); i++)
 	{
-		LPAmontage mon =  theApp.monList.GetNext( pos );
-		if (tmp == mon->mName)
+		Amontage mon =  theApp.monList.GetAt( i );
+		if (tmp == mon.mName)
 		{
-			POSITION pos1 =  mon->mList.GetHeadPosition();
-			for (int j = 0; j < mon->mList.GetCount(); j++)
+			for (int j = 0; j < mon.mList.GetSize(); j++)
 			{
-				LPAlead lead = mon->mList.GetNext( pos1 );
+				Alead lead = mon.mList.GetAt( j );
 				CString tmp;
-				tmp = getElecName(lead->lFirstID) + "   ->   " + getElecName(lead->lSecondID);
+				tmp = getElecName(lead.lFirstID) + "   ->   " + getElecName(lead.lSecondID);
 				mon_list.AddString(tmp);
 			}
-			memcpy(crtMon, mon, sizeof(Amontage));
+			crtMon = mon;
 			this->OnPaint();
 			this->Invalidate();
 			this->UpdateWindow();
@@ -1206,13 +1204,13 @@ void CMontageDlg::OnBnClickedadd()
 	int pos1 = mon_l1.GetCurSel();
 	int pos2 = mon_l2.GetCurSel();
 	mon_list.AddString(getElecName(pos1+1) + "   ->   " + getElecName(pos2+1));
-	LPAlead node = new Alead;
-	node->lFirstID = pos1 + 1;
-	node->lSecondID = pos2 + 1;
+	Alead node;
+	node.lFirstID = pos1 + 1;
+	node.lSecondID = pos2 + 1;
 
-	//crtMon->mName = tmp;
-	crtMon->mList.AddTail(node);
-	//theApp.monList.AddTail(crtMon);
+	//crtMon.mName = tmp;
+	crtMon.mList.Add(node);
+	//theApp.monList.Add(crtMon);
 	//mon_lName.AddString(tmp);
 	this->OnPaint();
 	this->Invalidate();
@@ -1231,15 +1229,15 @@ void CMontageDlg::OnBnClickeddel()
 	it++;
 	CString cs2((*it).c_str());
 
-	POSITION pos =  crtMon->mList.GetHeadPosition();
-	POSITION savePos;
-	while(pos) 
+	//POSITION pos =  crtMon.mList.GetHeadPosition();
+	//POSITION savePos;
+	for (int i = 0; i < crtMon.mList.GetSize(); i++)
 	{ 
-		savePos = pos; 
-		LPAlead curr = crtMon->mList.GetNext(pos); 
-		if (curr->lFirstID == getElecID(cs1) && curr->lSecondID == getElecID(cs2))
+		//savePos = pos; 
+		Alead curr = crtMon.mList.GetAt(i); 
+		if (curr.lFirstID == getElecID(cs1) && curr.lSecondID == getElecID(cs2))
 		{
-			crtMon->mList.RemoveAt(savePos);
+			crtMon.mList.RemoveAt(i);
 			mon_list.DeleteString(crtPos);
 			this->OnPaint();
 			this->Invalidate();
@@ -1255,24 +1253,22 @@ void CMontageDlg::OnBnClickedMonsave()
 	CString tmp;
 	mon_lName.GetWindowText(tmp);
 
-	crtMon->mName = tmp;
+	crtMon.mName = tmp;
 
-	POSITION pos =  theApp.monList.GetHeadPosition();
-	POSITION savePos;
-	while(pos) 
+	//POSITION pos =  theApp.monList.GetHeadPosition();
+	//POSITION savePos;
+	for (int i = 0; i < theApp.monList.GetSize(); i++)
 	{ 
-		savePos = pos; 
-		LPAmontage curr = theApp.monList.GetNext(pos); 
-		if (curr->mName == tmp)
+		//savePos = pos; 
+		Amontage curr = theApp.monList.GetAt(i); 
+		if (curr.mName == tmp)
 		{
-			theApp.monList.SetAt(savePos, crtMon); 
+			theApp.monList.SetAt(i, crtMon); 
 			return;
 		}
 	}
-	LPAmontage saveMon = new Amontage();
-	memcpy(saveMon, crtMon, sizeof(Amontage));
-	theApp.monList.AddTail(saveMon);
-	mon_lName.AddString(saveMon->mName);
+	theApp.monList.Add(crtMon);
+	mon_lName.AddString(crtMon.mName);
 }
 
 void CMontageDlg::DoDataExchange(CDataExchange* pDX)
@@ -1639,26 +1635,26 @@ void CMontageDlg::OnBnClickedOk()
 	CMFCRibbonComboBox* pMon = DYNAMIC_DOWNCAST(
 		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_MonList));
 	if (pMon != NULL)
-		pMon->SetEditText(crtdoc->mMon->mName);
+		pMon->SetEditText(crtdoc->mMon.mName);
 		
 	TiXmlDocument doc;
 	TiXmlElement* root = new TiXmlElement("root");
 	doc.LinkEndChild(root);
 
-	POSITION pos =  theApp.monList.GetHeadPosition();
-	while (pos)
+	//POSITION pos =  theApp.monList.GetHeadPosition();
+	for (int i = 0; i < theApp.monList.GetSize(); i++)
 	{
-		LPAmontage mon =  theApp.monList.GetNext( pos );
-		TiXmlElement* element = new TiXmlElement((LPCSTR)(CStringA)mon->mName);
+		Amontage mon =  theApp.monList.GetAt( i );
+		TiXmlElement* element = new TiXmlElement((LPCSTR)(CStringA)mon.mName);
 		root->LinkEndChild(element);
-		POSITION pos1 =  mon->mList.GetHeadPosition();
-		while (pos1)
+		//POSITION pos1 =  mon.mList.GetHeadPosition();
+		for (int j = 0; j < mon.mList.GetSize(); j++)
 		{
-			LPAlead lead = mon->mList.GetNext( pos1 );
-			TiXmlElement* element1 = new TiXmlElement((LPCSTR)(CStringA)mon->mName);
+			Alead lead = mon.mList.GetAt( j );
+			TiXmlElement* element1 = new TiXmlElement((LPCSTR)(CStringA)mon.mName);
 			element->LinkEndChild(element1);
-			element1->SetAttribute("channel1", lead->lFirstID);
-			element1->SetAttribute("channel2", lead->lSecondID);
+			element1->SetAttribute("channel1", lead.lFirstID);
+			element1->SetAttribute("channel2", lead.lSecondID);
 		}
 	}
 

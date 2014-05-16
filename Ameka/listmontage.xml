@@ -33,4 +33,12 @@
         <da channel1="3" channel2="5" />
         <da channel1="15" channel2="16" />
     </da>
+    <sahn>
+        <sahn channel1="5" channel2="3" />
+        <sahn channel1="3" channel2="7" />
+        <sahn channel1="12" channel2="9" />
+        <sahn channel1="11" channel2="13" />
+        <sahn channel1="3" channel2="5" />
+        <sahn channel1="15" channel2="16" />
+    </sahn>
 </root>

@@ -184,7 +184,7 @@ void CAmekaView::OnDraw(CDC* pDC)
 
 		int j,tmp;
 		
-		channelNum = this->GetDocument()->mMon->mList.GetCount();
+		channelNum = this->GetDocument()->mMon.mList.GetCount();
 
 		for(int i = 0; i < channelNum; i++)
 		{
@@ -666,7 +666,7 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	MemDC.LineTo(rect.Width(), rect.Height() - FOOT_RANGE);
 	MemDC.SelectObject(tmpPen);
 
-	channelNum = this->GetDocument()->mMon->mList.GetCount();
+	channelNum = this->GetDocument()->mMon.mList.GetCount();
 
 	//draw all point to current bitmap
 	for(int i = 0; i < channelNum;i++)
@@ -885,7 +885,7 @@ int CAmekaView::drawBarGraph( void )
 	CBrush brushS(CUSTOM_BARCOLOR);
 	MemDC.SelectObject(brushS);
 
-	channelNum = this->GetDocument()->mMon->mList.GetCount();
+	channelNum = this->GetDocument()->mMon.mList.GetCount();
 
 	for (int i = 0; i < buflen; i++)
 	{
@@ -1108,7 +1108,7 @@ void CAmekaView::drawRecData(CDC* pDC)
 	//drawLeadName(&MemDC);
 
 	//uint16_t maxPos = (arrPos + screenPosNum) <= pDoc->counter?(arrPos + screenPosNum):pDoc->counter;
-	channelNum = this->GetDocument()->mMon->mList.GetCount();
+	channelNum = this->GetDocument()->mMon.mList.GetCount();
 
 	for (int i = 0; i < pDoc->counter - 1; i++)
 	{
@@ -1176,8 +1176,8 @@ void CAmekaView::drawLeadName(CDC* pDC)
 	CAmekaDoc* pDoc = this->GetDocument();
 	if (!pDoc)
 		return;
-	POSITION pos = pDoc->mMon->mList.GetHeadPosition();
-	int leadNum = pDoc->mMon->mList.GetCount();
+	//POSITION pos = pDoc->mMon.mList.GetHeadPosition();
+	int leadNum = pDoc->mMon.mList.GetCount();
 
 	CRect clearRect(0, 0, MONNAME_BAR + 2, rect.Height());
 	MemDC.FillRect(&clearRect, WHITE_BRUSH);
@@ -1185,12 +1185,12 @@ void CAmekaView::drawLeadName(CDC* pDC)
 	CFont txtFont;
 	txtFont.CreatePointFont(70, _T("Arial"), &MemDC);
 	MemDC.SelectObject(&txtFont);
-	for (int i = 0; i < leadNum; i++)
+	for (int i = 0; i < pDoc->mMon.mList.GetSize(); i++)
 	{
-		LPAlead lead = pDoc->mMon->mList.GetNext(pos);
+		Alead lead = pDoc->mMon.mList.GetAt(i);
 		CString leadTxt;
 		CRect txtRect(0, i*(rect.Height() - FOOT_RANGE)/leadNum + 1, MONNAME_BAR,(i + 1)*(rect.Height() - FOOT_RANGE)/leadNum - 1);
-		leadTxt = getElecName(lead->lSecondID) + "-" + getElecName(lead->lFirstID);
+		leadTxt = getElecName(lead.lSecondID) + "-" + getElecName(lead.lFirstID);
 		MemDC.DrawTextW(leadTxt, txtRect, 0);
 		CPen silverPen(PS_SOLID, 1, RGB(0xC0, 0xC0, 0xC0));
 		//CPen* oldPen = MemDC.SelectObject(&silverPen);

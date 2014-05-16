@@ -180,11 +180,11 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		CMFCRibbonComboBox, m_wndRibbonBar.FindByID(MN_MonList));
 	if (pMon)
 	{
-		POSITION pos =  theApp.monList.GetHeadPosition();
-		while(pos)
+		//POSITION pos =  theApp.monList.GetHeadPosition();
+		for (int i = 0; i < theApp.monList.GetSize(); i++)
 		{
-			LPAmontage tmp = theApp.monList.GetNext( pos );
-			pMon->AddItem(tmp->mName,count++);
+			Amontage tmp = theApp.monList.GetAt( i );
+			pMon->AddItem(tmp.mName,count++);
 		}
 	}
 
@@ -460,11 +460,11 @@ void CMainFrame::OnMonlist()
 	int nCurSel = pMon->GetCurSel();
 	CString data = pMon->GetItem(nCurSel);
 
-	POSITION pos =  theApp.monList.GetHeadPosition();
-	while(pos)
+	//POSITION pos =  theApp.monList.GetHeadPosition();
+	for (int i = 0; i < theApp.monList.GetSize(); i++)
 	{
-		LPAmontage mon =  theApp.monList.GetNext( pos );
-		if (mon->mName == data)
+		Amontage mon =  theApp.monList.GetAt( i );
+		if (mon.mName == data)
 			doc->mMon = mon;
 	}
 

@@ -124,26 +124,26 @@ CAmekaDoc::~CAmekaDoc()
 		object.Write(temp, sizeof(temp));
 
 		int temp_mon[65];
-		int monNum =  mMon->mList.GetCount();
+		int monNum =  mMon.mList.GetCount();
 		temp_mon[64] = monNum;
 		POSITION pos;
-		pos = mMon->mList.GetHeadPosition();
+		//pos = mMon.mList.GetHeadPosition();
 		if (monNum > 32)
 			monNum = 32;
 		for (int i=0; i<monNum; i++)
 		{
-			LPAlead temp;
-			temp = mMon->mList.GetNext(pos);
-			int fID = temp->lFirstID;
-			int sID = temp->lSecondID;
+			Alead temp;
+			temp = mMon.mList.GetAt(i);
+			int fID = temp.lFirstID;
+			int sID = temp.lSecondID;
 			temp_mon[i*2] = fID;
 			temp_mon[i*2 + 1] = sID;
 		}
 		object.Write(temp_mon, sizeof(temp_mon));
 
 		CString name;
-		int nLen = mMon->mName.GetLength()*sizeof(TCHAR);
-		object.Write(mMon->mName.GetBuffer(), nLen);
+		int nLen = mMon.mName.GetLength()*sizeof(TCHAR);
+		object.Write(mMon.mName.GetBuffer(), nLen);
 		object.Close();
 		isOpenFile = FALSE;
 	}
@@ -173,16 +173,16 @@ BOOL CAmekaDoc::OnNewDocument()
 	dataBuffer = new amekaData<RawDataType>(BUFFER_LEN);
 	theApp.docList.AddTail(this);
 
-	POSITION pos =  theApp.monList.GetHeadPosition();
-	if (pos != NULL)
+	//POSITION pos =  theApp.monList.GetHeadPosition();
+	if (theApp.monList.GetSize() != 0)
 	{
-		LPAmontage mon =  theApp.monList.GetNext( pos );
+		Amontage mon =  theApp.monList.GetAt( 0 );
 		mMon = mon;
 		CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
 		CMFCRibbonComboBox* pMon = DYNAMIC_DOWNCAST(
 		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_MonList));
-		if (pMon && mMon)
-			pMon->SetEditText(mMon->mName);
+		if (pMon)
+			pMon->SetEditText(mMon.mName);
 	}
 
 	return TRUE;
