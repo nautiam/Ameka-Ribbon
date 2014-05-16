@@ -398,53 +398,48 @@ BOOL CAmekaView::OnEraseBkgnd(CDC* pDC)
 void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-
+	return;
 	CView::OnMouseMove(nFlags, point);
 
-	//if (!isNull && !isRunning)
-	//{
-	//	int X = GetSystemMetrics( SM_CXSCREEN );
-	//	int Y = GetSystemMetrics( SM_CYSCREEN );
+	if (!isNull && !isRunning && isDrawRec)
+	{
+		int X = GetSystemMetrics( SM_CXSCREEN );
+		int Y = GetSystemMetrics( SM_CYSCREEN );
 
-	//	CPoint ptLog = point;
-	//	ClientToScreen(&ptLog);
-	//	uint16_t* posResult = this->getDataFromPos(point, crtPos, this);
-	//	uint16_t tmpData[2];
-	//	tmpData[0] = posResult[0];
-	//	tmpData[1] = posResult[1];
-	//	uint16_t* valResult = getMaxMin(tmpData);
-	//	uint16_t fuck[2];
-	//	fuck[0] = valResult[0];
-	//	fuck[1] = valResult[1];
+		CPoint ptLog = point;
+		ClientToScreen(&ptLog);
+		uint16_t* posResult = this->getDataFromPos(point, crtPos, this);
 
-	//	CString strTemp;
-	//	strTemp.Format(L"Data value: %d\r\nMix value: %d\r\nMax value: %d", this->dataBuffer[posResult[0]].value[posResult[1]], fuck[0], fuck[1]);
-	//	// show tool tip in mouse move
-	//	int xPos, yPos;
-	//	if (ptLog.x + X_TOOLTIP + 5 > X)
-	//	{
-	//		xPos = X - X_TOOLTIP - 5;
-	//	}
-	//	else
-	//	{
-	//		xPos = ptLog.x + 5;
-	//	}
-	//	if (ptLog.y + Y_TOOLTIP + 5 > Y)
-	//	{
-	//		yPos = Y - Y_TOOLTIP - 5;
-	//	}
-	//	else
-	//	{
-	//		yPos = ptLog.y + 5;
-	//	}
-	//	m_Tips.ShowTips(xPos, yPos, strTemp);
+		uint16_t* valResult = getMaxMin(posResult);
 
-	//	CView::OnMouseMove(nFlags, point);
-	//}
-	//else
-	//{
-	//	m_Tips.HideTips();
-	//}
+		CString strTemp;
+		//strTemp.Format(L"Data value: %d\r\nMix value: %d\r\nMax value: %d", this->dataBuffer[posResult[0]].value[posResult[1]], fuck[0], fuck[1]);
+		// show tool tip in mouse move
+		int xPos, yPos;
+		if (ptLog.x + X_TOOLTIP + 5 > X)
+		{
+			xPos = X - X_TOOLTIP - 5;
+		}
+		else
+		{
+			xPos = ptLog.x + 5;
+		}
+		if (ptLog.y + Y_TOOLTIP + 5 > Y)
+		{
+			yPos = Y - Y_TOOLTIP - 5;
+		}
+		else
+		{
+			yPos = ptLog.y + 5;
+		}
+		m_Tips.ShowTips(xPos, yPos, strTemp);
+
+		CView::OnMouseMove(nFlags, point);
+	}
+	else
+	{
+		m_Tips.HideTips();
+	}
 }
 
 void CAmekaView::resetData()
@@ -948,32 +943,27 @@ uint16_t* CAmekaView::getDataFromPos(CPoint mousePos, float crtPos, CAmekaView* 
 	int xMousePos = mousePos.x;
 	int yMousePos = mousePos.y;
 
-	if (onPhotic)
+	CAmekaDoc* pDoc = GetDocument();
+
+	/*if (onPhotic)
 		maxWidth = rect.Width()*FACTOR;
 	else
-		maxWidth = rect.Width();
+		maxWidth = rect.Width();*/
+
+	uint16_t crtPoint = GetDeviceScrollPosition().x;
 
 	float xDistance;
 	float distance = (float)this->graphData.paperSpeed*(float)this->graphData.dotPmm/this->graphData.sampleRate;
-	if (xMousePos > crtPos)
-	{
-		if (!isResize)
-			xDistance = crtPos + maxWidth - xMousePos + this->lastDistance;
-		else
-			xDistance = crtPos + maxWidth - xMousePos - SBAR_W;
-	}
-	else
-	{
-		xDistance = crtPos - xMousePos;
-	}
+	xDistance = crtPoint + crtPos - MONNAME_BAR - 2;
 	//get position
-	uint16_t posNum = (uint16_t)(this->count - 1 + this->bufLen - (uint16_t)xDistance/distance)%(this->bufLen);
+	uint16_t posNum = (uint16_t)xDistance/distance;
 	int pos = 0;
-	uint16_t val = abs(mousePos.y - ((rect.Height() - FOOT_RANGE)/this->channelNum)/2 - (((float)this->dataBuffer[posNum].value[0]
+	
+	uint16_t val = abs(mousePos.y - ((rect.Height() - FOOT_RANGE)/this->channelNum)/2 - (((float)pDoc->PrimaryData->get(posNum).value[0]
 						- this->m_BaseLine)/this->m_Amp)*this->graphData.scaleRate);
 	for (int i = 0; i < LEAD_NUMBER; i++)
 	{
-		int tmp = ((rect.Height() - FOOT_RANGE)*i/this->channelNum) + ((rect.Height() - FOOT_RANGE)/this->channelNum)/2 - (((float)this->dataBuffer[posNum].value[i]
+		int tmp = ((rect.Height() - FOOT_RANGE)*i/this->channelNum) + ((rect.Height() - FOOT_RANGE)/this->channelNum)/2 - (((float)pDoc->PrimaryData->get(posNum).value[i]
 						- this->m_BaseLine)/this->m_Amp)*this->graphData.scaleRate;
 		if (abs(mousePos.y - tmp) < val)
 		{
@@ -995,13 +985,13 @@ uint16_t* CAmekaView::getMaxMin(uint16_t* inputData)
 
 	if (inputData[0] > this->count)
 	{
-		if ((inputData[0] - CHECK_RANGE ) > this->count )
+		if ((inputData[0] - CHECK_RANGE ) > 0 )
 		{
 			lowVal = inputData[0] - CHECK_RANGE;
 		}
 		else
 		{
-			lowVal = this->count;
+			lowVal = 0;
 		}
 
 		if ((inputData[0] + CHECK_RANGE)%this->bufLen < this->count - 1)

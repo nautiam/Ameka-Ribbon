@@ -6,7 +6,7 @@
 #include "easylogging++.h"
 
 #ifndef settingName
-#define settingName "config.xml"
+#define settingName "config.conf"
 #endif
 
 CString itoS ( int x)

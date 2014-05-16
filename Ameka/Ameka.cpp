@@ -46,8 +46,8 @@
 #define strHP "0.5 1 2 3 5 8"
 #define strCOM "COM1 COM2 COM3 COM4 COM5 COM6 COM7 COM8 COM9 COM10"
 #define strBaud "9600 14400 19200 38400 56000 115200 "
-#define xmlName "listmontage.xml"
-#define settingName "config.xml"
+#define xmlName "listmontage.conf"
+#define settingName "config.conf"
 
 #define monXScale 300
 #define monYScale 300
@@ -649,8 +649,8 @@ void CAmekaApp::OnPhotic()
 				pView->pPhoticThread = NULL;
 			}
 		}
+		pView->OnDraw(pView->GetDC());
 	}
-	pView->OnDraw(pView->GetDC());
 }
 
 void CAmekaApp::OnSetupPhotic()
@@ -747,7 +747,7 @@ END_MESSAGE_MAP()
 //Show Setting Dialog
 void CAmekaApp::OnWave()
 {
-	MessageBoxA(NULL,"This function still is not support","Warning",0);
+	MessageBoxA(NULL,"Tính năng này tạm thời chưa được hỗ trợ!","Thông báo",0);
 	/*
 	CWaveDlg waveDlg;
 	waveDlg.DoModal();
@@ -1968,7 +1968,7 @@ void CAmekaApp::OnScan()
 void CAmekaApp::OnLan()
 {
 	// Create an instance First
-	CFileDialog fOpenDlg(TRUE, L".txt", NULL, OFN_HIDEREADONLY|OFN_FILEMUSTEXIST, L"Ameka Language Files (*.xml)|*.xml||");
+	CFileDialog fOpenDlg(TRUE, L".lan", NULL, OFN_HIDEREADONLY|OFN_FILEMUSTEXIST, L"Ameka Language Files (*.lan)|*.lan||");
 
 	// Initializes m_pOFN structure
 	fOpenDlg.m_pOFN->lpstrTitle=L"Ameka Language File";
