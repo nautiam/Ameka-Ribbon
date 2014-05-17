@@ -601,7 +601,10 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	}
 
 	int drawW = ceil(distance * buflen + SBAR_W);
-
+	if(crtPos > maxWidth)
+	{
+		crtPos = MONNAME_BAR + 2;
+	}
 	if(bitmap != NULL)
 	{
 		if (crtPos + drawW > maxWidth)
@@ -861,7 +864,7 @@ int CAmekaView::drawBarGraph( void )
 		if(NULL == bitmap->CreateCompatibleBitmap(pDC, (rect.Width()-startPos), rect.Height()))
 		{
 			DWORD tmp = GetLastError();
-			LOG(ERROR) << static_cast <int>(tmp);
+			//LOG(ERROR) << static_cast <int>(tmp);
 			DeleteObject(pDC);
 			delete [] data;
 			delete bitmap;

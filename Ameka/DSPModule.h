@@ -7,7 +7,7 @@
 
 void photic_processing(float fre_step, LPVOID pParam);
 void dsp_processing(LPVOID pParam);
-
+void initial_dsp_data(LPVOID pParam);
 class DSP {
 public:
 	static UINT DSPThread(LPVOID pParam);

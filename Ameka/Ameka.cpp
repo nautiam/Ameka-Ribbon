@@ -42,8 +42,8 @@
 
 #define strSen "10 15 30 60 90 120"
 #define strSpeed "15 30 75 150 200 300"
-#define strLP "10 15 20 30 40 50 60 70"
-#define strHP "0.5 1 2 3 5 8"
+#define strLP "10 15 20 30 40 50 60"
+#define strHP "0.1 0.2 0.5 1 1.5"
 #define strCOM "COM1 COM2 COM3 COM4 COM5 COM6 COM7 COM8 COM9 COM10"
 #define strBaud "9600 14400 19200 38400 56000 115200 "
 #define xmlName "listmontage.conf"
@@ -865,8 +865,19 @@ void CAmekaApp::OnDemo()
 	{
 		CAmekaView *pView = CAmekaView::GetView();
 		CAmekaDoc *pDoc = CAmekaDoc::GetDoc();
+		CRect rect;
+		pView->GetClientRect(&rect);
+		CSize sizeTotal;
+		// TODO: calculate the total size of this view
+
+		sizeTotal.cx = rect.Width();
+		sizeTotal.cy = rect.Height();
+		pView->SetScrollSizes(MM_TEXT, sizeTotal);
 		if (!pView->isRunning)
 		{
+			//LPVOID pParam;
+			initial_dsp_data((LPVOID)pDoc);
+
 			pDoc->m_dspProcess = AfxBeginThread(DSP::DSPThread, (LPVOID)pDoc);
 			pView->resetData();
 			pView->OnDraw(pView->GetDC());
@@ -898,8 +909,8 @@ void CAmekaApp::OnStop()
 		pView->isRunning = false;
 	}
 
-	if (!pDoc->isRecord)
-		return;
+	/*if (!pDoc->isRecord)
+		return;*/
 
 	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
 	CMFCRibbonButton* pStopRec = DYNAMIC_DOWNCAST(
@@ -909,13 +920,7 @@ void CAmekaApp::OnStop()
 
 	if (pDoc)
 	{
-		if (pDoc->isRecord)
-		{
-			pDoc->isRecord = FALSE;
-
-			/*if (WaitForSingleObject(pDoc->CloseFileEvent, INFINITE) == WAIT_OBJECT_0)
-			{*/
-			exit_code = NULL;
+		exit_code = NULL;
 			GetExitCodeThread(pDoc->m_dspProcess->m_hThread, &exit_code);
 			if(exit_code == STILL_ACTIVE)
 			{
@@ -924,6 +929,13 @@ void CAmekaApp::OnStop()
 			}
 			pDoc->m_dspProcess->m_hThread = NULL;
 			pDoc->m_dspProcess = NULL;
+		if (pDoc->isRecord)
+		{
+			pDoc->isRecord = FALSE;
+
+			/*if (WaitForSingleObject(pDoc->CloseFileEvent, INFINITE) == WAIT_OBJECT_0)
+			{*/
+			
 
 			pDoc->saveFileName = pDoc->recordFileName;
 			/*uint16_t buffer[4] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};

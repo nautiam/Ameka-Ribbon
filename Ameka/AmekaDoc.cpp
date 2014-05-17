@@ -152,15 +152,15 @@ CAmekaDoc::~CAmekaDoc()
 	delete SecondaryData;
 	delete TemporaryData;
 	// Try to remove old record file whatever it is created or not
-	//try
-	//{
-	//	CFile::Remove(recordFileName);
-	//}
-	//catch (CFileException* pEx)
-	//{
-	//	//AfxMessageBox(L"File cannot be removed");
-	//	pEx->Delete();
-	//}
+	try
+	{
+		CFile::Remove(recordFileName);
+	}
+	catch (CFileException* pEx)
+	{
+		//AfxMessageBox(L"File cannot be removed");
+		pEx->Delete();
+	}
 }
 
 BOOL CAmekaDoc::OnNewDocument()

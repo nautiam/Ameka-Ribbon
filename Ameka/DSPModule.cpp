@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "easylogging++.h"
+//#include "easylogging++.h"
 #include "AmekaDoc.h"
 #include "dsp_filters.h"
 #include "DSPModule.h"
@@ -299,6 +299,47 @@ void dsp_processing(LPVOID pParam)
 	mDoc->object.Close();
 }
 
+void initial_dsp_data(LPVOID pParam)
+{
+	CAmekaDoc* mDoc = (CAmekaDoc*)(pParam);
+
+	if(mDoc->PrimaryData)
+	{
+		delete mDoc->PrimaryData;
+		mDoc->PrimaryData = NULL;
+	}
+	mDoc->PrimaryData = new amekaData<PrimaryDataType>(BUFFER_LEN);
+
+	if(mDoc->TemporaryData)
+	{
+		delete mDoc->TemporaryData;
+		mDoc->TemporaryData = NULL;
+	}
+	mDoc->TemporaryData = new amekaData<PrimaryDataType>(BUFFER_LEN);
+
+	if(mDoc->dataBuffer)
+	{
+		delete mDoc->dataBuffer;
+		mDoc->dataBuffer = NULL;
+	}
+	mDoc->dataBuffer = new amekaData<RawDataType>(BUFFER_LEN);
+
+	if(mDoc->SecondaryData)
+	{
+		delete mDoc->SecondaryData;
+		mDoc->SecondaryData = NULL;
+	}
+	mDoc->SecondaryData = new amekaData<SecondaryDataType>(BUFFER_LEN);
+	mDoc->mDSP.HPFFre = 0.5;
+	mDoc->mDSP.LPFFre = 30;
+	mDoc->mDSP.SampleRate = SAMPLE_RATE;
+	mDoc->mDSP.epocLength = 1.6;
+	mDoc->isOpenFile = FALSE;
+	mDoc->isRecord = FALSE;
+	mDoc->isSave = FALSE;
+	mDoc->m_dspProcess = NULL;
+	mDoc->eventID = 0;
+}
 
 UINT DSP::DSPThread(LPVOID pParam)
 {
@@ -316,13 +357,6 @@ UINT DSP::DSPThread(LPVOID pParam)
 			pEx->Delete();
 		}
 	}
-
-	if(mDoc->PrimaryData)
-	{
-		delete mDoc->PrimaryData;
-		mDoc->PrimaryData = NULL;
-	}
-	mDoc->PrimaryData = new amekaData<PrimaryDataType>(BUFFER_LEN);
 
 	uint16_t numSamples = 2000;
 	time_t oldtime = 0;
