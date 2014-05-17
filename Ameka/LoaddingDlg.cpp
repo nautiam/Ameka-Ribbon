@@ -23,7 +23,7 @@ CLoaddingDlg::CLoaddingDlg(CWnd* pParent /*=NULL*/)
 CLoaddingDlg::~CLoaddingDlg()
 {
 	KillTimer(timer);
-	ShowWindow(SW_HIDE);
+	//ShowWindow(SW_HIDE);
 }
 
 void CLoaddingDlg::DoDataExchange(CDataExchange* pDX)

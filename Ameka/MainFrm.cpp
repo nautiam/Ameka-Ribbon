@@ -559,13 +559,24 @@ void CMainFrame::OnOpen()
 	CAmekaView* pView = CAmekaView::GetView();
 
 	//check if not in recording mode
-	if (!pDoc || !pView)
-		return;
 
 	char strFilter[] = { "Ameka Save File (*.amek)|*.amek|" }; 
 	CFileDialog FileDlg(TRUE, CString(".amek"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, CString(strFilter));
 	if (FileDlg.DoModal() == IDOK)  
 	{ 
+		if (!pDoc || !pView)
+		{
+			POSITION pos=AfxGetApp()->GetFirstDocTemplatePosition();
+
+			CDocTemplate* pTemplate=AfxGetApp()->GetNextDocTemplate(pos); 
+
+			CAmekaDoc* pSim =(CAmekaDoc*) pTemplate->OpenDocumentFile(NULL);
+
+			pDoc = CAmekaDoc::GetDoc();
+			pView = CAmekaView::GetView();
+			//return;
+		}
+
 		pDoc->saveFileName = FileDlg.GetPathName();
 
 		DWORD exit_code= NULL;

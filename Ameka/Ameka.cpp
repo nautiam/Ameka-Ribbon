@@ -921,14 +921,14 @@ void CAmekaApp::OnStop()
 	if (pDoc)
 	{
 		exit_code = NULL;
-			GetExitCodeThread(pDoc->m_dspProcess->m_hThread, &exit_code);
-			if(exit_code == STILL_ACTIVE)
-			{
-				::TerminateThread(pDoc->m_dspProcess->m_hThread, 0);
-				CloseHandle(pDoc->m_dspProcess->m_hThread);
-			}
-			pDoc->m_dspProcess->m_hThread = NULL;
-			pDoc->m_dspProcess = NULL;
+		GetExitCodeThread(pDoc->m_dspProcess->m_hThread, &exit_code);
+		if(exit_code == STILL_ACTIVE)
+		{
+			::TerminateThread(pDoc->m_dspProcess->m_hThread, 0);
+			CloseHandle(pDoc->m_dspProcess->m_hThread);
+		}
+		pDoc->m_dspProcess->m_hThread = NULL;
+		pDoc->m_dspProcess = NULL;
 		if (pDoc->isRecord)
 		{
 			pDoc->isRecord = FALSE;
@@ -2173,6 +2173,8 @@ void CAmekaApp::OnRecording()
 		pView->isDrawRec = FALSE;
 		if (!pView->isRunning)
 		{
+			initial_dsp_data((LPVOID)pDoc);
+			pDoc->isRecord = TRUE;
 			pDoc->m_dspProcess = AfxBeginThread(DSP::DSPThread, (LPVOID)pDoc);
 			pView->resetData();
 			pView->OnDraw(pView->GetDC());
