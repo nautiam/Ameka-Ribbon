@@ -864,9 +864,11 @@ void CAmekaApp::OnDemo()
 	if (theApp.docList.IsEmpty())
 		return;
 	//if ((theApp.pIO != NULL) && (theApp.pIO->m_bState == S_CONNECTED))
-	{
-		CAmekaView *pView = CAmekaView::GetView();
+	CAmekaView *pView = CAmekaView::GetView();
 		CAmekaDoc *pDoc = CAmekaDoc::GetDoc();
+	if (pView->isRunning || pDoc->isRecord)
+			return;
+	{
 		CRect rect;
 		pView->GetClientRect(&rect);
 		CSize sizeTotal;
@@ -875,7 +877,6 @@ void CAmekaApp::OnDemo()
 		sizeTotal.cx = rect.Width();
 		sizeTotal.cy = rect.Height();
 		pView->SetScrollSizes(MM_TEXT, sizeTotal);
-		if (!pView->isRunning)
 		{
 			//LPVOID pParam;
 			initial_dsp_data((LPVOID)pDoc);
@@ -923,14 +924,17 @@ void CAmekaApp::OnStop()
 	if (pDoc)
 	{
 		exit_code = NULL;
-		GetExitCodeThread(pDoc->m_dspProcess->m_hThread, &exit_code);
-		if(exit_code == STILL_ACTIVE)
+		if (pDoc->m_dspProcess != NULL)
 		{
-			::TerminateThread(pDoc->m_dspProcess->m_hThread, 0);
-			CloseHandle(pDoc->m_dspProcess->m_hThread);
+			GetExitCodeThread(pDoc->m_dspProcess->m_hThread, &exit_code);
+			if(exit_code == STILL_ACTIVE)
+			{
+				::TerminateThread(pDoc->m_dspProcess->m_hThread, 0);
+				CloseHandle(pDoc->m_dspProcess->m_hThread);
+			}
+			pDoc->m_dspProcess->m_hThread = NULL;
+			pDoc->m_dspProcess = NULL;
 		}
-		pDoc->m_dspProcess->m_hThread = NULL;
-		pDoc->m_dspProcess = NULL;
 		if (pDoc->isRecord)
 		{
 			pDoc->isRecord = FALSE;

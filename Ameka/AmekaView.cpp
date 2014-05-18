@@ -282,11 +282,16 @@ void CAmekaView::OnDraw(CDC* pDC)
 			MemDC.MoveTo(maxWidth + i*barW, rect.Height() - 5);
 			MemDC.LineTo(maxWidth + i*barW, 0);
 			//draw text
+			CFont txtFont;
+			txtFont.CreatePointFont(70, _T("Arial"), &MemDC);
+			CFont* tmpFont = MemDC.SelectObject(&txtFont);
 			CRect txtRect(maxWidth + (int)(i*barW), (rect.Height() - FOOT_RANGE),
 				maxWidth + i*barW + 10, rect.Height());
 			CString text;
 			text.Format(_T("%d"), (int)(theApp.photicTick*i + theApp.photicMin));
 			MemDC.DrawTextW(text, txtRect, 0);
+			MemDC.SelectObject(tmpFont);
+			DeleteObject(&txtFont);
 			
 		}
 	}
@@ -818,6 +823,8 @@ int CAmekaView::drawBarGraph( void )
 	CDC MemDC;
 
 	float startPos;
+	if (!this)
+		return -1;
 	CAmekaDoc* pDoc = this->GetDocument();
 	if (pDoc == NULL)
 		return -1;
@@ -895,6 +902,8 @@ int CAmekaView::drawBarGraph( void )
 		float barW = (float)range/barCount;
 		for (int j = 0; j < channelNum; j++)
 		{
+			if ((data[i].value[j])/theApp.photicWRate < 1)
+				continue;
 			CRect barRect(abs(barPos - barW/2), (j+1)*(rect.Height() - FOOT_RANGE)/channelNum - (data[i].value[j])/theApp.photicWRate - ((rect.Height() - FOOT_RANGE)/channelNum)/2, 
 				abs((rect.Width() - startPos)/barNum + barPos - barW/2),(j+1)*(rect.Height() - FOOT_RANGE)/channelNum - ((rect.Height() - FOOT_RANGE)/channelNum)/2);
 			MemDC.FillRect(barRect,&brushS);
