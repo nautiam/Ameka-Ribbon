@@ -103,6 +103,8 @@ CAmekaApp::CAmekaApp()
 	//init electrode name
 	const char* setFileName = settingName;
 	//writeSetting(setFileName);
+	for (int i = 0; i < 10; i++)
+		evName[i] = "undefined";
 	loadSetting(setFileName);
 	//init Language
 	mnLan = new amekaLan();
@@ -1438,6 +1440,16 @@ public:
 
 	CEdit ev_1;
 	CEdit ev_2;
+	CEdit mEV1;
+	CEdit mEV2;
+	CEdit mEV3;
+	CEdit mEV4;
+	CEdit mEV5;
+	CEdit mEV6;
+	CEdit mEV7;
+	CEdit mEV8;
+	CEdit mEV9;
+	CEdit mEV10;
 };
 
 CTabEventDlg::CTabEventDlg() : CDialogEx(CTabEventDlg::IDD)
@@ -1448,14 +1460,43 @@ CTabEventDlg::CTabEventDlg() : CDialogEx(CTabEventDlg::IDD)
 int CTabEventDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+	mEV1.SetWindowTextW(theApp.evName[1]);
+	mEV2.SetWindowTextW(theApp.evName[2]);
+	mEV3.SetWindowTextW(theApp.evName[3]);
+	mEV4.SetWindowTextW(theApp.evName[4]);
+	mEV5.SetWindowTextW(theApp.evName[5]);
+	mEV6.SetWindowTextW(theApp.evName[6]);
+	mEV7.SetWindowTextW(theApp.evName[7]);
+	mEV8.SetWindowTextW(theApp.evName[8]);
+	mEV9.SetWindowTextW(theApp.evName[9]);
+	mEV10.SetWindowTextW(theApp.evName[0]);
 	return 0;
 }
 
 void CTabEventDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_EDIT1, ev_1);
-	DDX_Control(pDX, IDC_EDIT6, ev_2);
+	DDX_Control(pDX, EV_1, mEV1);
+	DDX_Control(pDX, EV_2, mEV2);
+	DDX_Control(pDX, EV_3, mEV3);
+	DDX_Control(pDX, EV_4, mEV4);
+	DDX_Control(pDX, EV_5, mEV5);
+	DDX_Control(pDX, EV_6, mEV6);
+	DDX_Control(pDX, EV_7, mEV7);
+	DDX_Control(pDX, EV_8, mEV8);
+	DDX_Control(pDX, EV_9, mEV9);
+	DDX_Control(pDX, EV_10, mEV10);
+
+	DDX_Text(pDX, EV_1, theApp.evName[1]);
+	DDX_Text(pDX, EV_2, theApp.evName[2]);
+	DDX_Text(pDX, EV_3, theApp.evName[3]);
+	DDX_Text(pDX, EV_4, theApp.evName[4]);
+	DDX_Text(pDX, EV_5, theApp.evName[5]);
+	DDX_Text(pDX, EV_6, theApp.evName[6]);
+	DDX_Text(pDX, EV_7, theApp.evName[7]);
+	DDX_Text(pDX, EV_8, theApp.evName[8]);
+	DDX_Text(pDX, EV_9, theApp.evName[9]);
+	DDX_Text(pDX, EV_10, theApp.evName[0]);
 }
 
 BEGIN_MESSAGE_MAP(CTabEventDlg, CDialogEx)
@@ -1829,7 +1870,7 @@ void COptionDlg::OnBnClickedok()
 		CString cs((*it).c_str());
 		pHP->AddItem(cs,count++);
 	}
-
+	writeSetting(settingName);
 	EndDialog(0);
 }
 

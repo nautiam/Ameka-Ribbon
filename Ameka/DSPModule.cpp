@@ -338,7 +338,7 @@ void initial_dsp_data(LPVOID pParam)
 	mDoc->isRecord = FALSE;
 	mDoc->isSave = FALSE;
 	mDoc->m_dspProcess = NULL;
-	mDoc->eventID = 0;
+	mDoc->eventID = 10;
 }
 
 UINT DSP::DSPThread(LPVOID pParam)
@@ -476,7 +476,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 					mDoc->counter++;
 					buffer[16] = tempEventID;
 					if (tempEventID)
-						tempEventID = 0;
+						tempEventID = 10;
 
 					mDoc->object.Write(buffer, sizeof(buffer));
 				}
@@ -539,7 +539,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 				output[j].time = oldtime;
 				output[j].eventID = mDoc->eventID;
 				if (mDoc->eventID)
-					mDoc->eventID = 0;
+					mDoc->eventID = 10;
 				for (int i=0; i<MONTAGE_NUM; i++)				
 				{
 					output[j].value[i] = (uint16_t)audioData[i][j];					

@@ -89,7 +89,7 @@ public:
 	uint16_t* getMaxMin(uint16_t* inputData);
 	void drawRecData(CDC* pDC);
 	void drawLeadName(CDC* pDC);
-	void drawEvent(CDC* pDC);
+	void drawEvent(CDC* pDC, uint16_t evID);
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;

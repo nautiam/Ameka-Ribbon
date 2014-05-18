@@ -534,6 +534,7 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	uint16_t buflen = 0;
 	float maxWidth;
 	PrimaryDataType* data;
+	uint16_t crtEVID = 10;
 	
 	if (pDC == NULL || !this->mDoc->PrimaryData)
 	{
@@ -665,10 +666,13 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	MemDC.SelectObject(tmpPen);
 
 	channelNum = this->GetDocument()->mMon.mList.GetCount();
-
 	//draw all point to current bitmap
 	for(int i = 0; i < channelNum;i++)
 	{
+		if (data[0].eventID != 10)
+		{
+			crtEVID = data[0].eventID;
+		}
 		if (data[0].isDraw)
 		{
 			preTimePos = crtPos;
@@ -697,8 +701,13 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 		MemDC.LineTo((distance), tmp);
 	}
 	
-	for(int i = 0; i < channelNum; i++)
-		for(int j = 1; j < buflen; j++)
+	for(int j = 1; j < buflen; j++)
+	{
+		if (data[j].eventID != 10)
+		{
+			crtEVID = data[j].eventID;
+		}
+		for(int i = 0; i < channelNum; i++)
 		{
 			if (data[j].isDraw)
 			{
@@ -727,6 +736,7 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 			//MemDC.SetPixel((distance*(j+1)),tmp ,CUSTOM_PEN);
 			MemDC.LineTo((distance*(j+1)), tmp);	//
 		}
+	}
 	
 	//draw scan bar
 	CBrush brushS(CUSTOM_PEN);
@@ -750,7 +760,7 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	//free all resource
 	if (hasEv)
 	{
-		drawEvent(pDC);
+		drawEvent(pDC, GetDocument()->eventID);
 		hasEv = FALSE;
 	}
 	//DeleteObject(brushS);
@@ -1099,26 +1109,37 @@ void CAmekaView::drawRecData(CDC* pDC)
 
 	//draw lead name + line
 	//drawLeadName(&MemDC);
-
+	CFont txtFont;
+	txtFont.CreatePointFont(70, _T("Arial"), pDC);
 	//uint16_t maxPos = (arrPos + screenPosNum) <= pDoc->counter?(arrPos + screenPosNum):pDoc->counter;
 	channelNum = this->GetDocument()->mMon.mList.GetCount();
 
 	for (int i = 0; i < pDoc->counter - 1; i++)
 	{
-		if (pDoc->PrimaryData->get(i).isDraw)
+		PrimaryDataType crtData = pDoc->PrimaryData->get(i);
+		if (crtData.isDraw)
 		{
 			CPen* tmpPen = MemDC.SelectObject(&silverPen);
 			MemDC.MoveTo(i*distance, 0);
 			MemDC.LineTo(i*distance, rect.Height() - FOOT_RANGE);
 			MemDC.SelectObject(tmpPen);
 
-			time_t tim = pDoc->PrimaryData->get(i).time;
+			time_t tim =crtData.time;
 			if (tim > 0)
 				drawTime(&MemDC, tim, i*distance);
 		}
+		if (crtData.eventID >= 0 && crtData.eventID < 10)
+		{
+			CFont* tmpFont = MemDC.SelectObject(&txtFont);
+
+			MemDC.SetBkMode(TRANSPARENT);
+			CString evTxt = theApp.evName[crtData.eventID];
+			MemDC.TextOutW(i*distance - 15, 0, evTxt);
+			MemDC.SelectObject(tmpFont);
+		}
 		for (int j = 0; j < channelNum; j++)
 		{
-			int tmp = (((rect.Height() - FOOT_RANGE)*j)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)pDoc->PrimaryData->get(i).value[j]-m_BaseLine)/m_Amp)*graphData.scaleRate);
+			int tmp = (((rect.Height() - FOOT_RANGE)*j)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)crtData.value[j]-m_BaseLine)/m_Amp)*graphData.scaleRate);
 			if (tmp > (rect.Height() - FOOT_RANGE))
 			tmp = rect.Height() - FOOT_RANGE;
 			if (tmp < 0)
@@ -1138,6 +1159,7 @@ void CAmekaView::drawRecData(CDC* pDC)
 	pDC->BitBlt(MONNAME_BAR + 2, 0, maxWidth, rect.Height(), &MemDC, 0, 0, SRCCOPY);
 
 	DeleteObject(&bmp);
+	DeleteObject(&txtFont);
 	DeleteObject(&silverPen);
 	MemDC.DeleteDC();
 	//isDrawRec = FALSE;
@@ -1209,17 +1231,18 @@ void CAmekaView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	CScrollView::OnKeyUp(nChar, nRepCnt, nFlags);
 
+
 	// TODO: Add your message handler code here and/or call default
 	char evChar[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'};
 	CAmekaDoc* pDoc = GetDocument();
-	
+
 	if (!pDoc->isRecord && !isRunning)
 		return;
 
 	char* found = std::find (evChar, std::end (evChar), nChar);
 	if (found != std::end (evChar))
 	{
-		pDoc->eventID = nChar;
+		pDoc->eventID = nChar - '0';
 		evPos = crtPos;
 		if (evPos < MONNAME_BAR + 2 + 15)
 			evPos = MONNAME_BAR + 2 + 15;
@@ -1227,7 +1250,7 @@ void CAmekaView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 }
 
-void CAmekaView::drawEvent(CDC* pDC)
+void CAmekaView::drawEvent(CDC* pDC, uint16_t evID)
 {
 	/*CDC MemDC;
 	CBitmap bmp;
@@ -1244,9 +1267,11 @@ void CAmekaView::drawEvent(CDC* pDC)
 	pDC->SelectObject(&txtFont);
 
 	pDC->SetBkMode(TRANSPARENT);
-	CString evTxt = L"Event";
-	pDC->TextOutW(evPos - 15, 0, evTxt);
-
+	if (evID >= 0 && evID < 10)
+	{
+			CString evTxt = theApp.evName[evID];
+			pDC->TextOutW(evPos - 15, 0, evTxt);
+	}
 	//pDC->BitBlt(crtPos - 10, 0, 10, FOOT_RANGE, &MemDC, 0, 0, SRCCOPY);
 
 	DeleteObject(&txtFont);

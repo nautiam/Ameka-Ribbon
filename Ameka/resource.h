@@ -57,7 +57,6 @@
 #define DLG_Opt_Rec                     324
 #define DLG_Opt_Event                   325
 #define DLG_Print                       326
-#define IDD_DIALOG1                     328
 #define DLG_Loading                     328
 #define IDC_COMBO1                      1000
 #define IDC_CHECK1                      1001
@@ -74,6 +73,7 @@
 #define IDC_EDIT3                       1007
 #define info_2ndName                    1007
 #define view_lp                         1007
+#define EV_5                            1007
 #define IDC_DATETIMEPICKER1             1008
 #define info_birthday                   1008
 #define IDC_CHECK5                      1008
@@ -136,6 +136,15 @@
 #define photic_Width                    1065
 #define photic_WRate                    1066
 #define LOAD_Progress                   1067
+#define EV_1                            1068
+#define EV_2                            1077
+#define EV_3                            1078
+#define EV_4                            1079
+#define EV_6                            1080
+#define EV_7                            1081
+#define EV_8                            1082
+#define EV_9                            1083
+#define EV_10                           1084
 #define ID_WRITE_PASTEASHYPERLINK       32770
 #define MN_Open                         32771
 #define MN_Close                        32772
@@ -180,7 +189,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        329
 #define _APS_NEXT_COMMAND_VALUE         32820
-#define _APS_NEXT_CONTROL_VALUE         1068
+#define _APS_NEXT_CONTROL_VALUE         1085
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

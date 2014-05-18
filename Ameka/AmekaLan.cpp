@@ -175,7 +175,17 @@ void loadSetting(const char* fileName)
 				}
 				iCount++;
 			}
-			break;
+		}
+		if (strcmp(tmp, "event") == 0)
+		{
+			for(TiXmlElement* e = elem->FirstChildElement(); e != NULL; e = e->NextSiblingElement())
+			{
+				if (e->Attribute("Name") != NULL && e->Attribute("ID") != NULL &&
+					atoi(e->Attribute("ID")) < 10 && atoi(e->Attribute("ID")) >= 0)
+				{
+					theApp.evName[atoi(e->Attribute("ID"))] = e->Attribute("Name");
+				}
+			}
 		}
 	}
 	doc.Clear();
@@ -207,7 +217,7 @@ CPoint* getElecPoint(uint16_t num)
 
 void writeSetting(const char* fileName)
 {		
-	CString tempElecName[16] = {L"ml", L"cd1", L"cd2", L"tf1", L"f2", L"tf2", L"tf3", L"ld", L"ss", L"ss2", L"se3", L"af", L"af1", L"af2", L"af3", L"af4"};
+	//CString tempElecName[16] = {L"ml", L"cd1", L"cd2", L"tf1", L"f2", L"tf2", L"tf3", L"ld", L"ss", L"ss2", L"se3", L"af", L"af1", L"af2", L"af3", L"af4"};
 	TiXmlDocument doc;
 	TiXmlElement* root = new TiXmlElement("root");
 	doc.LinkEndChild(root);
@@ -215,13 +225,34 @@ void writeSetting(const char* fileName)
 	TiXmlElement* element = new TiXmlElement("Lead");
 	element->SetAttribute("Name", "lead");
 	root->LinkEndChild(element);
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < theApp.elecNum; i++)
 	{
-		TiXmlElement* element1 = new TiXmlElement((LPCSTR)(CStringA)itoS(i+1));
+		TiXmlElement* element1 = new TiXmlElement("Lead");
 		element->LinkEndChild(element1);
-		element1->SetAttribute("Name", (LPCSTR)(CStringA)tempElecName[i]);
+		element1->SetAttribute("ID", i + 1);
+		element1->SetAttribute("Name", (LPCSTR)(CStringA)theApp.mElec[i].eName);
+		element1->SetAttribute("point1", theApp.mElec[i].ePos.x);
+		element1->SetAttribute("point2", theApp.mElec[i].ePos.y);
+	}
+
+	element = new TiXmlElement("Event");
+	element->SetAttribute("Name", "event");
+	root->LinkEndChild(element);
+	for (int i = 0; i < 10; i++)
+	{
+		TiXmlElement* element1 = new TiXmlElement("Event");
+		element->LinkEndChild(element1);
+		element1->SetAttribute("Name", (LPCSTR)(CStringA)theApp.evName[i]);
+		element1->SetAttribute("ID", i);
 	}
 
 	bool success = doc.SaveFile(fileName);
 	doc.Clear();
+}
+
+CString getEventName(uint16_t evID)
+{
+	if (evID > 10 || evID < 0)
+		return L"";
+	return theApp.evName[evID];
 }

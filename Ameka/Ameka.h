@@ -55,6 +55,7 @@ public:
 	amekaLan* mnLan;
 	Aelectrode* mElec;
 	uint16_t elecNum;
+	CString evName[10];
 
 	float photicMin;
 	float photicWRate;

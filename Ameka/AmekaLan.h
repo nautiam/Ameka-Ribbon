@@ -19,4 +19,6 @@ void writeLan(const char* fileName);
 
 void writeSetting(const char* fileName);
 
+CString getEventName(uint16_t evID);
+
 #endif
