@@ -572,18 +572,7 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	{
 		delete bitmap;
 		return -2;
-	}
-	
-	
-	if (isNull)
-	{
-		prePos = data[buflen - 1];
-		dataBuffer[count++] = data[buflen - 1];
-		isNull = false;
-		delete [] data;
-		delete bitmap;
-		return 0;
-	}
+	}	
 
 	for (uint16_t i = 0; i < buflen; i++)
 	{
@@ -667,40 +656,43 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 
 	channelNum = this->GetDocument()->mMon.mList.GetCount();
 	//draw all point to current bitmap
-	for(int i = 0; i < channelNum;i++)
+	if (!isNull)
 	{
-		if (data[0].eventID != 10)
+		for(int i = 0; i < channelNum;i++)
 		{
-			crtEVID = data[0].eventID;
-		}
-		if (data[0].isDraw)
-		{
-			preTimePos = crtPos;
-			onDrawTime = TRUE;
+			if (data[0].eventID != 10)
+			{
+				crtEVID = data[0].eventID;
+			}
+			if (data[0].isDraw)
+			{
+				preTimePos = crtPos;
+				onDrawTime = TRUE;
 
-			CPen* tmpPen = MemDC.SelectObject(&silverPen);
-			MemDC.MoveTo(0, 0);
-			MemDC.LineTo(0, rect.Height() - FOOT_RANGE);
-			MemDC.SelectObject(tmpPen);
+				CPen* tmpPen = MemDC.SelectObject(&silverPen);
+				MemDC.MoveTo(0, 0);
+				MemDC.LineTo(0, rect.Height() - FOOT_RANGE);
+				MemDC.SelectObject(tmpPen);
 
-			drawTime(pDC, data[0].time, crtPos);
+				drawTime(pDC, data[0].time, crtPos);
+			}
+			tmp = (((rect.Height() - FOOT_RANGE)*i)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)prePos.value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
+			if (tmp > (rect.Height() - FOOT_RANGE))
+				tmp = rect.Height() - FOOT_RANGE;
+			if (tmp < 0)
+				tmp = 0;
+			//MemDC.SetPixel(0, tmp, CUSTOM_PEN);
+			MemDC.MoveTo(0, tmp);
+			tmp = (((rect.Height() - FOOT_RANGE)*i)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)data[0].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
+			if (tmp > (rect.Height() - FOOT_RANGE))
+				tmp = rect.Height() - FOOT_RANGE;
+			if (tmp < 0)
+				tmp = 0;
+			//MemDC.SetPixel(distance,tmp ,CUSTOM_PEN);
+			MemDC.LineTo((distance), tmp);
 		}
-		tmp = (((rect.Height() - FOOT_RANGE)*i)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)prePos.value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
-		if (tmp > (rect.Height() - FOOT_RANGE))
-			tmp = rect.Height() - FOOT_RANGE;
-		if (tmp < 0)
-			tmp = 0;
-		//MemDC.SetPixel(0, tmp, CUSTOM_PEN);
-		MemDC.MoveTo(0, tmp);
-		tmp = (((rect.Height() - FOOT_RANGE)*i)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)data[0].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
-		if (tmp > (rect.Height() - FOOT_RANGE))
-			tmp = rect.Height() - FOOT_RANGE;
-		if (tmp < 0)
-			tmp = 0;
-		//MemDC.SetPixel(distance,tmp ,CUSTOM_PEN);
-		MemDC.LineTo((distance), tmp);
 	}
-	
+	isNull = FALSE;
 	for(int j = 1; j < buflen; j++)
 	{
 		if (data[j].eventID != 10)
