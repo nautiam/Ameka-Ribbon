@@ -24,11 +24,26 @@
 #include <iostream>
 #include <fstream>
 
-#include "AmekaDoc.h"
+#include "AmekaView.h"
+#include "MainFrm.h"
+#include "ChildFrm.h"
+#include "tinystr.h"
+#include "tinyxml.h"
+#include "AmekaLan.h"
+#include "AmekaUserConfig.h"
 
 #define portNo "COM2"
 #define BAUD_RATE "115200"
 #define settingFileName "AmekaSetting.conf"
+
+#define strSen "10 15 30 60 90 120"
+#define strSpeed "15 30 75 150 200 300"
+#define strLP "10 15 20 30 40 50 60"
+#define strHP "0.1 0.2 0.5 1 1.5"
+#define strCOM "COM1 COM2 COM3 COM4 COM5 COM6 COM7 COM8 COM9 COM10"
+#define strBaud "9600 14400 19200 38400 56000 115200 "
+#define xmlName "listmontage.conf"
+#define settingName "config.conf"
 
 using namespace std;
 
@@ -36,6 +51,8 @@ using namespace std;
 // CAmekaApp:
 // See Ameka.cpp for the implementation of this class
 //
+
+vector<string> Tokenize(CString buf, string delimiters = " ");
 
 class CAmekaApp : public CWinAppEx
 {

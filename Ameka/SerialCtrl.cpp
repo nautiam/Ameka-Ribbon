@@ -263,7 +263,7 @@ int ReadThread::Run()
                 /* Chuyen trang thai State */
                 m_serialIO->m_bState = S_NOCONNECTED;
 				//AfxMessageBox("Open serial communication successfully.");
-				LOG(DEBUG) << "Open serial communication successfully";
+				//LOG(DEBUG) << "Open serial communication successfully";
                 /* Su dung su kien EV_RXCHAR cua Comport*/
                 if (m_serialIO->m_serialCtrl.SetPortEvent(EV_RXCHAR) == 0)
 				{

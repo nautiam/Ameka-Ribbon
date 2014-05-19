@@ -107,6 +107,23 @@ struct GraphData
 	uint16_t gridInterval;
 };
 
+//patient information structure
+struct PatientInfo {
+	CString fname;
+	CString lname;
+	CString surName;
+	CString note;
+	CTime birthday;
+	uint16_t uID;
+	uint8_t sex;
+	bool lefthanded;
+};
+
+
+/************************************************************
+Data struct for Ameka
+************************************************************/
+
 //template<class T> CList<int, int> *rawData[16];
 struct RawDataType {
 	uint16_t value[LEAD_NUMBER];

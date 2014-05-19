@@ -115,9 +115,13 @@
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="EnvSetupModule.h" />
     <ClInclude Include="GraphModule.h" />
+    <ClInclude Include="InfoDlg.h" />
     <ClInclude Include="kiss_fft.h" />
     <ClInclude Include="LoaddingDlg.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="MontageDlg.h" />
+    <ClInclude Include="OptionDlg.h" />
+    <ClInclude Include="PhoticDlg.h" />
     <ClInclude Include="RecordingModule.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SerialCtrl.h" />
@@ -140,9 +144,13 @@
     <ClCompile Include="DSPModule.cpp" />
     <ClCompile Include="dsp_filters.cpp" />
     <ClCompile Include="GraphModule.cpp" />
+    <ClCompile Include="InfoDlg.cpp" />
     <ClCompile Include="kiss_fft.cpp" />
     <ClCompile Include="LoaddingDlg.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="MontageDlg.cpp" />
+    <ClCompile Include="OptionDlg.cpp" />
+    <ClCompile Include="PhoticDlg.cpp" />
     <ClCompile Include="SerialCtrl.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
