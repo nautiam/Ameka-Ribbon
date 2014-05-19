@@ -8,7 +8,12 @@ CInfoDlg::CInfoDlg() : CDialogEx(CInfoDlg::IDD)
 int CInfoDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	info_sex.SetCurSel(0);
+	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
+	if (!pDoc)
+		return 0;
+
+
+	info_sex.SetCurSel(pDoc->patientInfo.sex);
 	return 0;
 }
 

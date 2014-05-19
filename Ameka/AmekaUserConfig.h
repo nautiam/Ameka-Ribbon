@@ -111,12 +111,20 @@ struct GraphData
 struct PatientInfo {
 	CString fname;
 	CString lname;
-	CString surName;
+	CString surname;
 	CString note;
 	CTime birthday;
 	uint16_t uID;
 	uint8_t sex;
 	bool lefthanded;
+	PatientInfo() {
+		fname = "N.A";
+		lname = "N.A";
+		surname = "N.A";
+		note = "N.A";
+		uID = 0;
+		sex = FALSE;
+	};
 };
 
 

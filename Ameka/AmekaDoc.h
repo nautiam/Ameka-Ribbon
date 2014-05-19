@@ -29,6 +29,7 @@ protected: // create from serialization only
 
 // Attributes
 public:
+	PatientInfo patientInfo;
 	Amontage mMon;
 	DSPData mDSP;
 	CMyArray<Aelectrode, Aelectrode &> mElec;
