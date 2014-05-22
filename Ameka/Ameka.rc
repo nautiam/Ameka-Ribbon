@@ -326,7 +326,7 @@ BEGIN
     LTEXT           "Ngày sinh",IDC_STATIC,177,18,32,8
     LTEXT           "Giõìi tính",IDC_STATIC,183,41,26,8
     LTEXT           "MaÞ sôì",IDC_STATIC,189,65,20,8
-    EDITTEXT        info_fname,60,16,90,14,ES_AUTOHSCROLL
+    EDITTEXT        info_fistName,60,16,90,14,ES_AUTOHSCROLL
     EDITTEXT        info_lname,60,39,90,14,ES_AUTOHSCROLL
     EDITTEXT        info_surName,60,63,90,14,ES_AUTOHSCROLL
     CONTROL         "",info_birthday,"SysDateTimePick32",DTS_RIGHTALIGN | WS_TABSTOP,210,15,92,15

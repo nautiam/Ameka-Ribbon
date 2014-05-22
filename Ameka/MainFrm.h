@@ -17,8 +17,8 @@
 class MyToolBar : public CMFCRibbonBar
 {
 public:
-    virtual void OnUpdateCmdUI(CFrameWnd* pTarget, BOOL bDisableIfNoHndler)
-    { return CMFCRibbonBar::OnUpdateCmdUI(pTarget, FALSE);}
+	virtual void OnUpdateCmdUI(CFrameWnd* pTarget, BOOL bDisableIfNoHndler)
+	{ return CMFCRibbonBar::OnUpdateCmdUI(pTarget, FALSE);}
 };
 
 class CMainFrame : public CMDIFrameWndEx
@@ -27,20 +27,23 @@ class CMainFrame : public CMDIFrameWndEx
 public:
 	CMainFrame();
 
-// Attributes
+	// Attributes
 public:
 
-// Operations
+	// Operations
 public:
 
-// Overrides
+	// Overrides
 public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 
-// Implementation
+	// Implementation
 public:
 	virtual ~CMainFrame();
 	MyToolBar     m_wndRibbonBar;
+	bool startEnable;
+	bool stopEnable;
+	bool recEnable;
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
@@ -52,7 +55,7 @@ protected:  // control bar embedded members
 	CMFCRibbonStatusBar  m_wndStatusBar;
 	CMFCCaptionBar    m_wndCaptionBar;
 
-// Generated message map functions
+	// Generated message map functions
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnWindowManager();
@@ -72,6 +75,9 @@ public:
 	afx_msg void OnHp();
 	afx_msg void OnSave();
 	afx_msg void OnOpen();
+	afx_msg void OnUpdateStartdemo(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateStopdemo(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateRecording(CCmdUI *pCmdUI);
 };
 
 

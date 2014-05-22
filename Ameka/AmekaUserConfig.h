@@ -22,37 +22,37 @@ class CMyArray : public CArray<T , T2>
 {
 public:
 
-    // constructors
+	// constructors
 
-    CMyArray(){}
+	CMyArray(){}
 
-    CMyArray(int n) { SetSize(n);}
+	CMyArray(int n) { SetSize(n);}
 
-    CMyArray(int n, const T& t) 
-    { 
-        for (int i=0; i<n; ++i) Add(t); 
-    }
+	CMyArray(int n, const T& t) 
+	{ 
+		for (int i=0; i<n; ++i) Add(t); 
+	}
 
-    // copy constructor
+	// copy constructor
 
-    CMyArray (const CMyArray& rhs) { Append(rhs); }
+	CMyArray (const CMyArray& rhs) { Append(rhs); }
 
-    // copy assignment operator
+	// copy assignment operator
 
-    CMyArray& operator = (const CMyArray& rhs) 
-    {
-        if (this != &rhs)
-        {
-            RemoveAll();
-            Append(rhs);
-        }
+	CMyArray& operator = (const CMyArray& rhs) 
+	{
+		if (this != &rhs)
+		{
+			RemoveAll();
+			Append(rhs);
+		}
 
-        return *this;
-    }
+		return *this;
+	}
 
-    // destructor
+	// destructor
 
-    ~CMyArray(){}
+	~CMyArray(){}
 };
 
 // Electrode struct
@@ -61,7 +61,7 @@ struct Aelectrode {
 	CString eName;
 	CPoint ePos;
 	/*Aelectrode& operator=( const Aelectrode& rhs ) { return *this; }
-    BOOL operator==( const Aelectrode& rhs ) const { return TRUE; }*/
+	BOOL operator==( const Aelectrode& rhs ) const { return TRUE; }*/
 };
 
 // Lead struct
@@ -70,7 +70,7 @@ struct Alead {
 	uint16_t lFirstID;
 	uint16_t lSecondID;
 	/*Alead& operator=( const Alead& rhs ) { return *this; }
-    BOOL operator==( const Alead& rhs ) const { return TRUE; }*/
+	BOOL operator==( const Alead& rhs ) const { return TRUE; }*/
 	//Color color;
 };
 // Montage struct
@@ -81,7 +81,7 @@ public:
 	uint16_t mID;
 	CString mName;
 	/*Amontage& operator=( const Amontage& rhs ) { return *this; }
-    BOOL operator==( const Amontage& rhs ) const { return TRUE; }*/
+	BOOL operator==( const Amontage& rhs ) const { return TRUE; }*/
 };
 
 // DSP Engine
@@ -168,7 +168,7 @@ public:
 	RawDataType* popAll();
 	RawDataType get(uint16_t index);
 	//RawDataType* getData(uint16_t pos, uint16_t len);
-	
+
 private:
 	// to be used later
 	bool onLock;
@@ -194,7 +194,7 @@ public:
 	T* popAll();
 	T* popData(uint16_t num);
 	T* checkPopData(uint16_t num);
-	
+
 private:
 	// to be used later
 	bool onLock;
@@ -340,7 +340,7 @@ T amekaData<T>::get(uint16_t index)
 {
 	//
 	/*if (isEmpty())
-		return NULL;*/
+	return NULL;*/
 
 	return arrData[(index + crtWPos)%dataLen];
 };

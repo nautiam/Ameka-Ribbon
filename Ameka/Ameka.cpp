@@ -38,7 +38,7 @@
 
 _INITIALIZE_EASYLOGGINGPP
 
-using namespace std;
+	using namespace std;
 
 // CAmekaApp
 
@@ -67,7 +67,7 @@ BEGIN_MESSAGE_MAP(CAmekaApp, CWinAppEx)
 	ON_COMMAND(MN_Scan, &CAmekaApp::OnScan)
 	ON_COMMAND(MN_Lan, &CAmekaApp::OnLan)
 	ON_COMMAND(MN_Recording, &CAmekaApp::OnRecording)
-//	ON_COMMAND(MN_StopRec, &CAmekaApp::OnStoprec)
+	//	ON_COMMAND(MN_StopRec, &CAmekaApp::OnStoprec)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------//
@@ -152,11 +152,11 @@ CAmekaApp::CAmekaApp()
 
 	setFile.open(settingFileName);
 	if(!setFile)
-    {
-        std::cerr<<"Cannot open the output file."<<std::endl;
+	{
+		std::cerr<<"Cannot open the output file."<<std::endl;
 		m_portNo = "COM8";
 		m_baudRate = "115200";
-    }
+	}
 	else
 	{
 		setFile >> line;
@@ -165,7 +165,7 @@ CAmekaApp::CAmekaApp()
 		m_baudRate = line;
 		setFile.close();
 	}
-	
+
 
 	// support Restart Manager
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_ALL_ASPECTS;
@@ -304,14 +304,14 @@ int CAmekaApp::ExitInstance()
 	/*POSITION pos = monList.GetHeadPosition();
 	while(pos)
 	{
-		Amontage mon = monList.GetNext(pos);
-		POSITION pos1 = mon.mList.GetHeadPosition();
-		while(pos1)
-		{
-			delete mon.mList.GetNext(pos1);
-		}
-		mon.mList.RemoveAll();
-		delete mon;
+	Amontage mon = monList.GetNext(pos);
+	POSITION pos1 = mon.mList.GetHeadPosition();
+	while(pos1)
+	{
+	delete mon.mList.GetNext(pos1);
+	}
+	mon.mList.RemoveAll();
+	delete mon;
 	}
 	monList.RemoveAll();*/
 	return CWinAppEx::ExitInstance();
@@ -328,13 +328,13 @@ class CAboutDlg : public CDialogEx
 public:
 	CAboutDlg();
 
-// Dialog Data
+	// Dialog Data
 	enum { IDD = IDD_ABOUTBOX };
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
-// Implementation
+	// Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
@@ -390,13 +390,13 @@ class CSettingDlg : public CDialogEx
 public:
 	CSettingDlg();
 
-// Dialog Data
+	// Dialog Data
 	enum { IDD = DLG_Setting };
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
-// Implementation
+	// Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
@@ -491,13 +491,13 @@ class CLogDlg : public CDialogEx
 public:
 	CLogDlg();
 
-// Dialog Data
+	// Dialog Data
 	enum { IDD = DLG_Log};
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
-// Implementation
+	// Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
@@ -535,13 +535,13 @@ class CWaveDlg : public CDialogEx
 public:
 	CWaveDlg();
 
-// Dialog Data
+	// Dialog Data
 	enum { IDD = DLG_Wave};
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
-// Implementation
+	// Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
@@ -588,7 +588,7 @@ void CAmekaApp::OnFileClose()
 				CFrameWnd* pFrame = pView->GetParentFrame(); 
 				if (pFrame) 
 				{ 
-				pFrame->SendMessage(WM_CLOSE); 
+					pFrame->SendMessage(WM_CLOSE); 
 				} 
 			} 
 		}
@@ -603,13 +603,13 @@ class CEventDlg : public CDialogEx
 public:
 	CEventDlg();
 
-// Dialog Data
+	// Dialog Data
 	enum { IDD = DLG_Event};
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
-// Implementation
+	// Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
 	virtual BOOL OnInitDialog();
@@ -675,16 +675,16 @@ void CAmekaApp::OnDemo()
 	CAmekaView *pView = CAmekaView::GetView();
 	if (!pView->isRunning)
 	{
-		pView->pThread = AfxBeginThread(pView->graphHandle, (LPVOID)pView);
+	pView->pThread = AfxBeginThread(pView->graphHandle, (LPVOID)pView);
 	}	pView->isRunning = true;
 	*/
 	if (theApp.docList.IsEmpty())
 		return;
 	//if ((theApp.pIO != NULL) && (theApp.pIO->m_bState == S_CONNECTED))
 	CAmekaView *pView = CAmekaView::GetView();
-		CAmekaDoc *pDoc = CAmekaDoc::GetDoc();
+	CAmekaDoc *pDoc = CAmekaDoc::GetDoc();
 	if (pView->isRunning || pDoc->isRecord)
-			return;
+		return;
 	{
 		CRect rect;
 		pView->GetClientRect(&rect);
@@ -705,7 +705,7 @@ void CAmekaApp::OnDemo()
 			pView->isRunning = true;
 		}
 	}
-	
+
 }
 
 void CAmekaApp::OnStop()
@@ -730,7 +730,7 @@ void CAmekaApp::OnStop()
 	}
 
 	/*if (!pDoc->isRecord)
-		return;*/
+	return;*/
 
 	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
 	CMFCRibbonButton* pStopRec = DYNAMIC_DOWNCAST(
@@ -758,7 +758,7 @@ void CAmekaApp::OnStop()
 
 			/*if (WaitForSingleObject(pDoc->CloseFileEvent, INFINITE) == WAIT_OBJECT_0)
 			{*/
-			
+
 
 			pDoc->saveFileName = pDoc->recordFileName;
 			/*uint16_t buffer[4] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
@@ -827,24 +827,24 @@ void CAmekaApp::OnStop()
 
 vector<string> Tokenize(CString buf, string delimiters)
 {   
-    vector<string> tokens;
+	vector<string> tokens;
 	CT2CA pszConvertedAnsiString (buf);
 	std::string str(pszConvertedAnsiString);
-    string::size_type nwpos; //position of first non white space, which means it is     first real char
-    nwpos = str.find_first_not_of(delimiters, 0); //ignore the whitespace before the first word
+	string::size_type nwpos; //position of first non white space, which means it is     first real char
+	nwpos = str.find_first_not_of(delimiters, 0); //ignore the whitespace before the first word
 
-    string::size_type pos = str.find_first_of(delimiters, nwpos);
+	string::size_type pos = str.find_first_of(delimiters, nwpos);
 
-    while (string::npos != pos || string::npos != nwpos)
-    {
-        // Found a token, add it to the vector.
-        tokens.push_back(str.substr(nwpos, pos - nwpos));
-        // Skip delimiters.  Note the "not_of"
-        nwpos = str.find_first_not_of(delimiters, pos);
-        // Find next "non-delimiter"
-        pos = str.find_first_of(delimiters, nwpos);
-    }
-    return tokens;
+	while (string::npos != pos || string::npos != nwpos)
+	{
+		// Found a token, add it to the vector.
+		tokens.push_back(str.substr(nwpos, pos - nwpos));
+		// Skip delimiters.  Note the "not_of"
+		nwpos = str.find_first_not_of(delimiters, pos);
+		// Find next "non-delimiter"
+		pos = str.find_first_of(delimiters, nwpos);
+	}
+	return tokens;
 };
 
 
@@ -966,6 +966,9 @@ void CAmekaApp::OnPortOpen()
 		Sleep(100);
 		if (pIO->m_bState == S_CONNECTED || pIO->m_bState == S_NOCONNECTED)
 		{
+			pMainWnd->stopEnable = TRUE;
+			pMainWnd->startEnable = TRUE;
+			pMainWnd->recEnable = TRUE;
 			pPortOpen->SetText(L"Đóng cổng");
 		}
 		else
@@ -977,6 +980,9 @@ void CAmekaApp::OnPortOpen()
 	else
 	{
 		pPortOpen->SetText(L"Mở cổng");
+		pMainWnd->startEnable = FALSE;
+		pMainWnd->stopEnable = FALSE;
+		pMainWnd->recEnable = FALSE;
 		delete pIO;
 		pIO = NULL;
 	}
@@ -990,10 +996,10 @@ void CAmekaApp::OnScan()
 	// TODO: Add your command handler code here
 	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
 	//show port list
-    TCHAR lpTargetPath[5000]; // buffer to store the path of the COMPORTS
-    DWORD test;
-    bool gotPort=0; // in case the port is not found
-    CMFCRibbonComboBox* pPort = DYNAMIC_DOWNCAST(
+	TCHAR lpTargetPath[5000]; // buffer to store the path of the COMPORTS
+	DWORD test;
+	bool gotPort=0; // in case the port is not found
+	CMFCRibbonComboBox* pPort = DYNAMIC_DOWNCAST(
 		CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_PortName));
 	if (pPort != NULL)
 	{
@@ -1002,10 +1008,10 @@ void CAmekaApp::OnScan()
 			CString str;
 			str.Format(_T("%d"),i);
 			CString ComName=CString("COM") + CString(str); // converting to COM0, COM1, COM2
-        
+
 			test = QueryDosDevice(ComName, (LPWSTR)lpTargetPath, 5000);
 
-				// Test the return value and error if any
+			// Test the return value and error if any
 			if(test!=0) //QueryDosDevice returns zero if it didn't find an object
 			{
 				pPort->AddItem((CString)ComName); // add to the ComboBox
@@ -1025,7 +1031,7 @@ void CAmekaApp::OnScan()
 			//pPort->SetEditText(pPort->GetItem(0));
 			pPort->SelectItem(0);
 		}
-    }
+	}
 }
 
 

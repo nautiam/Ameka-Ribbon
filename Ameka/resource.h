@@ -74,6 +74,7 @@
 #define info_2ndName                    1007
 #define view_lp                         1007
 #define EV_5                            1007
+#define info_surName                    1007
 #define IDC_DATETIMEPICKER1             1008
 #define info_birthday                   1008
 #define IDC_CHECK5                      1008
@@ -93,7 +94,10 @@
 #define evt_cancel                      1019
 #define evt_list                        1020
 #define info_1stname                    1021
+#define info_lname                      1021
 #define info_famName                    1022
+#define info_fname                      1022
+#define info_fistName                   1022
 #define info_ok                         1023
 #define info_cancel                     1024
 #define log_ok                          1025
