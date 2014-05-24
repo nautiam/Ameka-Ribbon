@@ -74,7 +74,8 @@ CAmekaView::CAmekaView()
 	isResize = FALSE;
 	lastDistance = 0;
 	isDrawRec = FALSE;
-	m_Tips.Create(CSize(X_TOOLTIP, Y_TOOLTIP));
+	m_Tips.Create(CSize(X_TOOLTIP, Y_TOOLTIP), this);
+	m_Pos.Create(CSize(X_TOOLTIP, Y_TOOLTIP), this);
 }
 
 CAmekaView::~CAmekaView()
@@ -403,7 +404,7 @@ BOOL CAmekaView::OnEraseBkgnd(CDC* pDC)
 void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-	return;
+	//return;
 	CView::OnMouseMove(nFlags, point);
 
 	if (!isNull && !isRunning && isDrawRec)
@@ -413,11 +414,25 @@ void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
 
 		CPoint ptLog = point;
 		ClientToScreen(&ptLog);
-		uint16_t* posResult = this->getDataFromPos(point, crtPos, this);
+
+		CRect rect;
+		GetClientRect(&rect);
+		/*if (point.x <= MONNAME_BAR + 2 || point.y > rect.Height() - FOOT_RANGE || point.x > rect.Width() || point.y < 0)
+			return;*/
+
+		uint16_t* posResult = this->getDataFromPos(point, this);
 
 		uint16_t* valResult = getMaxMin(posResult);
 
+		if (!valResult)
+			return;
+
 		CString strTemp;
+
+		CAmekaDoc* pDoc = GetDocument();
+
+		strTemp.Format(_T("Value: %d\nMin: %d\nMax: %d\n"), pDoc->primaryDataArray[posResult[0]].value[posResult[1]],
+			pDoc->primaryDataArray[valResult[0]].value[posResult[1]], pDoc->primaryDataArray[valResult[1]].value[posResult[1]]) ;
 		//strTemp.Format(L"Data value: %d\r\nMix value: %d\r\nMax value: %d", this->dataBuffer[posResult[0]].value[posResult[1]], fuck[0], fuck[1]);
 		// show tool tip in mouse move
 		int xPos, yPos;
@@ -437,13 +452,21 @@ void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
 		{
 			yPos = ptLog.y + 5;
 		}
+		
+		m_Pos.SetValue(valResult, posResult[1]);
+		m_Pos.SetRectSize(CSize(distance*(valResult[1] - valResult[0]), rect.Height() - FOOT_RANGE));
+		this->GetWindowRect(&rect);
+		m_Pos.ShowRect(rect.left + valResult[0]*distance - GetDeviceScrollPosition().x + MONNAME_BAR + 4, rect.top + 2);
 		m_Tips.ShowTips(xPos, yPos, strTemp);
+		delete [] posResult;
+		delete [] valResult;
 
 		CView::OnMouseMove(nFlags, point);
 	}
 	else
 	{
 		m_Tips.HideTips();
+		m_Pos.HideRect();
 	}
 }
 
@@ -604,7 +627,7 @@ int CAmekaView::amekaDrawPos(CDC* pDC)
 	{
 		if (crtPos + drawW > maxWidth)
 		{
-			if(NULL == bitmap->CreateCompatibleBitmap(pDC, ceil(maxWidth - crtPos), rect.Height()))
+			if(NULL == bitmap->CreateCompatibleBitmap(pDC, (maxWidth - crtPos), rect.Height()))
 			{
 				DWORD tmp = GetLastError();
 				LOG(ERROR) << static_cast <int>(tmp);
@@ -948,7 +971,7 @@ int CAmekaView::drawBarGraph( void )
 	return 0;
 };
 
-uint16_t* CAmekaView::getDataFromPos(CPoint mousePos, float crtPos, CAmekaView* pView)
+uint16_t* CAmekaView::getDataFromPos(CPoint mousePos, CAmekaView* pView)
 {
 	uint16_t* result = new uint16_t[2];
 	CRect rect;
@@ -968,16 +991,16 @@ uint16_t* CAmekaView::getDataFromPos(CPoint mousePos, float crtPos, CAmekaView* 
 
 	float xDistance;
 	float distance = (float)this->graphData.paperSpeed*(float)this->graphData.dotPmm/this->graphData.sampleRate;
-	xDistance = crtPoint + crtPos - MONNAME_BAR - 2;
+	xDistance = crtPoint + xMousePos - MONNAME_BAR - 2;
 	//get position
 	uint16_t posNum = (uint16_t)xDistance/distance;
 	int pos = 0;
 	
-	uint16_t val = abs(mousePos.y - ((rect.Height() - FOOT_RANGE)/this->channelNum)/2 - (((float)pDoc->PrimaryData->get(posNum).value[0]
+	uint16_t val = abs(mousePos.y - ((rect.Height() - FOOT_RANGE)/this->channelNum)/2 - (((float)pDoc->primaryDataArray[posNum].value[0]
 						- this->m_BaseLine)/this->m_Amp)*this->graphData.scaleRate);
 	for (int i = 0; i < LEAD_NUMBER; i++)
 	{
-		int tmp = ((rect.Height() - FOOT_RANGE)*i/this->channelNum) + ((rect.Height() - FOOT_RANGE)/this->channelNum)/2 - (((float)pDoc->PrimaryData->get(posNum).value[i]
+		int tmp = ((rect.Height() - FOOT_RANGE)*i/this->channelNum) + ((rect.Height() - FOOT_RANGE)/this->channelNum)/2 - (((float)pDoc->primaryDataArray[posNum].value[i]
 						- this->m_BaseLine)/this->m_Amp)*this->graphData.scaleRate;
 		if (abs(mousePos.y - tmp) < val)
 		{
@@ -996,59 +1019,43 @@ uint16_t* CAmekaView::getMaxMin(uint16_t* inputData)
 	uint16_t* result = new uint16_t[2];
 	//find low and high range
 	int lowVal, highVal;
+	CAmekaDoc* pDoc = GetDocument();
+	if (!pDoc || !inputData)
+		return NULL;
+	if (inputData[0] < 0 || inputData[0] > pDoc->counter)
+		return NULL;
 
-	if (inputData[0] > this->count)
+	if ((inputData[0] - CHECK_RANGE) > 0)
 	{
-		if ((inputData[0] - CHECK_RANGE ) > 0 )
-		{
-			lowVal = inputData[0] - CHECK_RANGE;
-		}
-		else
-		{
-			lowVal = 0;
-		}
-
-		if ((inputData[0] + CHECK_RANGE)%this->bufLen < this->count - 1)
-		{
-			highVal = inputData[0] + CHECK_RANGE + this->bufLen;
-		}
-		else
-		{
-			highVal = this->count - 1 + this->bufLen;
-		}
+		lowVal = inputData[0] - CHECK_RANGE;
 	}
 	else
 	{
-		if ((inputData[0] - CHECK_RANGE + this->bufLen ) > this->count )
-		{
-			lowVal = inputData[0] - CHECK_RANGE + this->bufLen;
-		}
-		else
-		{
-			lowVal = this->count;
-		}
-
-		if ((inputData[0] + CHECK_RANGE) < this->count - 1)
-		{
-			highVal = inputData[0] + CHECK_RANGE + this->bufLen;
-		}
-		else
-		{
-			highVal = this->count - 1 + this->bufLen;
-		}
+		lowVal = 0;
 	}
+	if ((inputData[0] + CHECK_RANGE ) < pDoc->counter )
+	{
+		highVal = inputData[0] + CHECK_RANGE;
+	}
+	else
+	{
+		highVal = pDoc->counter;
+	}
+	if (lowVal >= highVal)
+		return NULL;
+		
 	//find max and min position in range
-	uint16_t maxVal = 0;
-	uint16_t minVal = this->dataBuffer[lowVal%this->bufLen].value[inputData[1]];
+	uint16_t maxVal = lowVal;
+	uint16_t minVal = lowVal;
 	for (int i = lowVal; i < highVal; i++)
 	{
-		if (this->dataBuffer[i%this->bufLen].value[inputData[1]] < minVal)
+		if (pDoc->primaryDataArray[i].value[inputData[1]] < pDoc->primaryDataArray[minVal].value[inputData[1]])
 		{
-			minVal = this->dataBuffer[i%this->bufLen].value[inputData[1]];
+			minVal = i;
 		}
-		if (this->dataBuffer[i%this->bufLen].value[inputData[1]] > maxVal)
+		if (pDoc->primaryDataArray[i].value[inputData[1]] > pDoc->primaryDataArray[maxVal].value[inputData[1]])
 		{
-			maxVal = this->dataBuffer[i%this->bufLen].value[inputData[1]];
+			maxVal = i;
 		}
 	}
 
@@ -1117,7 +1124,7 @@ void CAmekaView::drawRecData(CDC* pDC)
 
 	for (int i = 0; i < pDoc->counter - 1; i++)
 	{
-		PrimaryDataType crtData = pDoc->PrimaryData->get(i);
+		PrimaryDataType crtData = pDoc->primaryDataArray[i];
 		if (crtData.isDraw)
 		{
 			CPen* tmpPen = MemDC.SelectObject(&silverPen);
@@ -1142,12 +1149,12 @@ void CAmekaView::drawRecData(CDC* pDC)
 		{
 			int tmp = (((rect.Height() - FOOT_RANGE)*j)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)crtData.value[j]-m_BaseLine)/m_Amp)*graphData.scaleRate);
 			if (tmp > (rect.Height() - FOOT_RANGE))
-			tmp = rect.Height() - FOOT_RANGE;
+				tmp = rect.Height() - FOOT_RANGE;
 			if (tmp < 0)
 				tmp = 0;
 			//MemDC.SetPixel((distance*j),tmp ,CUSTOM_PEN);
 			MemDC.MoveTo((distance*i), tmp);		//draw 16 channel
-			tmp = (((rect.Height() - FOOT_RANGE)*j)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)pDoc->PrimaryData->get(i + 1).value[j]-m_BaseLine)/m_Amp)*graphData.scaleRate);
+			tmp = (((rect.Height() - FOOT_RANGE)*j)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)pDoc->primaryDataArray[i + 1].value[j]-m_BaseLine)/m_Amp)*graphData.scaleRate);
 			if (tmp > (rect.Height() - FOOT_RANGE))
 			tmp = rect.Height() - FOOT_RANGE;
 			if (tmp < 0)

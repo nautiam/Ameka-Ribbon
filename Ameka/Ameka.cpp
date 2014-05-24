@@ -686,6 +686,7 @@ void CAmekaApp::OnDemo()
 	if (pView->isRunning || pDoc->isRecord)
 		return;
 	{
+		pView->isDrawRec = FALSE;
 		CRect rect;
 		pView->GetClientRect(&rect);
 		CSize sizeTotal;

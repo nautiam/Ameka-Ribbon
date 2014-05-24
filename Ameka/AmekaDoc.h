@@ -37,6 +37,7 @@ public:
 	CWinThread*  m_processRec;
 	amekaData<RawDataType>* dataBuffer;
 	amekaData<PrimaryDataType>* PrimaryData;
+	PrimaryDataType* primaryDataArray;
 	amekaData<PrimaryDataType>* TemporaryData; // Temporary Data is used to calculate photic
 	amekaData<SecondaryDataType>* SecondaryData;
 	CWinThread* thrd;

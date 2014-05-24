@@ -18,6 +18,7 @@
 #include "AmekaDoc.h"
 #include "SerialCtrl.h"
 #include "C_ColorToolTip.h"
+#include "CDrawPos.h"
 
 #define baseLine 16383
 #define amp 812
@@ -49,7 +50,7 @@ class CAmekaView : public CScrollView
 protected: // create from serialization only
 	CAmekaView();
 	DECLARE_DYNCREATE(CAmekaView)
-
+	friend class CDrawPos;
 // Attributes
 public:
 	CAmekaDoc* GetDocument() const;
@@ -84,7 +85,7 @@ public:
 	void setParentDoc(CAmekaDoc* doc);
 	int drawBarGraph( void );
 	void drawTime(CDC* pDC, time_t x_time, uint16_t x_pos);
-	uint16_t* getDataFromPos(CPoint mousePos, float crtPos, CAmekaView* pView);
+	uint16_t* getDataFromPos(CPoint mousePos, CAmekaView* pView);
 	void resetData();
 	uint16_t* getMaxMin(uint16_t* inputData);
 	void drawRecData(CDC* pDC);
@@ -124,6 +125,7 @@ private:
 	uint16_t evPos;
 	
 	C_ColorToolTip m_Tips;
+	CDrawPos m_Pos;
 protected:
 
 // Generated message map functions

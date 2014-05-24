@@ -115,6 +115,8 @@ void dsp_processing(LPVOID pParam)
 	uint16_t stdCfrmData[2] = {0xFFFF, 0xFFFF};
 	time_t oldtime = 0;
 	uint16_t count = 0;
+	uint64_t pos_arr = 0;
+
 	if (!mDoc->object.Open(mDoc->saveFileName, CFile::modeRead))
 	{
 		AfxMessageBox(L"File cannot be opened");
@@ -223,6 +225,8 @@ void dsp_processing(LPVOID pParam)
 						temp.value[i] = (uint16_t)audioData[i][j];					
 					}
 					mDoc->PrimaryData->pushData(temp);
+					mDoc->primaryDataArray[pos_arr] = temp;
+					pos_arr++;
 				}
 			}
 		}
@@ -285,6 +289,8 @@ void dsp_processing(LPVOID pParam)
 				temp.value[i] = (uint16_t)audioData[i][j];					
 			}
 			mDoc->PrimaryData->pushData(temp);
+			mDoc->primaryDataArray[pos_arr] = temp;
+			pos_arr++;
 		}		
 		raw_cnt = 0;
 		//delete m_rawData;
@@ -330,6 +336,12 @@ void initial_dsp_data(LPVOID pParam)
 		mDoc->SecondaryData = NULL;
 	}
 	mDoc->SecondaryData = new amekaData<SecondaryDataType>(BUFFER_LEN);
+	if(mDoc->primaryDataArray)
+	{
+		delete mDoc->primaryDataArray;	
+		mDoc->primaryDataArray = NULL;
+	}
+	
 	mDoc->mDSP.HPFFre = 0.5;
 	mDoc->mDSP.LPFFre = 30;
 	mDoc->mDSP.SampleRate = SAMPLE_RATE;
@@ -713,6 +725,15 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	}
 	//EnterCriticalSection(&mView->csess);
 	mDoc->PrimaryData = new amekaData<PrimaryDataType>(counter);
+
+	if (mDoc->primaryDataArray)
+	{
+		//EnterCriticalSection(&mView->csess);
+		delete mDoc->primaryDataArray;
+		mDoc->primaryDataArray = NULL;
+		//LeaveCriticalSection(&mView->csess);
+	}
+	mDoc->primaryDataArray = new PrimaryDataType[counter];
 	//mDoc->SecondaryData = new amekaData<SecondaryDataType>(counter);
 	
 	// Xu ly du lieu Primary Data

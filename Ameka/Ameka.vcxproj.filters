@@ -105,6 +105,9 @@
     <ClInclude Include="PhoticDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CDrawPos.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Ameka.cpp">
@@ -174,6 +177,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PhoticDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDrawPos.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
