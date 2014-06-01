@@ -81,16 +81,19 @@ public:
 	static UINT graphHandle(LPVOID pParam);			//handle thread
 	static UINT photicHandle(LPVOID pParam);			//photic thread
 	//int amekaDrawPos(CBitmap* bitmap);			//for draw current position only	
-	int amekaDrawPos(CDC* pDC);			//for draw current position only	
 	void setParentDoc(CAmekaDoc* doc);
-	int drawBarGraph( void );
-	void drawTime(CDC* pDC, time_t x_time, uint16_t x_pos);
 	uint16_t* getDataFromPos(CPoint mousePos, CAmekaView* pView);
 	void resetData();
 	uint16_t* getMaxMin(uint16_t* inputData);
+
 	void drawRecData(CDC* pDC);
 	void drawLeadName(CDC* pDC);
 	void drawEvent(CDC* pDC, uint16_t evID);
+	int amekaDrawPos(CDC* pDC);			//for draw current position only	
+	int drawBarGraph( void );
+	void drawTime(CDC* pDC, time_t x_time, uint16_t x_pos);
+	void drawMouseMove(CDC* pDC, int xPos, int maxVal, int minVal, int drawVal);
+
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
@@ -100,6 +103,7 @@ public:
 	BOOL isDrawRec;
 	CRITICAL_SECTION csess;
 private:
+	CBitmap oldBitmap;
 	PrimaryDataType* dataBuffer;
 	uint16_t count;
 	uint8_t channelNum;

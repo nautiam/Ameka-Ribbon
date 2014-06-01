@@ -809,7 +809,8 @@ void CAmekaApp::OnStop()
 				//AfxMessageBox(L"Load file success");
 				ResetEvent(pDoc->onReadSuccess);
 				pView->isDrawRec = TRUE;
-				pView->OnDraw(pView->GetDC());
+				pView->drawLeadName(pView->GetDC());
+				pView->drawRecData(pView->GetDC());
 			}
 			else
 			{
