@@ -762,8 +762,6 @@ void CAmekaApp::OnStop()
 
 
 			pDoc->saveFileName = pDoc->recordFileName;
-			/*uint16_t buffer[4] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
-			pDoc->object.Write(buffer, sizeof(buffer));*/
 			pDoc->object.SeekToBegin();
 			uint16_t temp[8];
 			temp[0] = (uint16_t)(pDoc->mDSP.HPFFre * 10);
@@ -775,9 +773,10 @@ void CAmekaApp::OnStop()
 			temp[6] = (uint16_t)(pDoc->counter >> 32);
 			temp[7] = (uint16_t)(pDoc->counter >> 48);
 			pDoc->object.Write(temp, sizeof(temp));
-
-			int temp_mon[65];
-			int monNum =  pDoc->mMon.mList.GetCount();
+			
+			uint8_t nLen = _tcslen(pDoc->mMon.mName);
+			uint8_t temp_mon[66];
+			uint8_t monNum =  pDoc->mMon.mList.GetCount();
 			temp_mon[64] = monNum;
 			POSITION pos;
 			//pos = pDoc->mMon.mList.GetHeadPosition();
@@ -787,15 +786,19 @@ void CAmekaApp::OnStop()
 			{
 				Alead temp;
 				temp = pDoc->mMon.mList.GetAt(i);
-				int fID = temp.lFirstID;
-				int sID = temp.lSecondID;
+				uint8_t fID = temp.lFirstID;
+				uint8_t sID = temp.lSecondID;
 				temp_mon[i*2] = fID;
 				temp_mon[i*2 + 1] = sID;
 			}
+			temp_mon[65] = nLen;
 			pDoc->object.Write(temp_mon, sizeof(temp_mon));
-
-			int nLen = pDoc->mMon.mName.GetLength()*sizeof(TCHAR);
-			pDoc->object.Write(pDoc->mMon.mName.GetBuffer(), nLen);
+			
+			char *szTo = new char[nLen + 1];
+			WideCharToMultiByte(1258, 0, pDoc->mMon.mName, nLen, szTo, nLen, NULL, NULL);			
+			int size = sizeof(szTo);
+			pDoc->object.Write(szTo, (nLen + 1)*sizeof(char));
+			delete szTo;
 			pDoc->object.Close();
 			pDoc->isOpenFile = FALSE;
 			pDoc->counter = 0;

@@ -433,7 +433,8 @@ BEGIN
     PUSHBUTTON      "Thêm",mon_add,310,214,50,14
     LTEXT           "Ðiêòn cýòc 1",IDC_STATIC,131,218,35,8
     LTEXT           "Ðiêòn cýòc 2",IDC_STATIC,220,218,35,8
-    PUSHBUTTON      "Xoìa",mon_del,7,214,50,14
+    PUSHBUTTON      "Xoìa node",mon_del,7,214,50,14
+    PUSHBUTTON      "Xoìa montage",IDC_BUTTON4,186,239,50,14
 END
 
 DLG_Opt_COM DIALOGEX 0, 0, 270, 157

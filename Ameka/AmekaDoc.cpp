@@ -124,27 +124,30 @@ CAmekaDoc::~CAmekaDoc()
 		temp[7] = (uint16_t)(counter >> 48);
 		object.Write(temp, sizeof(temp));
 
-		int temp_mon[65];
-		int monNum =  mMon.mList.GetCount();
+		uint8_t nLen = _tcslen(mMon.mName);
+		uint8_t temp_mon[66];
+		uint8_t monNum =  mMon.mList.GetCount();
 		temp_mon[64] = monNum;
 		POSITION pos;
-		//pos = mMon.mList.GetHeadPosition();
 		if (monNum > 32)
 			monNum = 32;
 		for (int i=0; i<monNum; i++)
 		{
 			Alead temp;
 			temp = mMon.mList.GetAt(i);
-			int fID = temp.lFirstID;
-			int sID = temp.lSecondID;
+			uint8_t fID = temp.lFirstID;
+			uint8_t sID = temp.lSecondID;
 			temp_mon[i*2] = fID;
 			temp_mon[i*2 + 1] = sID;
 		}
+		temp_mon[65] = nLen;
 		object.Write(temp_mon, sizeof(temp_mon));
-
-		CString name;
-		int nLen = mMon.mName.GetLength()*sizeof(TCHAR);
-		object.Write(mMon.mName.GetBuffer(), nLen);
+			
+		char *szTo = new char[nLen + 1];
+		WideCharToMultiByte(1258, 0, mMon.mName, nLen, szTo, nLen, NULL, NULL);			
+		int size = sizeof(szTo);
+		object.Write(szTo, (nLen + 1)*sizeof(char));
+		delete szTo;
 		object.Close();
 		isOpenFile = FALSE;
 	}

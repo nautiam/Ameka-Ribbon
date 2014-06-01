@@ -123,7 +123,7 @@ struct PatientInfo {
 		surname = "N.A";
 		note = "N.A";
 		uID = 0;
-		sex = FALSE;
+		sex = 0;
 	};
 };
 

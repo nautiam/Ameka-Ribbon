@@ -407,15 +407,13 @@ UINT DSP::DSPThread(LPVOID pParam)
 				uint16_t temp[100];
 				for (int i=0; i<100; i++)
 				{
-					temp[i] = 0xFF;
+					temp[i] = 0xFFFF;
 				}
 				mDoc->object.Write(temp, sizeof(temp));
 			}
 		}
 		else if ((mDoc->isRecord == FALSE) && (mDoc->isOpenFile == TRUE))
 		{
-			/*uint16_t buffer[4] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
-			mDoc->object.Write(buffer, sizeof(buffer));*/
 			mDoc->object.SeekToBegin();
 			uint16_t temp[8];
 			temp[0] = (uint16_t)(mDoc->mDSP.HPFFre * 10);
@@ -428,8 +426,9 @@ UINT DSP::DSPThread(LPVOID pParam)
 			temp[7] = (uint16_t)(mDoc->counter >> 48);
 			mDoc->object.Write(temp, sizeof(temp));
 
-			int temp_mon[65];
-			int monNum =  mDoc->mMon.mList.GetCount();
+			uint8_t nLen = _tcslen(mDoc->mMon.mName);
+			uint8_t temp_mon[66];
+			uint8_t monNum =  mDoc->mMon.mList.GetCount();
 			temp_mon[64] = monNum;
 			POSITION pos;
 			//pos = mDoc->mMon.mList.GetHeadPosition();
@@ -439,15 +438,19 @@ UINT DSP::DSPThread(LPVOID pParam)
 			{
 				Alead temp;
 				temp = mDoc->mMon.mList.GetAt(i);
-				int fID = temp.lFirstID;
-				int sID = temp.lSecondID;
+				uint8_t fID = temp.lFirstID;
+				uint8_t sID = temp.lSecondID;
 				temp_mon[i*2] = fID;
 				temp_mon[i*2 + 1] = sID;
 			}
+			temp_mon[65] = nLen;
 			mDoc->object.Write(temp_mon, sizeof(temp_mon));
-
-			int nLen = mDoc->mMon.mName.GetLength()*sizeof(TCHAR);
-			mDoc->object.Write(mDoc->mMon.mName.GetBuffer(), nLen);
+			
+			char *szTo = new char[nLen + 1];
+			WideCharToMultiByte(1258, 0, mDoc->mMon.mName, nLen, szTo, nLen, NULL, NULL);			
+			int size = sizeof(szTo);
+			mDoc->object.Write(szTo, (nLen + 1)*sizeof(char));
+			delete szTo;
 			mDoc->object.Close();
 			mDoc->isOpenFile = FALSE;
 			mDoc->counter = 0;
@@ -687,15 +690,18 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	uint64_t counter = 0;
 	counter = (uint64_t)(temp[4]) | (uint64_t)(temp[5] << 16) | (uint64_t)(temp[6] << 32) | (uint64_t)(temp[7] << 48);
 	mDoc->counter = counter;
-	int temp_mon[65];
+	uint8_t temp_mon[66];
 	mDoc->object.Read(temp_mon, sizeof(temp_mon));
-	int monNum = temp_mon[64];
+	uint8_t monNum = temp_mon[64];
+	uint8_t nLen = temp_mon[65];
+	
+	char *szTo = new char[nLen + 1];
+	LPWSTR wszTo = new WCHAR[nLen + 1];
+	wszTo[nLen] = '\0';
+	mDoc->object.Read(szTo, (nLen + 1)*sizeof(char));
+	MultiByteToWideChar(1258, 0, szTo, nLen, wszTo, nLen);
+	mDoc->mMon.mName = (CString)wszTo;
 	POSITION pos;
-	/*pos = mDoc->mMon.mList.GetHeadPosition();
-	while(pos)
-	{
-		delete mDoc->mMon.mList.GetNext(pos);
-	}*/
 	mDoc->mMon.mList.RemoveAll();
 	if (monNum > 32)
 		monNum = 32;
