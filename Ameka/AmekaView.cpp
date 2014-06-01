@@ -351,6 +351,14 @@ void CAmekaView::drawMouseMove(CDC* pDC, int xPos, int maxVal, int minVal, int d
 	{
 		for (int j = 0; j < channelNum; j++)
 		{
+			if (pDoc->primaryDataArray[minVal + i].isDraw)
+			{
+				CPen silverPen(PS_SOLID, 1, RGB(0xC0, 0xC0, 0xC0));
+				CPen* tmpPen = MemDC.SelectObject(&silverPen);
+				MemDC.MoveTo(i*distance, 0);
+				MemDC.LineTo(i*distance, rtWin.Height() - FOOT_RANGE);
+				MemDC.SelectObject(tmpPen);
+			}
 			if (j == drawVal)
 				continue;
 			int tmp = (((rtWin.Height() - FOOT_RANGE)*j)/channelNum + ((rtWin.Height() - FOOT_RANGE)/channelNum)/2 - (((float)pDoc->primaryDataArray[minVal + i].value[j]- pView->m_BaseLine)/pView->m_Amp)*pView->graphData.scaleRate);
@@ -477,7 +485,7 @@ CAmekaDoc* CAmekaView::GetDocument() const // non-debug version is inline
 
 BOOL CAmekaView::OnEraseBkgnd(CDC* pDC)
 {
-	return FALSE;
+	return TRUE;
 }
 
 
@@ -540,18 +548,18 @@ void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
 		}
 		if (valResult[0] < valResult[1])
 		{
-			int xDraw = valResult[0]*distance - GetDeviceScrollPosition().x + MONNAME_BAR + 2;
+			int xDraw = (valResult[0]*distance + MONNAME_BAR + 2) - GetScrollPosition().x;
 			drawMouseMove(this->GetDC(), xDraw, valResult[1], valResult[0], posResult[1]);
 		}
 		else
 		{
-			int xDraw = valResult[1]*distance - GetDeviceScrollPosition().x + MONNAME_BAR + 2;
+			int xDraw = (valResult[1]*distance + MONNAME_BAR + 2) - GetScrollPosition().x;
 			drawMouseMove(this->GetDC(), xDraw, valResult[0], valResult[1], posResult[1]);
 		}
 		//m_Pos.SetValue(valResult, posResult[1]);
 		//m_Pos.SetRectSize(CSize(distance*(valResult[1] - valResult[0]), rect.Height() - FOOT_RANGE));
 		//this->GetWindowRect(&rect);
-		//m_Pos.ShowRect(rect.left + valResult[0]*distance - GetDeviceScrollPosition().x + MONNAME_BAR + 4, rect.top + 2);
+		//m_Pos.ShowRect(rect.left + valResult[0]*distance - GetScrollPosition().x + MONNAME_BAR + 4, rect.top + 2);
 		m_Tips.ShowTips(xPos, yPos, strTemp);
 		delete [] posResult;
 		delete [] valResult;
@@ -1083,7 +1091,7 @@ uint16_t* CAmekaView::getDataFromPos(CPoint mousePos, CAmekaView* pView)
 	else
 		maxWidth = rect.Width();*/
 
-	uint16_t crtPoint = GetDeviceScrollPosition().x;
+	uint16_t crtPoint = GetScrollPosition().x;
 
 	float xDistance;
 	float distance = (float)this->graphData.paperSpeed*(float)this->graphData.dotPmm/this->graphData.sampleRate;
@@ -1199,7 +1207,7 @@ void CAmekaView::drawRecData(CDC* pDC)
 	if (pDoc->counter == 0)
 		return;
 
-	float crtPercent = (float)GetDeviceScrollPosition().x/GetTotalSize().cx;
+	float crtPercent = (float)(GetScrollPosition().x - MONNAME_BAR - 2)/(GetTotalSize().cx - MONNAME_BAR - 2);
 	uint16_t arrPos = (uint16_t)(crtPercent*pDoc->counter);
 	//uint16_t screenPosNum = (rect.Width() - MONNAME_BAR)/distance;
 
@@ -1218,7 +1226,7 @@ void CAmekaView::drawRecData(CDC* pDC)
 	//uint16_t maxPos = (arrPos + screenPosNum) <= pDoc->counter?(arrPos + screenPosNum):pDoc->counter;
 	channelNum = this->GetDocument()->mMon.mList.GetCount();
 
-	CPoint point = GetDeviceScrollPosition();
+	CPoint point = GetScrollPosition();
 	int minPos = int((point.x )/distance);
 	int maxPos = int((point.x + rect.Width())/distance);
 	if (maxPos > pDoc->counter)

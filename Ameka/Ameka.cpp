@@ -1233,6 +1233,14 @@ void CAmekaApp::OnRecording()
 	{
 		CAmekaView *pView = CAmekaView::GetView();
 		pView->isDrawRec = FALSE;
+		CRect rect;
+		pView->GetClientRect(&rect);
+		CSize sizeTotal;
+		// TODO: calculate the total size of this view
+
+		sizeTotal.cx = rect.Width();
+		sizeTotal.cy = rect.Height();
+		pView->SetScrollSizes(MM_TEXT, sizeTotal);
 		if (!pView->isRunning)
 		{
 			initial_dsp_data((LPVOID)pDoc);
