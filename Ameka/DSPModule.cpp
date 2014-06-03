@@ -407,54 +407,54 @@ UINT DSP::DSPThread(LPVOID pParam)
 				uint16_t temp[100];
 				for (int i=0; i<100; i++)
 				{
-					temp[i] = 0xFFFF;
+					temp[i] = 0xFF;
 				}
 				mDoc->object.Write(temp, sizeof(temp));
 			}
 		}
-		else if ((mDoc->isRecord == FALSE) && (mDoc->isOpenFile == TRUE))
-		{
-			mDoc->object.SeekToBegin();
-			uint16_t temp[8];
-			temp[0] = (uint16_t)(mDoc->mDSP.HPFFre * 10);
-			temp[1] = (uint16_t)(mDoc->mDSP.LPFFre * 10);
-			temp[2] = (uint16_t)(mDoc->mDSP.epocLength * 10);
-			temp[3] = mDoc->mDSP.SampleRate;
-			temp[4] = (uint16_t)(mDoc->counter);
-			temp[5] = (uint16_t)(mDoc->counter >> 16);
-			temp[6] = (uint16_t)(mDoc->counter >> 32);
-			temp[7] = (uint16_t)(mDoc->counter >> 48);
-			mDoc->object.Write(temp, sizeof(temp));
+		//else if ((mDoc->isRecord == FALSE) && (mDoc->isOpenFile == TRUE))
+		//{
+		//	mDoc->object.SeekToBegin();
+		//	uint16_t temp[8];
+		//	temp[0] = (uint16_t)(mDoc->mDSP.HPFFre * 10);
+		//	temp[1] = (uint16_t)(mDoc->mDSP.LPFFre * 10);
+		//	temp[2] = (uint16_t)(mDoc->mDSP.epocLength * 10);
+		//	temp[3] = mDoc->mDSP.SampleRate;
+		//	temp[4] = (uint16_t)(mDoc->counter);
+		//	temp[5] = (uint16_t)(mDoc->counter >> 16);
+		//	temp[6] = (uint16_t)(mDoc->counter >> 32);
+		//	temp[7] = (uint16_t)(mDoc->counter >> 48);
+		//	mDoc->object.Write(temp, sizeof(temp));
 
-			uint8_t nLen = _tcslen(mDoc->mMon.mName);
-			uint8_t temp_mon[66];
-			uint8_t monNum =  mDoc->mMon.mList.GetCount();
-			temp_mon[64] = monNum;
-			POSITION pos;
-			//pos = mDoc->mMon.mList.GetHeadPosition();
-			if (monNum > 32)
-				monNum = 32;
-			for (int i=0; i<monNum; i++)
-			{
-				Alead temp;
-				temp = mDoc->mMon.mList.GetAt(i);
-				uint8_t fID = temp.lFirstID;
-				uint8_t sID = temp.lSecondID;
-				temp_mon[i*2] = fID;
-				temp_mon[i*2 + 1] = sID;
-			}
-			temp_mon[65] = nLen;
-			mDoc->object.Write(temp_mon, sizeof(temp_mon));
-			
-			char *szTo = new char[nLen + 1];
-			WideCharToMultiByte(1258, 0, mDoc->mMon.mName, nLen, szTo, nLen, NULL, NULL);			
-			int size = sizeof(szTo);
-			mDoc->object.Write(szTo, (nLen + 1)*sizeof(char));
-			delete szTo;
-			mDoc->object.Close();
-			mDoc->isOpenFile = FALSE;
-			mDoc->counter = 0;
-		}
+		//	uint8_t nLen = _tcslen(mDoc->mMon.mName);
+		//	uint8_t temp_mon[66];
+		//	uint8_t monNum =  mDoc->mMon.mList.GetCount();
+		//	temp_mon[64] = monNum;
+		//	POSITION pos;
+		//	//pos = mDoc->mMon.mList.GetHeadPosition();
+		//	if (monNum > 32)
+		//		monNum = 32;
+		//	for (int i=0; i<monNum; i++)
+		//	{
+		//		Alead temp;
+		//		temp = mDoc->mMon.mList.GetAt(i);
+		//		uint8_t fID = temp.lFirstID;
+		//		uint8_t sID = temp.lSecondID;
+		//		temp_mon[i*2] = fID;
+		//		temp_mon[i*2 + 1] = sID;
+		//	}
+		//	temp_mon[65] = nLen;
+		//	mDoc->object.Write(temp_mon, sizeof(temp_mon));
+		//	
+		//	char *szTo = new char[nLen + 1];
+		//	WideCharToMultiByte(1258, 0, mDoc->mMon.mName, nLen, szTo, nLen, NULL, NULL);			
+		//	int size = sizeof(szTo);
+		//	mDoc->object.Write(szTo, (nLen + 1)*sizeof(char));
+		//	delete szTo;
+		//	mDoc->object.Close();
+		//	mDoc->isOpenFile = FALSE;
+		//	mDoc->counter = 0;
+		//}
 
 		float HighFre = mDoc->mDSP.HPFFre;
 		float LowFre = mDoc->mDSP.LPFFre;
