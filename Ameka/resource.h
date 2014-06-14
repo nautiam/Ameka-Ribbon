@@ -187,13 +187,16 @@
 #define MN_Baud                         32817
 #define MN_PortOpen                     32818
 #define MN_Scan                         32819
+#define ID_MN_Spec                      32820
+#define ID_MN_Setup                     32821
+#define ID_MN_Info                      32822
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        329
-#define _APS_NEXT_COMMAND_VALUE         32820
+#define _APS_NEXT_COMMAND_VALUE         32823
 #define _APS_NEXT_CONTROL_VALUE         1086
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

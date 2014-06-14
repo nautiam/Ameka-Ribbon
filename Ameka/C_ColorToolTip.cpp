@@ -50,7 +50,7 @@ BOOL C_ColorToolTip::Create(CSize szSize, CWnd *pWnd)
 	}
 	// register class 
     LPCTSTR lpszClassName = AfxRegisterWndClass(NULL);
-	BOOL bRet = CreateEx(WS_EX_TOPMOST | WS_EX_TOOLWINDOW, lpszClassName, _T(""),
+	BOOL bRet = CreateEx(WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_TRANSPARENT, lpszClassName, _T(""),
 		WS_POPUP /*| WS_BORDER*/, 0, 0, 1, 1, NULL, NULL);
 	if (bRet)
 	{
@@ -91,11 +91,14 @@ void C_ColorToolTip::OnPaint()
 	// TODO: Add your message handler code here
 	CRect rtWin;
 	GetClientRect(rtWin);
+	CFont txtFont;
+	txtFont.CreatePointFont(70, _T("Arial"), &dc);
+	dc.SelectObject(&txtFont);
 	dc.FillSolidRect(rtWin, m_clrBack);
 	dc.SetBkMode(TRANSPARENT);
 	dc.Draw3dRect(rtWin, m_clrFrameColor, m_clrFrameColor);
 	dc.SetTextColor(m_clrText);                
-	dc.DrawText(m_strTips, rtWin,  DT_CENTER |DT_VCENTER);	
+	dc.DrawTextW(m_strTips, rtWin,  DT_CENTER |DT_VCENTER);	
 }
 
 

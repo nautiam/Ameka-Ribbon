@@ -41,8 +41,8 @@
 
 #define FACTOR 0.667
 
-#define X_TOOLTIP 200
-#define Y_TOOLTIP 80
+#define X_TOOLTIP 100
+#define Y_TOOLTIP 50
 #define CHECK_RANGE 5
 
 class CAmekaView : public CScrollView
@@ -143,6 +143,7 @@ public:
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg void OnMouseLeave();
 };
 
 #ifndef _DEBUG  // debug version in AmekaView.cpp

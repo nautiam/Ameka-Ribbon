@@ -46,6 +46,7 @@ BEGIN_MESSAGE_MAP(CAmekaView, CView)
 	ON_WM_MOUSEMOVE()
 	ON_WM_HSCROLL()
 	ON_WM_KEYUP()
+	ON_WM_MOUSELEAVE()
 END_MESSAGE_MAP()
 
 // CAmekaView construction/destruction
@@ -75,7 +76,7 @@ CAmekaView::CAmekaView()
 	lastDistance = 0;
 	isDrawRec = FALSE;
 	m_Tips.Create(CSize(X_TOOLTIP, Y_TOOLTIP), this);
-	m_Pos.Create(CSize(X_TOOLTIP, Y_TOOLTIP), this);
+	//m_Pos.Create(CSize(X_TOOLTIP, Y_TOOLTIP), this);
 }
 
 CAmekaView::~CAmekaView()
@@ -340,7 +341,10 @@ void CAmekaView::drawMouseMove(CDC* pDC, int xPos, int maxVal, int minVal, int d
 		MemDC.SelectObject(&oldBitmap);
 		pDC->BitBlt(0, 0, bmpW, bmpH, &MemDC, 0, 0, SRCCOPY);
 	}*/
-	bmp.CreateCompatibleBitmap(pDC, rtWin.Width(), rtWin.Height());
+	int maxWidth = (maxVal - minVal)*distance;
+	CRect bmpRect(0, 0, maxWidth, rtWin.Height() - FOOT_RANGE);
+	
+	bmp.CreateCompatibleBitmap(pDC, bmpRect.Width(), bmpRect.Height());
 	MemDC.SelectObject(&bmp);
 
 	MemDC.FillRect(rtWin, WHITE_BRUSH);
@@ -349,27 +353,27 @@ void CAmekaView::drawMouseMove(CDC* pDC, int xPos, int maxVal, int minVal, int d
 	uint16_t channelNum = pDoc->mMon.mList.GetCount();
 	for (int i = 0; i < maxVal - minVal; i++)
 	{
+		if (pDoc->primaryDataArray[minVal + i].isDraw)
+		{
+			CPen silverPen(PS_SOLID, 1, RGB(0xC0, 0xC0, 0xC0));
+			CPen* tmpPen = MemDC.SelectObject(&silverPen);
+			MemDC.MoveTo(i*distance, 0);
+			MemDC.LineTo(i*distance, rtWin.Height() - FOOT_RANGE);
+			MemDC.SelectObject(tmpPen);
+		}
 		for (int j = 0; j < channelNum; j++)
 		{
-			if (pDoc->primaryDataArray[minVal + i].isDraw)
-			{
-				CPen silverPen(PS_SOLID, 1, RGB(0xC0, 0xC0, 0xC0));
-				CPen* tmpPen = MemDC.SelectObject(&silverPen);
-				MemDC.MoveTo(i*distance, 0);
-				MemDC.LineTo(i*distance, rtWin.Height() - FOOT_RANGE);
-				MemDC.SelectObject(tmpPen);
-			}
 			if (j == drawVal)
 				continue;
-			int tmp = (((rtWin.Height() - FOOT_RANGE)*j)/channelNum + ((rtWin.Height() - FOOT_RANGE)/channelNum)/2 - (((float)pDoc->primaryDataArray[minVal + i].value[j]- pView->m_BaseLine)/pView->m_Amp)*pView->graphData.scaleRate);
-			if (tmp > (rtWin.Height() - FOOT_RANGE))
-				tmp = rtWin.Height() - FOOT_RANGE;
+			int tmp = ((bmpRect.Height()*j)/channelNum + (bmpRect.Height()/channelNum)/2 - (((float)pDoc->primaryDataArray[minVal + i].value[j]- pView->m_BaseLine)/pView->m_Amp)*pView->graphData.scaleRate);
+			if (tmp > bmpRect.Height())
+				tmp = bmpRect.Height();
 			if (tmp < 0)
 				tmp = 0;
 			MemDC.MoveTo(i*mDistance, tmp);
-			tmp = ((rtWin.Height() - FOOT_RANGE)*j/channelNum + ((rtWin.Height() - FOOT_RANGE)/channelNum)/2 - (((float)pDoc->primaryDataArray[minVal + i + 1].value[j]- pView->m_BaseLine)/pView->m_Amp)*pView->graphData.scaleRate);
-			if (tmp > (rtWin.Height() - FOOT_RANGE))
-				tmp = rtWin.Height() - FOOT_RANGE;
+			tmp = ((bmpRect.Height()*j)/channelNum + (bmpRect.Height()/channelNum)/2 - (((float)pDoc->primaryDataArray[minVal + i + 1].value[j]- pView->m_BaseLine)/pView->m_Amp)*pView->graphData.scaleRate);
+			if (tmp > bmpRect.Height())
+				tmp = bmpRect.Height();
 			if (tmp < 0)
 				tmp = 0;
 			MemDC.LineTo((i+1)*mDistance, tmp);
@@ -394,7 +398,7 @@ void CAmekaView::drawMouseMove(CDC* pDC, int xPos, int maxVal, int minVal, int d
 			MemDC.LineTo((i+1)*mDistance, tmp);
 		}
 	}
-	pDC->BitBlt(xPos, 0, (maxVal - minVal)*distance, rtWin.Height() - FOOT_RANGE, &MemDC, 0, 0, SRCCOPY);
+	pDC->BitBlt(xPos, 0, bmpRect.Width(), bmpRect.Height(), &MemDC, 0, 0, SRCCOPY);
 	DeleteObject(&redPen);
 	MemDC.DeleteDC();
 }
@@ -454,7 +458,25 @@ void CAmekaView::OnRButtonUp(UINT /* nFlags */, CPoint point)
 void CAmekaView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
 {
 #ifndef SHARED_HANDLERS
-	theApp.GetContextMenuManager()->ShowPopupMenu(IDR_POPUP_EDIT, point.x, point.y, this, TRUE);
+	CMenu rMenu;
+	rMenu.LoadMenuW(IDR_POPUP_EDIT);
+	CMenu* subMenu = rMenu.GetSubMenu(0);
+	UINT tmpFlags = TPM_LEFTALIGN|TPM_RETURNCMD|TPM_NONOTIFY;
+	int rID = subMenu->TrackPopupMenu(tmpFlags, point.x, point.y, this);
+	switch (rID)
+	{
+	case ID_MN_Spec:
+		theApp.OnPhotic();
+		break;
+	case ID_MN_Setup:
+		theApp.OnOption();
+		break;
+	case ID_MN_Info:
+		theApp.OnInfo();
+		break;
+	default:
+		break;
+	}
 #endif
 }
 
@@ -495,6 +517,13 @@ void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
 	//return;
 	CView::OnMouseMove(nFlags, point);
 
+	TRACKMOUSEEVENT tme;
+	tme.cbSize = sizeof(TRACKMOUSEEVENT);
+	tme.dwFlags = TME_LEAVE;
+	tme.hwndTrack = this->m_hWnd;
+		
+	::_TrackMouseEvent(&tme);
+
 	if (!isNull && !isRunning && isDrawRec)
 	{
 		int X = GetSystemMetrics( SM_CXSCREEN );
@@ -516,7 +545,7 @@ void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
 
 		uint16_t* posResult = this->getDataFromPos(point, this);
 
-		uint16_t* valResult = getMaxMin(posResult);
+		uint16_t* valResult = this->getMaxMin(posResult);
 
 		if (!valResult)
 			return;
@@ -525,7 +554,7 @@ void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
 
 		CAmekaDoc* pDoc = GetDocument();
 
-		strTemp.Format(_T("Value: %d\nMin: %d\nMax: %d\n"), pDoc->primaryDataArray[posResult[0]].value[posResult[1]],
+		strTemp.Format((L"Giá trị: %d\nNhỏ nhất: %d\nLớn nhất: %d\n"), pDoc->primaryDataArray[posResult[0]].value[posResult[1]],
 			pDoc->primaryDataArray[valResult[0]].value[posResult[1]], pDoc->primaryDataArray[valResult[1]].value[posResult[1]]) ;
 		//strTemp.Format(L"Data value: %d\r\nMix value: %d\r\nMax value: %d", this->dataBuffer[posResult[0]].value[posResult[1]], fuck[0], fuck[1]);
 		// show tool tip in mouse move
@@ -561,6 +590,7 @@ void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
 		//this->GetWindowRect(&rect);
 		//m_Pos.ShowRect(rect.left + valResult[0]*distance - GetScrollPosition().x + MONNAME_BAR + 4, rect.top + 2);
 		m_Tips.ShowTips(xPos, yPos, strTemp);
+		SetFocus();
 		delete [] posResult;
 		delete [] valResult;
 
@@ -1197,7 +1227,13 @@ void CAmekaView::drawRecData(CDC* pDC)
 	/*if (distance*pDoc->counter > rect.Width())
 		maxWidth = distance*pDoc->counter;
 	else*/
-		maxWidth = rect.Width();
+	if ((rect.Width() > MONNAME_BAR + 2))
+		if (distance*pDoc->counter > rect.Width())
+			maxWidth = rect.Width() - MONNAME_BAR - 2;
+		else
+			maxWidth = rect.Width() - MONNAME_BAR - 2;
+	else
+		return;
 
 	bmp.CreateCompatibleBitmap(pDC, maxWidth, rect.Height());
 	MemDC.SelectObject(&bmp);
@@ -1207,8 +1243,8 @@ void CAmekaView::drawRecData(CDC* pDC)
 	if (pDoc->counter == 0)
 		return;
 
-	float crtPercent = (float)(GetScrollPosition().x - MONNAME_BAR - 2)/(GetTotalSize().cx - MONNAME_BAR - 2);
-	uint16_t arrPos = (uint16_t)(crtPercent*pDoc->counter);
+	//float crtPercent = (float)(GetScrollPosition().x - MONNAME_BAR - 2)/(GetTotalSize().cx - MONNAME_BAR - 2);
+	uint16_t minPos = (uint16_t)((GetScrollPosition().x /*- MONNAME_BAR - 2*/)/distance);
 	//uint16_t screenPosNum = (rect.Width() - MONNAME_BAR)/distance;
 
 	//draw foot line
@@ -1226,15 +1262,19 @@ void CAmekaView::drawRecData(CDC* pDC)
 	//uint16_t maxPos = (arrPos + screenPosNum) <= pDoc->counter?(arrPos + screenPosNum):pDoc->counter;
 	channelNum = this->GetDocument()->mMon.mList.GetCount();
 
-	CPoint point = GetScrollPosition();
-	int minPos = int((point.x )/distance);
-	int maxPos = int((point.x + rect.Width())/distance);
+	//CPoint point = GetScrollPosition();
+	//int minPos = int((point.x )/distance);
+	int maxPos = minPos + (int)(maxWidth/distance);
 	if (maxPos > pDoc->counter)
-		maxPos = pDoc->counter - 1;
+		maxPos = pDoc->counter;
+	//if (maxPos > pDoc->counter)
+	//	maxPos = pDoc->counter - 1;
 	//draw all pos from buffer data
 	MemDC.SelectStockObject(BLACK_PEN);
 	for (int i = minPos; i < maxPos; i++)
 	{
+		//if ((MONNAME_BAR + 2 + (i - minPos)*distance) > maxWidth)
+		//	break;
 		PrimaryDataType crtData = pDoc->primaryDataArray[i];
 		if (crtData.isDraw)
 		{
@@ -1397,4 +1437,13 @@ void CAmekaView::drawEvent(CDC* pDC, uint16_t evID)
 
 	DeleteObject(&txtFont);
 	//MemDC.DeleteDC();
+}
+
+void CAmekaView::OnMouseLeave()
+{
+	// TODO: Add your message handler code here and/or call default
+
+	CScrollView::OnMouseLeave();
+	m_Tips.HideTips();
+
 }

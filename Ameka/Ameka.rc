@@ -233,9 +233,9 @@ IDR_POPUP_EDIT MENU
 BEGIN
     POPUP "Edit"
     BEGIN
-        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
-        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
-        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
+        MENUITEM "B‚Út/T„Ït phÙ“",              ID_MN_Spec
+        MENUITEM "C‚Ïu hiÃnh",                  ID_MN_Setup
+        MENUITEM "ThÙng tin bÍÚnh nh‚n",        32822
     END
 END
 
@@ -859,9 +859,7 @@ BEGIN
     ID_EDIT_CLEAR           "Erase the selection\nErase"
     ID_EDIT_CLEAR_ALL       "Erase everything\nErase All"
     ID_EDIT_COPY            "Copy the selection and put it on the Clipboard\nCopy"
-    ID_EDIT_CUT             "Cut the selection and put it on the Clipboard\nCut"
     ID_EDIT_FIND            "Find the specified text\nFind"
-    ID_EDIT_PASTE           "Insert Clipboard contents\nPaste"
     ID_EDIT_REPEAT          "Repeat the last action\nRepeat"
     ID_EDIT_REPLACE         "Replace specific text with different text\nReplace"
     ID_EDIT_SELECT_ALL      "Select the entire document\nSelect All"
@@ -905,8 +903,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_STATUS_PANE1        "Pane 1"
-    IDS_STATUS_PANE2        "Pane 2"
+    IDS_STATUS_PANE1        "Ameka"
+    IDS_STATUS_PANE2        "V1.00"
 END
 
 STRINGTABLE
