@@ -5,7 +5,7 @@
 #define ARRAY_LENGTH 10
 #define BACKUP_ARRAY 10
 
-void photic_processing(float fre_step, LPVOID pParam);
+void photic_processing(float fre_step, LPVOID pParam, uint64_t pos);
 void dsp_processing(LPVOID pParam);
 void initial_dsp_data(LPVOID pParam);
 class DSP {

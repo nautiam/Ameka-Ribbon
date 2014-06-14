@@ -447,7 +447,14 @@ void CAmekaApp::OnPhotic()
 		//Cameka
 		pView->onPhotic = ~pView->onPhotic;
 		if (pView->onPhotic)
-		{			
+		{
+			if (pView->isDrawRec)
+			{
+				uint64_t startPos = pView->GetScrollPosition().x/pView->distance;
+				photic_processing(FRE_STEP, pView->GetDocument(), startPos);
+				pView->drawBarGraph();
+				return;
+			}
 			CAmekaView *pView = CAmekaView::GetView();
 			pView->pPhoticThread = AfxBeginThread(pView->photicHandle, (LPVOID)pView);
 		}
@@ -695,6 +702,7 @@ void CAmekaApp::OnDemo()
 		sizeTotal.cx = rect.Width();
 		sizeTotal.cy = rect.Height();
 		pView->SetScrollSizes(MM_TEXT, sizeTotal);
+		
 		{
 			//LPVOID pParam;
 			initial_dsp_data((LPVOID)pDoc);

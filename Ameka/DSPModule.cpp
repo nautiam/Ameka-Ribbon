@@ -42,13 +42,15 @@ static float get_peak_frequence(const kiss_fft_cpx *cout, int nfft, float start_
 	return get_peak_pos(cout, nfft, start_pos) * sample_hz / nfft;
 }
 
-void photic_processing(float fre_step, LPVOID pParam)
+void photic_processing(float fre_step, LPVOID pParam, uint64_t pos)
 {
 	CAmekaDoc* mDoc = (CAmekaDoc*)(pParam);
 	int nfft;
 	nfft = (float)SAMPLE_RATE/fre_step;
 	float NC = (float)nfft/2.0 + 1.0;
 
+	if (pos != -1)
+		mDoc->PrimaryData->LRPos = pos;
 	PrimaryDataType* output = mDoc->PrimaryData->checkPopData(nfft);
 	uint16_t size =  mDoc->PrimaryData->rLen;
 		
@@ -109,6 +111,7 @@ void photic_processing(float fre_step, LPVOID pParam)
 		delete [] output;
 	}
 }
+
 void dsp_processing(LPVOID pParam)
 {
 	CAmekaDoc* mDoc = (CAmekaDoc*)(pParam);
@@ -768,7 +771,7 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 		return 0;
 	}
 		//mDoc->PrimaryData->LRPos = mDoc->PrimaryData->crtWPos - nfft;
-	photic_processing(fre_step, pParam);
+	photic_processing(fre_step, pParam, -1);
 
 	mDoc->PrimaryData->LRPos = 0; //Tra ve con tro doc o dau mang
 	//mDoc->object.Close();

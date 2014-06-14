@@ -102,6 +102,7 @@ public:
 public:
 	BOOL isDrawRec;
 	CRITICAL_SECTION csess;
+	float distance;
 private:
 	CBitmap oldBitmap;
 	PrimaryDataType* dataBuffer;
@@ -112,7 +113,7 @@ private:
 	static const uint16_t m_Amp = amp;
 
 	float crtPos;
-	float distance;
+	
 	PrimaryDataType prePos;
 
 	SecondaryDataType preBar;
