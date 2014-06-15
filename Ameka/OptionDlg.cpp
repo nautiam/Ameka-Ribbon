@@ -185,7 +185,7 @@ void CTabViewDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, view_hp, m_view_hp);
 	DDX_Control(pDX, view_dotPmm, m_view_dotPmm);
 
-	pView->graphData.dotPmm = atoi((LPCSTR)(CStringA)theApp.m_dotPmm);
+	pView->graphData.dotPmm = atoi((LPCSTR)(CStringA)theApp.m_dotPmm)/30;
 }
 
 void CTabViewDlg::OnBnClickedbtdef()
