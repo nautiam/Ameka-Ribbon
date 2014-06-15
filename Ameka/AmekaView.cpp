@@ -64,7 +64,7 @@ CAmekaView::CAmekaView()
 	bufLen = 4096;
 	channelNum = 16;
 	graphData.scaleRate = 30;
-	graphData.dotPmm = 10;
+	graphData.dotPmm = 200/30;
 	graphData.paperSpeed = 75;
 	graphData.sampleRate = SAMPLE_RATE;
 	InitializeCriticalSection(&csess);
@@ -133,8 +133,11 @@ void CAmekaView::OnDraw(CDC* pDC)
 	{
 		drawLeadName(pDC);
 		drawRecData(pDC);
-		photic_processing(FRE_STEP, this->GetDocument(), GetScrollPosition().x/distance);
-		drawBarGraph();
+		if (onPhotic)
+		{
+			photic_processing(FRE_STEP, this->GetDocument(), GetScrollPos(SB_HORZ));
+			drawBarGraph();
+		}
 		return;
 	}
 
@@ -538,7 +541,7 @@ void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
 
 		if (onPhotic)
 		{
-			if (ptLog.x > (rect.Width()*FACTOR))
+			if (point.x > (rect.Width()*FACTOR))
 				return;
 		}
 
@@ -555,6 +558,20 @@ void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
 		uint16_t* posResult = this->getDataFromPos(point, this);
 
 		uint16_t* valResult = this->getMaxMin(posResult);
+		if (valResult[0] < GetScrollPos(SB_HORZ))
+			valResult[0] = GetScrollPos(SB_HORZ);
+
+		if (valResult[1] < GetScrollPos(SB_HORZ))
+			valResult[1] = GetScrollPos(SB_HORZ);
+
+		if (onPhotic)
+		{
+			if ((valResult[0] - GetScrollPos(SB_HORZ))*distance > (rect.Width()*FACTOR - MONNAME_BAR - 2))
+				valResult[0] = (rect.Width()*FACTOR - MONNAME_BAR - 2)/distance + GetScrollPos(SB_HORZ);
+
+			if ((valResult[1] - GetScrollPos(SB_HORZ))*distance > (rect.Width()*FACTOR - MONNAME_BAR - 2))
+				valResult[1] = (rect.Width()*FACTOR - MONNAME_BAR - 2)/distance + GetScrollPos(SB_HORZ);
+		}
 
 		if (!valResult)
 			return;
@@ -586,18 +603,18 @@ void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
 		}
 		if (valResult[0] < valResult[1])
 		{
-			int xDraw = (valResult[0] - GetScrollPosition().x/distance)*distance + MONNAME_BAR + 2;
+			int xDraw = (valResult[0] - GetScrollPos(SB_HORZ))*distance + MONNAME_BAR + 2;
 			drawMouseMove(this->GetDC(), xDraw, valResult[1], valResult[0], posResult[1]);
 		}
 		else
 		{
-			int xDraw = (valResult[1] - GetScrollPosition().x/distance)*distance + MONNAME_BAR + 2;
+			int xDraw = (valResult[1] - GetScrollPos(SB_HORZ))*distance + MONNAME_BAR + 2;
 			drawMouseMove(this->GetDC(), xDraw, valResult[0], valResult[1], posResult[1]);
 		}
 		//m_Pos.SetValue(valResult, posResult[1]);
 		//m_Pos.SetRectSize(CSize(distance*(valResult[1] - valResult[0]), rect.Height() - FOOT_RANGE));
 		//this->GetWindowRect(&rect);
-		//m_Pos.ShowRect(rect.left + valResult[0]*distance - GetScrollPosition().x + MONNAME_BAR + 4, rect.top + 2);
+		//m_Pos.ShowRect(rect.left + valResult[0]*distance - GetScrollPos(SB_HORZ) + MONNAME_BAR + 4, rect.top + 2);
 		m_Tips.ShowTips(xPos, yPos, strTemp);
 		SetFocus();
 		delete [] posResult;
@@ -1053,12 +1070,26 @@ int CAmekaView::drawBarGraph( void )
 	uint16_t buflen = SAMPLE_RATE/FRE_STEP;
 	SecondaryDataType* data = this->mDoc->SecondaryData->checkPopData(buflen);
 	int size = this->mDoc->SecondaryData->rLen;
-	if (!data)
-		return -1;
+	if (data && buflen > 0)
+	{
+		//draw data
+		for (int i = 0; i < buflen; i++)
+		{
+			float freVal = data[i].fre - theApp.photicMin;
+			int barCount = freVal/pDoc->mDSP.epocLength;
+			float barPos = (float)barCount*(rect.Width()-startPos)/barNum;
+			float barW = (float)range/barCount;
+			for (int j = 0; j < channelNum; j++)
+			{
+				if ((data[i].value[j])/theApp.photicWRate < 1)
+					continue;
+				CRect barRect(abs(barPos - barW/2), (j+1)*(rect.Height() - FOOT_RANGE)/channelNum - (data[i].value[j])/theApp.photicWRate, 
+					abs((rect.Width() - startPos)/barNum + barPos - barW/2),(j+1)*(rect.Height() - FOOT_RANGE)/channelNum);
+				MemDC.FillRect(barRect,&brushS);
 
-	if ((buflen <= 0) || (data == NULL))
-		return -2;
-
+			}
+		}
+	}
 	//draw grid
 	MemDC.SetBkMode(TRANSPARENT);
 	int gridNum = range/theApp.photicTick;
@@ -1067,38 +1098,6 @@ int CAmekaView::drawBarGraph( void )
 	CFont txtFont;
 	txtFont.CreatePointFont(70, _T("Arial"), &MemDC);
 	float barGridW = (float)(rect.Width() - startPos ) / gridNum;
-	for (int i = 0; i < gridNum; i++)
-	{
-		MemDC.MoveTo(i*barGridW, rect.Height() - FOOT_RANGE);
-		MemDC.LineTo(i*barGridW, 0);
-		CString text;
-		MemDC.SelectObject(&txtFont);
-		text.Format(_T("%d"), (int)(theApp.photicTick*i + theApp.photicMin));
-		MemDC.TextOutW(i*barGridW, (rect.Height() - FOOT_RANGE), text);
-	}
-	MemDC.SelectObject(pOldPen);
-	DeleteObject(&pen2);
-
-	//draw data
-	for (int i = 0; i < buflen; i++)
-	{
-		float freVal = data[i].fre - theApp.photicMin;
-		int barCount = freVal/pDoc->mDSP.epocLength;
-		float barPos = (float)barCount*(rect.Width()-startPos)/barNum;
-		float barW = (float)range/barCount;
-		for (int j = 0; j < channelNum; j++)
-		{
-			if ((data[i].value[j])/theApp.photicWRate < 1)
-				continue;
-			CRect barRect(abs(barPos - barW/2), (j+1)*(rect.Height() - FOOT_RANGE)/channelNum - (data[i].value[j])/theApp.photicWRate, 
-				abs((rect.Width() - startPos)/barNum + barPos - barW/2),(j+1)*(rect.Height() - FOOT_RANGE)/channelNum);
-			MemDC.FillRect(barRect,&brushS);
-
-		}
-	}
-
-	//draw grid
-	pOldPen = MemDC.SelectObject(&pen2);
 	for (int i = 0; i < gridNum; i++)
 	{
 		MemDC.MoveTo(i*barGridW, rect.Height() - FOOT_RANGE);
@@ -1143,13 +1142,13 @@ uint16_t* CAmekaView::getDataFromPos(CPoint mousePos, CAmekaView* pView)
 	else
 		maxWidth = rect.Width();*/
 
-	uint16_t crtPoint = GetScrollPosition().x;
+	uint64_t posNum = GetScrollPos(SB_HORZ) + (xMousePos - MONNAME_BAR - 2)/distance;
 
-	float xDistance;
-	float distance = (float)this->graphData.paperSpeed*(float)this->graphData.dotPmm/this->graphData.sampleRate;
-	xDistance = crtPoint + xMousePos - MONNAME_BAR - 2;
+	//float xDistance;
+	//float distance = (float)this->graphData.paperSpeed*(float)this->graphData.dotPmm/this->graphData.sampleRate;
+	//xDistance = crtPoint + xMousePos - MONNAME_BAR - 2;
 	//get position
-	uint16_t posNum = (uint16_t)xDistance/distance;
+	
 	int pos = 0;
 	
 	uint16_t val = abs(mousePos.y - ((rect.Height() - FOOT_RANGE)/this->channelNum)/2 - (((float)pDoc->primaryDataArray[posNum].value[0]
@@ -1243,7 +1242,7 @@ void CAmekaView::drawRecData(CDC* pDC)
 	//sizeTotal.cx = pDoc->counter*distance + MONNAME_BAR + 2;
 	//sizeTotal.cy = rect.Height();
 	//SetScrollSizes(MM_TEXT, sizeTotal);
-	SetScrollRange(SB_HORZ, 0, pDoc->counter*distance);
+	SetScrollRange(SB_HORZ, 0, pDoc->counter);
 
 	MemDC.CreateCompatibleDC(pDC);
 	uint32_t maxWidth;
@@ -1255,7 +1254,7 @@ void CAmekaView::drawRecData(CDC* pDC)
 	else
 		return;
 	if (onPhotic)
-		maxWidth = maxWidth*FACTOR;
+		maxWidth = rect.Width()*FACTOR - MONNAME_BAR - 2;
 
 	bmp.CreateCompatibleBitmap(pDC, maxWidth, rect.Height());
 	MemDC.SelectObject(&bmp);
@@ -1265,8 +1264,8 @@ void CAmekaView::drawRecData(CDC* pDC)
 	if (pDoc->counter == 0)
 		return;
 
-	//float crtPercent = (float)(GetScrollPosition().x - MONNAME_BAR - 2)/(GetTotalSize().cx - MONNAME_BAR - 2);
-	uint16_t minPos = (uint16_t)((GetScrollPosition().x /*- MONNAME_BAR - 2*/)/distance);
+	//float crtPercent = (float)(GetScrollPos(SB_HORZ) - MONNAME_BAR - 2)/(GetTotalSize().cx - MONNAME_BAR - 2);
+	uint64_t minPos = GetScrollPos(SB_HORZ);
 	//uint16_t screenPosNum = (rect.Width() - MONNAME_BAR)/distance;
 
 	//draw foot line
@@ -1286,7 +1285,7 @@ void CAmekaView::drawRecData(CDC* pDC)
 
 	//CPoint point = GetScrollPosition();
 	//int minPos = int((point.x )/distance);
-	int maxPos = minPos + (int)(maxWidth/distance);
+	uint64_t maxPos = minPos + (uint64_t)(maxWidth/distance);
 	if (maxPos > pDoc->counter)
 		maxPos = pDoc->counter;
 	//if (maxPos > pDoc->counter)
@@ -1422,7 +1421,7 @@ void CAmekaView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	drawLeadName(this->GetDC());
 	drawRecData(this->GetDC());
 
-	photic_processing(FRE_STEP, this->GetDocument(), GetScrollPosition().x/distance);
+	photic_processing(FRE_STEP, this->GetDocument(), GetScrollPos(SB_HORZ));
 	drawBarGraph();
 }
 

@@ -114,6 +114,8 @@
 #define IDC_BUTTON2                     1047
 #define rec_video                       1047
 #define mon_add                         1047
+#define view_hp2                        1047
+#define view_dotPmm                     1047
 #define IDC_EDIT6                       1048
 #define IDC_EDIT7                       1049
 #define IDC_EDIT8                       1050

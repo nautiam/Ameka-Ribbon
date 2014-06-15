@@ -455,11 +455,14 @@ BEGIN
     LTEXT           "Tôìc ðôò soìng",IDC_STATIC,7,42,40,8
     LTEXT           "Loòc thông thâìp",IDC_STATIC,5,68,48,8
     LTEXT           "Loòc thông cao",IDC_STATIC,6,91,47,8
-    EDITTEXT        view_sensitivity,54,17,190,14,ES_AUTOHSCROLL
-    EDITTEXT        view_speed,54,40,190,14,ES_AUTOHSCROLL
-    EDITTEXT        view_lp,54,65,190,14,ES_AUTOHSCROLL
-    EDITTEXT        view_hp,54,89,190,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "Thiêìt lâòp mãòc ðiònh",view_btdef,54,119,68,14
+    EDITTEXT        view_sensitivity,71,17,190,14,ES_AUTOHSCROLL
+    EDITTEXT        view_speed,71,40,190,14,ES_AUTOHSCROLL
+    EDITTEXT        view_lp,71,65,190,14,ES_AUTOHSCROLL
+    EDITTEXT        view_hp,71,89,190,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Thiêìt lâòp mãòc ðiònh",view_btdef,71,136,68,14
+    LTEXT           "30mm týõng ðýõng",IDC_STATIC,6,116,71,8
+    EDITTEXT        view_dotPmm,71,114,68,14,ES_AUTOHSCROLL
+    LTEXT           "pixels",IDC_STATIC,143,116,71,8
 END
 
 DLG_Opt_Rec DIALOGEX 0, 0, 272, 157
@@ -668,6 +671,7 @@ BEGIN
 
     DLG_Opt_View, DIALOG
     BEGIN
+        VERTGUIDE, 71
     END
 
     DLG_Opt_Rec, DIALOG

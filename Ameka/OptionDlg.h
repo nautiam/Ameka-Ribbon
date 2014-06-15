@@ -1,6 +1,7 @@
 
 #include "stdafx.h"
 #include "Ameka.h"
+#include "afxwin.h"
 
 //------------------------------------------------------------------//
 //Tab Dialog
@@ -111,6 +112,7 @@ public:
 	CEdit m_view_lp;
 	CEdit m_view_hp;
 	afx_msg void OnBnClickedbtdef();
+	CEdit m_view_dotPmm;
 };
 
 //------------------------------------------------------------------//

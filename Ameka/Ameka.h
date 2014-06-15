@@ -40,6 +40,7 @@
 #define strSpeed "15 30 75 150 200 300"
 #define strLP "10 15 20 30 40 50 60"
 #define strHP "0.1 0.2 0.5 1 1.5"
+#define strdotPmm "200"
 #define strCOM "COM1 COM2 COM3 COM4 COM5 COM6 COM7 COM8 COM9 COM10"
 #define strBaud "9600 14400 19200 38400 56000 115200 "
 #define xmlName "listmontage.conf"
@@ -65,6 +66,7 @@ public:
 	CString m_sensitivity;
 	CString m_LP;
 	CString m_HP;
+	CString m_dotPmm;
 	CMyArray<Amontage, Amontage&> monList;
 	CList<CAmekaDoc*, CAmekaDoc*> docList;
 	amekaData<RawDataType>* dataBuffer;

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "OptionDlg.h"
 
 //------------------------------------------------------------------//
@@ -159,6 +159,12 @@ int CTabViewDlg::OnInitDialog()
 	m_view_speed.SetWindowTextW(theApp.m_speed);
 	m_view_lp.SetWindowTextW(theApp.m_LP);
 	m_view_hp.SetWindowTextW(theApp.m_HP);
+	CAmekaView* pView = CAmekaView::GetView();
+	if (pView)
+	{
+		int i = pView->graphData.dotPmm;
+		m_view_dotPmm.SetWindowTextW(itoS(pView->graphData.dotPmm));
+	}
 	return 0;
 }
 
@@ -169,10 +175,17 @@ void CTabViewDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, view_hp, theApp.m_HP);
 	DDX_Text(pDX, view_sensitivity, theApp.m_sensitivity);
 	DDX_Text(pDX, view_speed, theApp.m_speed);
+
+	CAmekaView* pView = CAmekaView::GetView();
+	DDX_Text(pDX, view_dotPmm, theApp.m_dotPmm);
+	
 	DDX_Control(pDX, view_sensitivity, m_view_sen);
 	DDX_Control(pDX, view_speed, m_view_speed);
 	DDX_Control(pDX, view_lp, m_view_lp);
 	DDX_Control(pDX, view_hp, m_view_hp);
+	DDX_Control(pDX, view_dotPmm, m_view_dotPmm);
+
+	pView->graphData.dotPmm = atoi((LPCSTR)(CStringA)theApp.m_dotPmm);
 }
 
 void CTabViewDlg::OnBnClickedbtdef()
@@ -182,6 +195,7 @@ void CTabViewDlg::OnBnClickedbtdef()
 	m_view_speed.SetWindowTextW((LPCTSTR)strSpeed);
 	m_view_lp.SetWindowTextW((LPCTSTR)strLP);
 	m_view_hp.SetWindowTextW((LPCTSTR)strHP);
+	m_view_dotPmm.SetWindowTextW((LPCTSTR)"30");
 }
 
 BEGIN_MESSAGE_MAP(CTabViewDlg, CDialogEx)
@@ -214,9 +228,9 @@ void COptionDlg::DoDataExchange(CDataExchange* pDX)
 int COptionDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-    tab_ctrl.InsertItem(0,L"Tables");
-	tab_ctrl.InsertItem(1,L"Events");
-	tab_ctrl.InsertItem(2,L"Recording");
+    tab_ctrl.InsertItem(0,L"Bảng");
+	tab_ctrl.InsertItem(1,L"Sự kiện");
+	tab_ctrl.InsertItem(2,L"Ghi");
 
 	mDlg[0] = new CTabViewDlg;
 	mDlg[1] = new CTabEventDlg;

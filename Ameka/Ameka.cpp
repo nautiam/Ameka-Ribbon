@@ -146,6 +146,7 @@ CAmekaApp::CAmekaApp()
 	m_speed = strSpeed;
 	m_LP = strLP;
 	m_HP = strHP;
+	m_dotPmm = strdotPmm;
 
 	char line[100];
 	ifstream setFile;
@@ -448,18 +449,18 @@ void CAmekaApp::OnPhotic()
 		pView->onPhotic = ~pView->onPhotic;
 		if (pView->onPhotic)
 		{
-			if (pView->isDrawRec)
-			{
-				uint64_t startPos = pView->GetScrollPosition().x/pView->distance;
-				photic_processing(FRE_STEP, pView->GetDocument(), startPos);
-				pView->drawBarGraph();
-				return;
-			}
 			CAmekaView *pView = CAmekaView::GetView();
 			pView->pPhoticThread = AfxBeginThread(pView->photicHandle, (LPVOID)pView);
 		}
 		else
 		{
+			if (pView->isDrawRec)
+			{
+				uint64_t startPos = pView->GetScrollPos(SB_HORZ);
+				photic_processing(FRE_STEP, pView->GetDocument(), startPos);
+				pView->drawBarGraph();
+				return;
+			}
 			if (theApp.docList.IsEmpty())
 				return;
 			DWORD exit_code= NULL;
@@ -822,6 +823,12 @@ void CAmekaApp::OnStop()
 				pView->isDrawRec = TRUE;
 				pView->drawLeadName(pView->GetDC());
 				pView->drawRecData(pView->GetDC());
+				/*if (pView->onPhotic)
+				{
+
+					photic_processing(FRE_STEP, pView->GetDocument(), pView->GetScrollPos(SB_HORZ));
+					pView->drawBarGraph();
+				}*/
 			}
 			else
 			{
