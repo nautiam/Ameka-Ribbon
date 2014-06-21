@@ -44,6 +44,9 @@ public:
 	bool startEnable;
 	bool stopEnable;
 	bool recEnable;
+	bool portEnable;
+	bool baudEnable;
+	bool scanPortEnable;
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
@@ -78,6 +81,9 @@ public:
 	afx_msg void OnUpdateStartdemo(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateStopdemo(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateRecording(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateScan(CCmdUI *pCmdUI);
+	afx_msg void OnUpdatePortname(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateBaud(CCmdUI *pCmdUI);
 };
 
 

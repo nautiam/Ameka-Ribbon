@@ -51,9 +51,6 @@
     <ClInclude Include="DSPModule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="easylogging++.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EnvSetupModule.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -3,7 +3,7 @@
 #include "AmekaLan.h"
 #include "tinystr.h"
 #include "tinyxml.h"
-#include "easylogging++.h"
+//#include "easylogging++.h"
 
 #ifndef settingName
 #define settingName "config.conf"
@@ -22,13 +22,13 @@ void loadLanguage(const char* fileName)
 	TiXmlDocument doc;
 	if(!doc.LoadFile(fileName))
 	{
-		LOG(ERROR) << doc.ErrorDesc();
+		//LOG(ERROR) << doc.ErrorDesc();
 		return;
 	}
 	TiXmlElement* root = doc.FirstChildElement();
 	if(root == NULL)
 	{
-		LOG(ERROR) << "Failed to load file: No root element.";
+		//LOG(ERROR) << "Failed to load file: No root element.";
 		doc.Clear();
 		return;
 	}
@@ -127,13 +127,13 @@ void loadSetting(const char* fileName)
 	TiXmlDocument doc;
 	if(!doc.LoadFile(fileName))
 	{
-		LOG(ERROR) << doc.ErrorDesc();
+		//LOG(ERROR) << doc.ErrorDesc();
 		return;
 	}
 	TiXmlElement* root = doc.FirstChildElement();
 	if(root == NULL)
 	{
-		LOG(ERROR) << "Failed to load file: No root element.";
+		//LOG(ERROR) << "Failed to load file: No root element.";
 		doc.Clear();
 		return;
 	}

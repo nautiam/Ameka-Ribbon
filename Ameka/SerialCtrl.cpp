@@ -1,6 +1,6 @@
-#include "StdAfx.h"
+﻿#include "StdAfx.h"
 #include "SerialCtrl.h"
-#include "easylogging++.h"
+//#include "easylogging++.h"
 #include "DSPModule.h"
 #include <atltime.h>
 #include "Ameka.h"
@@ -52,13 +52,18 @@ BOOL SerialCtrl::OpenPort(DCB dcb, CString portName)
 			0,                                  // default.
 			NULL);                              // default.
 
-		if(m_portHandle != INVALID_HANDLE_VALUE)
+		if(m_portHandle == INVALID_HANDLE_VALUE)
+		{
+			AfxMessageBox(L"Lỗi kết nối phần cứng");
+		}
+		else
 		{
 			// Get current configuration of serial communication port.
 			if (GetCommState(m_portHandle,&m_portConfig) == 0)
 			{
+				AfxMessageBox(L"Lỗi kết nối phần cứng");
 				//AfxMessageBox("Get configuration port has problem.");
-				LOG(ERROR) << "System Error: Get configuration port has problem";
+				//LOG(ERROR) << "System Error: Get configuration port has problem";
 				return FALSE;
 			}
 			// Assign user parameter.
@@ -71,7 +76,7 @@ BOOL SerialCtrl::OpenPort(DCB dcb, CString portName)
 			if (SetCommState(m_portHandle,&m_portConfig) == 0)
 			{
 				//AfxMessageBox("Set configuration port has problem.");
-				LOG(ERROR) << "System Error: Set configuration port has problem";
+				//LOG(ERROR) << "System Error: Set configuration port has problem";
 				return FALSE;
 			}
 
@@ -85,7 +90,8 @@ BOOL SerialCtrl::OpenPort(DCB dcb, CString portName)
 			// set the time-out parameter into device control.
 			if (SetCommTimeouts(m_portHandle,&comTimeOut) == 0)
 			{
-				LOG(ERROR) << "System Error: Set timeouts parameters has problem";
+				AfxMessageBox(L"Lỗi kết nối phần cứng");
+				//LOG(ERROR) << "System Error: Set timeouts parameters has problem";
 				return FALSE;
 			}
 			m_portStatus = TRUE; 
@@ -172,7 +178,7 @@ BOOL SerialCtrl::Read(char * inputData, const unsigned int & sizeBuffer, unsigne
 		NULL) == 0)              // pointer to structure for data
 	{
 		// AfxMessageBox("Reading of serial communication has problem.");
-		LOG(ERROR) << "System Error: Read serial communication has problem";
+		//LOG(ERROR) << "System Error: Read serial communication has problem";
 		return FALSE;
 	}
 	/*ClearCommError(m_portHandle, &Err, &comstat);
@@ -196,7 +202,7 @@ BOOL SerialCtrl::Write(CString outputData, const unsigned int & sizeBuffer, unsi
 			&length,NULL) == 0)      // pointer to number of bytes written
 		{
 			//AfxMessageBox("Reading of serial communication has problem.");
-			LOG(ERROR) << "System Error: Write serial communication has problem";
+			//LOG(ERROR) << "System Error: Write serial communication has problem";
 			return FALSE;
 		}
 		return TRUE;
@@ -212,7 +218,7 @@ BOOL SerialCtrl::ClosePort(void)
 		if(CloseHandle(m_portHandle) == 0)    // Call this function to close port.
 		{
 			/* TODO add code here: Ghi log file System error */
-			LOG(ERROR) << "System Error: Close Port has problem";
+			//LOG(ERROR) << "System Error: Close Port has problem";
 			return FALSE;
 		}    
 		return TRUE;
@@ -267,13 +273,14 @@ int ReadThread::Run()
                 /* Su dung su kien EV_RXCHAR cua Comport*/
                 if (m_serialIO->m_serialCtrl.SetPortEvent(EV_RXCHAR) == 0)
 				{
-					LOG(ERROR) << "System Error: Set Event for Serial Com has problem";
+					//LOG(ERROR) << "System Error: Set Event for Serial Com has problem";
 				}
             }
             else /* Cannot open com, so change to Error State */
             {
                 m_serialIO->m_bState = S_INITTIALZED;
-				//LOG(INFO) << "Open Port has problem";
+				AfxMessageBox(L"Lỗi kết nối phần cứng");
+				////LOG(INFO) << "Open Port has problem";
             }
         }
         else if(m_serialIO->m_bState == S_INITTIALZED)
@@ -286,7 +293,7 @@ int ReadThread::Run()
                 /* Su dung su kien EV_RXCHAR cua Comport*/
 				if (m_serialIO->m_serialCtrl.SetPortEvent(EV_RXCHAR) == 0)
 				{
-					LOG(ERROR) << "System Error: Set Event for Serial Com has problem";
+					//LOG(ERROR) << "System Error: Set Event for Serial Com has problem";
 				}
             }
             else /* Cannot open com, so change to Error State */
@@ -301,14 +308,15 @@ int ReadThread::Run()
 			{
 				m_serialIO->m_bState = S_NOCONNECTED;
 				counter = 0;
-				LOG(INFO) << "Change State";
+				AfxMessageBox(L"Lỗi kết nối phần cứng");				
+				//LOG(INFO) << "Change State";
 			}
 			else
 			{
 				Sleep(5);
    //         if (WaitCommEvent(m_serialIO->m_serialCtrl.GetPortHandle(), &EventMask, NULL) == 0)
 			//{
-			//	LOG(ERROR) << "System Error: Wait com event has problem";
+			//	//LOG(ERROR) << "System Error: Wait com event has problem";
 			//}
    //         /* Neu co ky tu trong COM Port, thi doc tung ky tu */
 			//if ((EventMask & EV_RXCHAR) == EV_RXCHAR)
@@ -321,8 +329,8 @@ int ReadThread::Run()
 					
 					if (lenMessage > 0)
 					{
-						//LOG(INFO) << "DataRead: ";
-						//LOG(INFO) << lenMessage;
+						////LOG(INFO) << "DataRead: ";
+						////LOG(INFO) << lenMessage;
 						for (unsigned int i=0; i<lenMessage; i++)
 						{
 							char temp_buff = buf[i];
@@ -337,7 +345,7 @@ int ReadThread::Run()
 								/* Sau khi xu ly xong thi clear co m_bPacketOK */
 								if (packetProcessing() != 0)
 								{
-									LOG(ERROR) << "Error: Packet Processing has problem";
+									//LOG(ERROR) << "Error: Packet Processing has problem";
 								}
 								m_serialIO->m_bPacketOK = FALSE;
 							}
@@ -349,7 +357,7 @@ int ReadThread::Run()
 					m_serialIO->m_bState = S_UNINITTIALZED;
 					m_serialIO->m_serialCtrl.ClosePort();
 					AfxMessageBox(L"The program has problem. Please close and reopen the program.");
-					LOG(INFO) << "Close port and reopen port";
+					//LOG(INFO) << "Close port and reopen port";
 				}
 
 			}
@@ -363,7 +371,7 @@ int ReadThread::Run()
 			Sleep(10);
 			//if (WaitCommEvent(m_serialIO->m_serialCtrl.GetPortHandle(), &EventMask, NULL) == 0)
 			//{
-			//	LOG(ERROR) << "System Error: Wait com event has problem";
+			//	//LOG(ERROR) << "System Error: Wait com event has problem";
 			//}
    //         /* Neu co ky tu trong COM Port, thi doc tung ky tu */
 			//if ((EventMask & EV_RXCHAR) == EV_RXCHAR)
@@ -388,7 +396,7 @@ int ReadThread::Run()
 							/* Sau khi xu ly xong thi clear co m_bPacketOK */
 							if (packetProcessing() != 0)
 							{
-								LOG(ERROR) << "Error: Packet Processing has problem";
+								//LOG(ERROR) << "Error: Packet Processing has problem";
 							}
 							m_serialIO->m_bPacketOK = FALSE;
 						};
@@ -400,7 +408,7 @@ int ReadThread::Run()
 				m_serialIO->m_bState = S_UNINITTIALZED;
 				m_serialIO->m_serialCtrl.ClosePort();
 				AfxMessageBox(L"The program has problem. Please close and reopen the program.");
-				LOG(INFO) << "Close port and reopen port";
+				//LOG(INFO) << "Close port and reopen port";
 			}           
         }
 	}
@@ -480,6 +488,7 @@ int ReadThread::packetProcessing()
 				m_serialIO->Write(secondConfirm, 4);
 				//confirmTimes = 0;
 				m_serialIO->m_bState = S_CONNECTED;
+				AfxMessageBox(L"Mở cổng thành công");
 			}
 			//}
 			break;
@@ -501,7 +510,7 @@ int ReadThread::packetProcessing()
 			//int i = m_serialIO->RawData->pushData(temp);
 			if (m_serialIO->m_bState == S_CONNECTED)
 			{
-				//LOG(INFO) << temp.value[0];
+				////LOG(INFO) << temp.value[0];
 				//RawDataType* data = new RawDataType[1];
 				//memcpy(data, &temp, 1*sizeof(RawDataType));
 				POSITION pos =  theApp.docList.GetHeadPosition();
@@ -521,6 +530,7 @@ int ReadThread::packetProcessing()
 			break;
 		}
 	default:
+		AfxMessageBox(L"Lỗi kết nối phần cứng");
 		break;
 	}
 
@@ -553,12 +563,12 @@ int WriteThread::Run()
             if(m_serialIO->m_serialCtrl.Write((LPCTSTR)m_serialIO->m_sendBuffer,m_serialIO->m_sendSize,nWritten) == FALSE)
             {
                 // TODO add code here : Ghi log file system error
-				LOG(ERROR) << "System Error: Write data has problem";
+				//LOG(ERROR) << "System Error: Write data has problem";
             }
         }
         if (ResetEvent(m_serialIO->m_WriteEvent) == 0)
 		{
-			LOG(ERROR) << "System Error: Reset com event has problem";
+			//LOG(ERROR) << "System Error: Reset com event has problem";
 		}
 	}
 	return 1;
@@ -596,7 +606,7 @@ BOOL CSerialIO::Init()
     if((m_readProcess == NULL) || (m_writeProcess == NULL))
     {
         /* TODO Code add here : Ghi Log File la System Error */
-		LOG(ERROR) << "System Error: Create thread has problem";
+		//LOG(ERROR) << "System Error: Create thread has problem";
         retVal = FALSE;
     }
 
@@ -605,12 +615,12 @@ BOOL CSerialIO::Init()
     if((m_WriteEvent == NULL) || (m_WriteEvent == INVALID_HANDLE_VALUE))
     {
         /* TODO Code add here : Ghi Log File la System Error */
-		LOG(ERROR) << "System Error: Create com event has problem";
+		//LOG(ERROR) << "System Error: Create com event has problem";
         retVal = FALSE;
     }
 	if (ResetEvent(m_WriteEvent) == 0)
 	{
-		LOG(ERROR) << "System Error: Reset com event has problem";
+		//LOG(ERROR) << "System Error: Reset com event has problem";
 	}
 
 	m_DCB.ByteSize = 8;
@@ -703,7 +713,7 @@ void CSerialIO::UnInit()
 
 	if (ResetEvent(m_WriteEvent) == 0)
 	{
-		LOG(ERROR) << "System Error: Reset com event has problem";
+		//LOG(ERROR) << "System Error: Reset com event has problem";
 	}
     m_serialCtrl.ClosePort();
 
@@ -718,14 +728,14 @@ void CSerialIO::Write(char *outPacket,int outLength)
 		m_sendSize = outLength;
 		if (SetEvent(m_WriteEvent) == 0)
 		{
-			LOG(ERROR) << "System Error: Reset com event has problem";
+			//LOG(ERROR) << "System Error: Reset com event has problem";
 		}
 		//SetEvent(m_WriteEvent);
 	}
     else
 	{
 		// TODO add code here : Ghi log file, system error
-		LOG(ERROR) << "System Error: Write Data is too large";
+		//LOG(ERROR) << "System Error: Write Data is too large";
 	}
 	return ;
 }

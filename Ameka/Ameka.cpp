@@ -22,7 +22,7 @@
 
 #include "Ameka.h"
 
-#include "easylogging++.h"
+//#include "easylogging++.h"
 #include "DSPModule.h"
 #include "GraphModule.h"
 #include "SerialCtrl.h"
@@ -36,7 +36,7 @@
 #define new DEBUG_NEW
 #endif
 
-_INITIALIZE_EASYLOGGINGPP
+//_INITIALIZE_EASYLOGGINGPP
 
 	using namespace std;
 
@@ -96,26 +96,26 @@ CAmekaApp::CAmekaApp()
 	//dataBuf = new AmekaData<RawDataType>(4096);
 
 	//initialize log
-	el::Configurations defaultConf;
-	defaultConf.setToDefault();
-	//defaultConf.setGlobally(el::ConfigurationType::Filename, "logs\\Log.txt");
-	defaultConf.setGlobally(el::ConfigurationType::LogFlushThreshold, "1000");
-	defaultConf.setGlobally(el::ConfigurationType::Format, "%datetime %level %msg");
-	el::Loggers::reconfigureLogger("default", defaultConf);
-	LOG(INFO) << "Log using default file";
+	//el::Configurations defaultConf;
+	//defaultConf.setToDefault();
+	////defaultConf.setGlobally(el::ConfigurationType::Filename, "logs\\Log.txt");
+	//defaultConf.setGlobally(el::ConfigurationType::LogFlushThreshold, "1000");
+	//defaultConf.setGlobally(el::ConfigurationType::Format, "%datetime %level %msg");
+	//el::Loggers::reconfigureLogger("default", defaultConf);
+	//LOG(INFO) << "Log using default file";
 
 	//initialize montage list
 
 	TiXmlDocument doc;
 	if(!doc.LoadFile(xmlName))
 	{
-		LOG(ERROR) << doc.ErrorDesc();
+		//LOG(ERROR) << doc.ErrorDesc();
 		return;
 	}
 	TiXmlElement* root = doc.FirstChildElement();
 	if(root == NULL)
 	{
-		LOG(ERROR) << "Failed to load file: No root element.";
+		//LOG(ERROR) << "Failed to load file: No root element.";
 		doc.Clear();
 		return;
 	}
@@ -447,7 +447,7 @@ void CAmekaApp::OnPhotic()
 	{
 		//Cameka
 		pView->onPhotic = ~pView->onPhotic;
-		if (pView->onPhotic)
+		if (pView->onPhotic && !pView->isDrawRec)
 		{
 			CAmekaView *pView = CAmekaView::GetView();
 			pView->pPhoticThread = AfxBeginThread(pView->photicHandle, (LPVOID)pView);
@@ -826,7 +826,7 @@ void CAmekaApp::OnStop()
 				/*if (pView->onPhotic)
 				{
 
-					photic_processing(FRE_STEP, pView->GetDocument(), pView->GetScrollPos(SB_HORZ));
+					photic_processing(FRE_STEP, pView->GetDocument(), pView->this->GetScrollPos(SB_HORZ));
 					pView->drawBarGraph();
 				}*/
 			}
@@ -983,18 +983,23 @@ void CAmekaApp::OnPortOpen()
 	if (!pIO)
 	{
 		pIO = new CSerialIO(portFullName, m_baudRate);
-		Sleep(100);
-		if (pIO->m_bState == S_CONNECTED || pIO->m_bState == S_NOCONNECTED)
+		Sleep(1000);
+		if (pIO->m_bState == S_CONNECTED)
 		{
 			pMainWnd->stopEnable = TRUE;
 			pMainWnd->startEnable = TRUE;
 			pMainWnd->recEnable = TRUE;
+			pMainWnd->portEnable = FALSE;
+			pMainWnd->baudEnable = FALSE;
+			pMainWnd->scanPortEnable = FALSE;
 			pPortOpen->SetText(L"Đóng cổng");
+			//AfxMessageBox(L"Mở cổng thành công");
 		}
 		else
 		{
 			delete pIO;
 			pIO = NULL;
+			//AfxMessageBox(L"Lỗi kết nối phần cứng");
 		}
 	}
 	else
@@ -1003,8 +1008,12 @@ void CAmekaApp::OnPortOpen()
 		pMainWnd->startEnable = FALSE;
 		pMainWnd->stopEnable = FALSE;
 		pMainWnd->recEnable = FALSE;
+		pMainWnd->portEnable = TRUE;
+		pMainWnd->baudEnable = TRUE;
+		pMainWnd->scanPortEnable = TRUE;
 		delete pIO;
 		pIO = NULL;
+		AfxMessageBox(L"Đã đóng cổng");
 	}
 
 	//m_dspProcess->setOwner(this);

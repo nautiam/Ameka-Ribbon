@@ -49,6 +49,9 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		ON_UPDATE_COMMAND_UI(MN_StartDemo, &CMainFrame::OnUpdateStartdemo)
 		ON_UPDATE_COMMAND_UI(MN_StopDemo, &CMainFrame::OnUpdateStopdemo)
 		ON_UPDATE_COMMAND_UI(MN_Recording, &CMainFrame::OnUpdateRecording)
+		ON_UPDATE_COMMAND_UI(MN_Scan, &CMainFrame::OnUpdateScan)
+		ON_UPDATE_COMMAND_UI(MN_PortName, &CMainFrame::OnUpdatePortname)
+		ON_UPDATE_COMMAND_UI(MN_Baud, &CMainFrame::OnUpdateBaud)
 	END_MESSAGE_MAP()
 
 	// CMainFrame construction/destruction
@@ -633,6 +636,8 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 				//AfxMessageBox(L"Load file success");
 				ResetEvent(pDoc->onReadSuccess);
 				pView->isDrawRec = TRUE;
+				pView->isNull = FALSE;;
+				pView->isRunning = FALSE;
 				pView->OnDraw(pView->GetDC());
 			}
 			else
@@ -662,4 +667,25 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 	{
 		// TODO: Add your command update UI handler code here
 		pCmdUI->Enable(recEnable);
+	}
+
+
+	void CMainFrame::OnUpdateScan(CCmdUI *pCmdUI)
+	{
+		// TODO: Add your command update UI handler code here
+		pCmdUI->Enable(scanPortEnable);
+	}
+
+
+	void CMainFrame::OnUpdatePortname(CCmdUI *pCmdUI)
+	{
+		// TODO: Add your command update UI handler code here
+		pCmdUI->Enable(portEnable);
+	}
+
+
+	void CMainFrame::OnUpdateBaud(CCmdUI *pCmdUI)
+	{
+		// TODO: Add your command update UI handler code here
+		pCmdUI->Enable(baudEnable);
 	}

@@ -113,7 +113,6 @@
     <ClInclude Include="CommModule.h" />
     <ClInclude Include="C_ColorToolTip.h" />
     <ClInclude Include="DSPModule.h" />
-    <ClInclude Include="easylogging++.h" />
     <ClInclude Include="EnvSetupModule.h" />
     <ClInclude Include="GraphModule.h" />
     <ClInclude Include="InfoDlg.h" />

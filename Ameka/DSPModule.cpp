@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "easylogging++.h"
+//#include "easylogging++.h"
 #include "AmekaDoc.h"
 #include "dsp_filters.h"
 #include "DSPModule.h"
@@ -50,7 +50,20 @@ void photic_processing(float fre_step, LPVOID pParam, uint64_t pos)
 	float NC = (float)nfft/2.0 + 1.0;
 
 	if (pos != -1)
-		mDoc->PrimaryData->LRPos = pos;
+	{
+		uint16_t buflen = SAMPLE_RATE/FRE_STEP;
+		if (pos >= (mDoc->PrimaryData->dataLen - buflen - 1))
+		{
+			mDoc->PrimaryData->LRPos = mDoc->PrimaryData->dataLen - buflen - 1;
+		}
+		else
+		{
+			mDoc->PrimaryData->LRPos = pos;
+		}		
+
+		mDoc->SecondaryData->LRPos = 0;
+		mDoc->SecondaryData->crtWPos = 0;
+	}
 	PrimaryDataType* output = mDoc->PrimaryData->checkPopData(nfft);
 	uint16_t size =  mDoc->PrimaryData->rLen;
 		
@@ -98,9 +111,9 @@ void photic_processing(float fre_step, LPVOID pParam, uint64_t pos)
 				else
 				{
 					temp.value[j] = bufout[j][i].r;
-				}
-			mDoc->SecondaryData->pushData(temp);
+				}			
 			}
+			mDoc->SecondaryData->pushData(temp);
 		}
 		free(st);
 		for (int i=0; i<MONTAGE_NUM; i++)
@@ -298,7 +311,7 @@ void dsp_processing(LPVOID pParam)
 		raw_cnt = 0;
 		//delete m_rawData;
 	}	
-	mDoc->PrimaryData->crtWPos = mDoc->counter;
+	mDoc->PrimaryData->crtWPos = mDoc->counter - 1;
 	delete m_rawData;
 	m_rawData = NULL;
 	for (int i=0; i<MONTAGE_NUM; i++)
@@ -566,16 +579,16 @@ UINT DSP::DSPThread(LPVOID pParam)
 			
 			for (int i=0; i<size; i++)
 			{
-				if (mDoc->PrimaryData->pushData(output[i]) != 0)
+				/*if (mDoc->PrimaryData->pushData(output[i]) != 0)
 				{
 					LOG(DEBUG) << "Primary Data ring buffer is full";	
 				}
 				if (mDoc->TemporaryData->pushData(output[i]) != 0)
 				{
 					LOG(DEBUG) << "Temporary Data ring buffer is full";	
-				}
-				//mDoc->PrimaryData->pushData(output[i]);
-				//mDoc->TemporaryData->pushData(output[i]);
+				}*/
+				mDoc->PrimaryData->pushData(output[i]);
+				mDoc->TemporaryData->pushData(output[i]);
 			}
 			
 			for (int i=0; i<MONTAGE_NUM; i++)
@@ -649,10 +662,10 @@ UINT DSP::DSPThread(LPVOID pParam)
 						temp.value[j] = bufout[j][i].r;
 					}
 					//float fre = i * (float)(SAMPLE_RATE / nfft);
-					/*LOG(INFO) << "------------";
-					LOG(INFO) << j;
-					LOG(INFO) << fre;
-					LOG(INFO) << bufout[j][i].r;*/
+					/*//LOG(INFO) << "------------";
+					//LOG(INFO) << j;
+					//LOG(INFO) << fre;
+					//LOG(INFO) << bufout[j][i].r;*/
 				}				
 				/*if (mDoc->SecondaryData->pushData(temp) != 0)
 				{

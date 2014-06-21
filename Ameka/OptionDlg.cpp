@@ -162,8 +162,8 @@ int CTabViewDlg::OnInitDialog()
 	CAmekaView* pView = CAmekaView::GetView();
 	if (pView)
 	{
-		int i = pView->graphData.dotPmm;
-		m_view_dotPmm.SetWindowTextW(itoS(pView->graphData.dotPmm));
+		
+		m_view_dotPmm.SetWindowTextW(theApp.m_dotPmm);
 	}
 	return 0;
 }
