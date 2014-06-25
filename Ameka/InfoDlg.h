@@ -1,14 +1,17 @@
-#include "stdafx.h"
-#include "Ameka.h"
+#pragma once
+#include "afxwin.h"
+#include "afxdtctl.h"
 
-//------------------------------------------------------------------//
-// CInfoDlg
-//------------------------------------------------------------------//
+
+// CInfoDlg dialog
 
 class CInfoDlg : public CDialogEx
 {
+	DECLARE_DYNAMIC(CInfoDlg)
+
 public:
-	CInfoDlg();
+	CInfoDlg(CWnd* pParent = NULL);   // standard constructor
+	virtual ~CInfoDlg();
 
 // Dialog Data
 	enum { IDD = DLG_Info };
@@ -16,13 +19,14 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
-// Implementation
-protected:
 	DECLARE_MESSAGE_MAP()
-	virtual BOOL OnInitDialog();
 public:
-	afx_msg void OnBnClickedok();
-	afx_msg void OnBnClickedcancel();
-	CComboBox info_sex;
-	CButton info_handed;
+	CEdit mName;
+	CEdit mSurName;
+	CEdit m_SecondName;
+	CDateTimeCtrl m_Date;
+	CComboBox m_Sex;
+	CEdit m_ID;
+	CButton m_Hand;
+	CEdit m_Info;
 };

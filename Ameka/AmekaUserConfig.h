@@ -114,16 +114,16 @@ struct PatientInfo {
 	CString surname;
 	CString note;
 	CTime birthday;
-	uint16_t uID;
-	uint8_t sex;
+	CString uID;
+	CString sex;
 	bool lefthanded;
 	PatientInfo() {
 		fname = "N.A";
 		lname = "N.A";
 		surname = "N.A";
 		note = "N.A";
-		uID = 0;
-		sex = 0;
+		uID = "N.A";
+		sex = "Unknown";
 	};
 };
 
