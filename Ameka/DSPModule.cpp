@@ -420,8 +420,8 @@ UINT DSP::DSPThread(LPVOID pParam)
 			{
 				mDoc->isOpenFile = TRUE;
 				mDoc->counter = 0;
-				uint16_t temp[100];
-				for (int i=0; i<100; i++)
+				uint16_t temp[200];
+				for (int i=0; i<200; i++)
 				{
 					temp[i] = 0xFF;
 				}
@@ -706,17 +706,87 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	uint64_t counter = 0;
 	counter = (uint64_t)(temp[4]) | (uint64_t)(temp[5] << 16) | (uint64_t)(temp[6] << 32) | (uint64_t)(temp[7] << 48);
 	mDoc->counter = counter;
-	uint8_t temp_mon[66];
+	uint8_t temp_mon[80];
 	mDoc->object.Read(temp_mon, sizeof(temp_mon));
 	uint8_t monNum = temp_mon[64];
 	uint8_t nLen = temp_mon[65];
 	
+	// Doc ten montage
 	char *szTo = new char[nLen + 1];
 	LPWSTR wszTo = new WCHAR[nLen + 1];
 	wszTo[nLen] = '\0';
 	mDoc->object.Read(szTo, (nLen + 1)*sizeof(char));
 	MultiByteToWideChar(1258, 0, szTo, nLen, wszTo, nLen);
 	mDoc->mMon.mName = (CString)wszTo;
+	delete szTo;
+	delete wszTo;
+
+	uint8_t no_c;
+	// Doc ho va ten benh nhan
+	no_c = temp_mon[66];
+	szTo = new char[no_c + 1];
+	wszTo = new WCHAR[no_c + 1];
+	wszTo[no_c] = '\0';
+	mDoc->object.Read(szTo, (no_c + 1)*sizeof(char));
+	MultiByteToWideChar(1258, 0, szTo, no_c, wszTo, no_c);
+	mDoc->patientInfo.fname = (CString)wszTo;
+	delete szTo;
+	delete wszTo;
+
+	no_c = temp_mon[67];
+	szTo = new char[no_c + 1];
+	wszTo = new WCHAR[no_c + 1];
+	wszTo[no_c] = '\0';
+	mDoc->object.Read(szTo, (no_c + 1)*sizeof(char));
+	MultiByteToWideChar(1258, 0, szTo, no_c, wszTo, no_c);
+	mDoc->patientInfo.lname = (CString)wszTo;
+	delete szTo;
+	delete wszTo;
+
+	//Doc ghi chu
+	no_c = temp_mon[68];
+	szTo = new char[no_c + 1];
+	wszTo = new WCHAR[no_c + 1];
+	wszTo[no_c] = '\0';
+	mDoc->object.Read(szTo, (no_c + 1)*sizeof(char));
+	MultiByteToWideChar(1258, 0, szTo, no_c, wszTo, no_c);
+	mDoc->patientInfo.note = (CString)wszTo;
+	delete szTo;
+	delete wszTo;
+
+	//Doc uID
+	no_c = temp_mon[69];
+	szTo = new char[no_c + 1];
+	wszTo = new WCHAR[no_c + 1];
+	wszTo[no_c] = '\0';
+	mDoc->object.Read(szTo, (no_c + 1)*sizeof(char));
+	MultiByteToWideChar(1258, 0, szTo, no_c, wszTo, no_c);
+	mDoc->patientInfo.uID = (CString)wszTo;
+	delete szTo;
+	delete wszTo;
+
+	//Doc gioi tinh
+	no_c = temp_mon[70];
+	szTo = new char[no_c + 1];
+	wszTo = new WCHAR[no_c + 1];
+	wszTo[no_c] = '\0';
+	mDoc->object.Read(szTo, (no_c + 1)*sizeof(char));
+	MultiByteToWideChar(1258, 0, szTo, no_c, wszTo, no_c);
+	mDoc->patientInfo.sex = (CString)wszTo;
+	delete szTo;
+	delete wszTo;
+
+	//Doc ten dem
+	no_c = temp_mon[71];
+	szTo = new char[no_c + 1];
+	wszTo = new WCHAR[no_c + 1];
+	wszTo[no_c] = '\0';
+	mDoc->object.Read(szTo, (no_c + 1)*sizeof(char));
+	MultiByteToWideChar(1258, 0, szTo, no_c, wszTo, no_c);
+	mDoc->patientInfo.surname = (CString)wszTo;
+	delete szTo;
+	delete wszTo;
+
 	POSITION pos;
 	mDoc->mMon.mList.RemoveAll();
 	if (monNum > 32)

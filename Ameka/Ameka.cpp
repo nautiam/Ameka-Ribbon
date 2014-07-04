@@ -813,7 +813,7 @@ void CAmekaApp::OnStop()
 			pDoc->object.Write(temp, sizeof(temp));
 			
 			uint8_t nLen = _tcslen(pDoc->mMon.mName);
-			uint8_t temp_mon[66];
+			uint8_t temp_mon[80];
 			uint8_t monNum =  pDoc->mMon.mList.GetCount();
 			temp_mon[64] = monNum;
 			POSITION pos;
@@ -829,14 +829,74 @@ void CAmekaApp::OnStop()
 				temp_mon[i*2] = fID;
 				temp_mon[i*2 + 1] = sID;
 			}
-			temp_mon[65] = nLen;
+			temp_mon[65] = nLen; // so ky tu cua montage name
+			temp_mon[66] = _tcsclen(pDoc->patientInfo.fname); // So ky tu cua Ho
+			temp_mon[67] = _tcsclen(pDoc->patientInfo.lname); // So ky tu cua Ten
+			temp_mon[68] = _tcsclen(pDoc->patientInfo.note); // So ky tu cua Ghi chu
+			temp_mon[69] = _tcsclen(pDoc->patientInfo.uID); // So ky tu cua uID
+			temp_mon[70] = _tcsclen(pDoc->patientInfo.sex); // So ky tu cua Gioi tinh
+			temp_mon[71] = pDoc->patientInfo.lefthanded; // Thuan tay trai
+			temp_mon[72] = _tcsclen(pDoc->patientInfo.surname); // So ky tu cua Ten dem
+			// Reserved for birthday
+			
 			pDoc->object.Write(temp_mon, sizeof(temp_mon));
 			
+			// Ghi montage name vao file
 			char *szTo = new char[nLen + 1];
 			WideCharToMultiByte(1258, 0, pDoc->mMon.mName, nLen, szTo, nLen, NULL, NULL);			
 			int size = sizeof(szTo);
 			pDoc->object.Write(szTo, (nLen + 1)*sizeof(char));
 			delete szTo;
+
+			uint8_t no_c;
+			// Ghi Ho vao file
+			no_c = _tcsclen(pDoc->patientInfo.fname);
+			szTo = new char[no_c + 1];
+			WideCharToMultiByte(1258, 0, pDoc->patientInfo.fname, no_c, szTo, nLen, NULL, NULL);			
+			size = sizeof(szTo);
+			pDoc->object.Write(szTo, (no_c + 1)*sizeof(char));
+			delete szTo;
+
+			// Ghi Ten vao file
+			no_c = _tcsclen(pDoc->patientInfo.lname);
+			szTo = new char[no_c + 1];
+			WideCharToMultiByte(1258, 0, pDoc->patientInfo.lname, no_c, szTo, nLen, NULL, NULL);			
+			size = sizeof(szTo);
+			pDoc->object.Write(szTo, (no_c + 1)*sizeof(char));
+			delete szTo;
+
+			// Ghi ghi chu vao file
+			no_c = _tcsclen(pDoc->patientInfo.note);
+			szTo = new char[no_c + 1];
+			WideCharToMultiByte(1258, 0, pDoc->patientInfo.note, no_c, szTo, nLen, NULL, NULL);			
+			size = sizeof(szTo);
+			pDoc->object.Write(szTo, (no_c + 1)*sizeof(char));
+			delete szTo;
+
+			// Ghi uID vao file
+			no_c = _tcsclen(pDoc->patientInfo.uID);
+			szTo = new char[no_c + 1];
+			WideCharToMultiByte(1258, 0, pDoc->patientInfo.uID, no_c, szTo, nLen, NULL, NULL);			
+			size = sizeof(szTo);
+			pDoc->object.Write(szTo, (no_c + 1)*sizeof(char));
+			delete szTo;
+
+			// Ghi Gioi tinh vao file
+			no_c = _tcsclen(pDoc->patientInfo.sex);
+			szTo = new char[no_c + 1];
+			WideCharToMultiByte(1258, 0, pDoc->patientInfo.sex, no_c, szTo, nLen, NULL, NULL);			
+			size = sizeof(szTo);
+			pDoc->object.Write(szTo, (no_c + 1)*sizeof(char));
+			delete szTo;
+
+			// Ghi Ten dem vao file
+			no_c = _tcsclen(pDoc->patientInfo.surname);
+			szTo = new char[no_c + 1];
+			WideCharToMultiByte(1258, 0, pDoc->patientInfo.surname, no_c, szTo, nLen, NULL, NULL);			
+			size = sizeof(szTo);
+			pDoc->object.Write(szTo, (no_c + 1)*sizeof(char));
+			delete szTo;
+
 			pDoc->object.Close();
 			pDoc->isOpenFile = FALSE;
 			pDoc->counter = 0;
