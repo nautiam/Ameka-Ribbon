@@ -51,7 +51,7 @@ BEGIN_MESSAGE_MAP(CAmekaApp, CWinAppEx)
 	ON_COMMAND(MN_New, &CWinAppEx::OnFileNew)
 	//ON_COMMAND(MN_Open, &CWinAppEx::OnFileOpen)
 	ON_COMMAND(MN_Close, &CAmekaApp::OnFileClose)
-	ON_COMMAND(MN_Print, &CWinAppEx::OnFilePrintSetup)
+	//ON_COMMAND(MN_Print, &CWinAppEx::OnFilePrintSetup)
 	ON_COMMAND(MN_Setting, &CAmekaApp::OnSetting)
 	ON_COMMAND(MN_Info, &CAmekaApp::OnInfo)
 	ON_COMMAND(MN_Option, &CAmekaApp::OnOption)
@@ -147,6 +147,11 @@ CAmekaApp::CAmekaApp()
 	m_LP = strLP;
 	m_HP = strHP;
 	m_dotPmm = strdotPmm;
+
+	marginLeft = LEFT_MARGIN;
+	marginRight= RIGHT_MARGIN;
+	marginTop = TOP_MARGIN;
+	marginBot = BOT_MARGIN;
 
 	char line[100];
 	ifstream setFile;

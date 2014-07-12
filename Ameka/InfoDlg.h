@@ -18,7 +18,8 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
+// Implementation
+	virtual BOOL OnInitDialog();
 	DECLARE_MESSAGE_MAP()
 public:
 	CEdit mName;
@@ -29,4 +30,6 @@ public:
 	CEdit m_ID;
 	CButton m_Hand;
 	CEdit m_Info;
+	afx_msg void OnBnClickedok();
+	afx_msg void OnBnClickedcancel();
 };

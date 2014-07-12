@@ -150,3 +150,36 @@ public:
 	afx_msg void OnBnClickedcancel();
 	afx_msg void OnBnClickedok();
 };
+
+//------------------------------------------------------------------//
+// CTabPrintDlg
+//------------------------------------------------------------------//
+
+#pragma once
+
+
+// CTabPrintDlg dialog
+
+class CTabPrintDlg : public CDialogEx
+{
+	DECLARE_DYNAMIC(CTabPrintDlg)
+
+public:
+	CTabPrintDlg(CWnd* pParent = NULL);   // standard constructor
+	virtual ~CTabPrintDlg();
+
+// Dialog Data
+	enum { IDD = DLG_Opt_Print };
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+// Implementation
+protected:
+	virtual BOOL OnInitDialog();
+	DECLARE_MESSAGE_MAP()
+public:
+	CEdit ed_left;
+	CEdit ed_right;
+	CEdit ed_top;
+	CEdit ed_bot;
+};

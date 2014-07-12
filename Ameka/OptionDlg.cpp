@@ -231,14 +231,17 @@ int COptionDlg::OnInitDialog()
     tab_ctrl.InsertItem(0,L"Bảng");
 	tab_ctrl.InsertItem(1,L"Sự kiện");
 	tab_ctrl.InsertItem(2,L"Ghi");
+	tab_ctrl.InsertItem(3,L"In");
 
 	mDlg[0] = new CTabViewDlg;
 	mDlg[1] = new CTabEventDlg;
 	mDlg[2] = new CTabRecDlg;
+	mDlg[3] = new CTabPrintDlg;
 
 	mDlg[0]->Create(DLG_Opt_View, &tab_ctrl);
 	mDlg[1]->Create(DLG_Opt_Event, &tab_ctrl);
 	mDlg[2]->Create(DLG_Opt_Rec, &tab_ctrl);
+	mDlg[3]->Create(DLG_Opt_Print, &tab_ctrl);
 
 	CRect TabRect; 
 	tab_ctrl.GetClientRect(&TabRect);
@@ -246,10 +249,12 @@ int COptionDlg::OnInitDialog()
 	mDlg[0]->MoveWindow(TabRect);
 	mDlg[1]->MoveWindow(TabRect);
 	mDlg[2]->MoveWindow(TabRect);
+	mDlg[3]->MoveWindow(TabRect);
 
     mDlg[0]->ShowWindow(true);
 	mDlg[1]->ShowWindow(false);
 	mDlg[2]->ShowWindow(false);
+	mDlg[3]->ShowWindow(false);
     tab_ctrl.SetCurSel(0);
 	mPrePos = 0;
 
@@ -259,7 +264,7 @@ int COptionDlg::OnInitDialog()
 void COptionDlg::OnBnClickedok()
 {
 	// TODO: Add your control notification handler code here
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		mDlg[i]->UpdateData();
 	}
@@ -344,3 +349,75 @@ void COptionDlg::OnBnClickedcancel()
 	// TODO: Add your control notification handler code here
 	CDialogEx::OnCancel();
 }
+
+
+
+//------------------------------------------------------------------//
+// CTabPrintDlg
+//------------------------------------------------------------------//
+
+
+IMPLEMENT_DYNAMIC(CTabPrintDlg, CDialogEx)
+
+CTabPrintDlg::CTabPrintDlg(CWnd* pParent /*=NULL*/)
+	: CDialogEx(CTabPrintDlg::IDD, pParent)
+{
+
+}
+
+CTabPrintDlg::~CTabPrintDlg()
+{
+}
+
+void CTabPrintDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+
+	DDX_Control(pDX, ID_LEFT, ed_left);
+	DDX_Control(pDX, ID_RIGHT, ed_right);
+	DDX_Control(pDX, ID_TOP, ed_top);
+	DDX_Control(pDX, ID_BOT, ed_bot);
+
+	CString tmp;
+	DDX_Text(pDX, ID_LEFT, tmp);
+	if (tmp != "")
+		theApp.marginLeft = atoi((LPCSTR)(CStringA)tmp);
+
+	DDX_Text(pDX, ID_RIGHT, tmp);
+	if (tmp != "")
+		theApp.marginRight = atoi((LPCSTR)(CStringA)tmp);
+
+	DDX_Text(pDX, ID_TOP, tmp);
+	if (tmp != "")
+		theApp.marginTop = atoi((LPCSTR)(CStringA)tmp);
+
+	DDX_Text(pDX, ID_BOT, tmp);
+	if (tmp != "")
+		theApp.marginBot= atoi((LPCSTR)(CStringA)tmp);
+}
+
+int CTabPrintDlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	CString str;
+	str.Format(L"%d", theApp.marginLeft);	
+	ed_left.SetWindowTextW(str);
+
+	str.Format(L"%d", theApp.marginRight);	
+	ed_right.SetWindowTextW(str);
+
+	str.Format(L"%d", theApp.marginTop);	
+	ed_top.SetWindowTextW(str);
+
+	str.Format(L"%d", theApp.marginBot);	
+	ed_bot.SetWindowTextW(str);
+
+	return 0;
+}
+
+BEGIN_MESSAGE_MAP(CTabPrintDlg, CDialogEx)
+END_MESSAGE_MAP()
+
+
+// CTabPrintDlg message handlers

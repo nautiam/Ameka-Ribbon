@@ -53,7 +53,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions);_UNICODE</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions);_UNICODE;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
     </ClCompile>
@@ -122,6 +122,7 @@
     <ClInclude Include="MontageDlg.h" />
     <ClInclude Include="OptionDlg.h" />
     <ClInclude Include="PhoticDlg.h" />
+    <ClInclude Include="QPrint.h" />
     <ClInclude Include="RecordingModule.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SerialCtrl.h" />
@@ -152,6 +153,7 @@
     <ClCompile Include="MontageDlg.cpp" />
     <ClCompile Include="OptionDlg.cpp" />
     <ClCompile Include="PhoticDlg.cpp" />
+    <ClCompile Include="QPrint.cpp" />
     <ClCompile Include="SerialCtrl.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

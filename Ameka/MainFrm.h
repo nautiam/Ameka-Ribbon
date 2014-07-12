@@ -84,6 +84,7 @@ public:
 	afx_msg void OnUpdateScan(CCmdUI *pCmdUI);
 	afx_msg void OnUpdatePortname(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateBaud(CCmdUI *pCmdUI);
+	afx_msg void OnPrint();
 };
 
 

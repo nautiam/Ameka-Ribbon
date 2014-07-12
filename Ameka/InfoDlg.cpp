@@ -21,6 +21,19 @@ CInfoDlg::~CInfoDlg()
 {
 }
 
+int CInfoDlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
+	if (!pDoc)
+		return 1;
+
+	m_Date.SetTime(&pDoc->patientInfo.birthday);
+	m_Hand.SetCheck(pDoc->patientInfo.lefthanded);
+	return 0;
+}
+
 void CInfoDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
@@ -43,7 +56,28 @@ void CInfoDlg::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CInfoDlg, CDialogEx)
+	ON_BN_CLICKED(info_ok, &CInfoDlg::OnBnClickedok)
+	ON_BN_CLICKED(info_cancel, &CInfoDlg::OnBnClickedcancel)
 END_MESSAGE_MAP()
 
 
 // CInfoDlg message handlers
+
+
+void CInfoDlg::OnBnClickedok()
+{
+	// TODO: Add your control notification handler code here
+	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
+	if (!pDoc)
+		return;
+	m_Date.GetTime(pDoc->patientInfo.birthday);
+	pDoc->patientInfo.lefthanded = m_Hand.GetCheck();
+	CDialogEx::OnOK();
+}
+
+
+void CInfoDlg::OnBnClickedcancel()
+{
+	// TODO: Add your control notification handler code here
+	CDialogEx::OnCancel();
+}

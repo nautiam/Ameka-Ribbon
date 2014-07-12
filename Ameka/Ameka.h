@@ -46,6 +46,11 @@
 #define xmlName "listmontage.conf"
 #define settingName "config.conf"
 
+#define LEFT_MARGIN 20
+#define RIGHT_MARGIN 20
+#define TOP_MARGIN 20
+#define BOT_MARGIN 20
+
 using namespace std;
 
 
@@ -81,6 +86,11 @@ public:
 	float photicMax;
 	float photicTick;
 	float photicBarW;
+
+	uint16_t marginLeft;
+	uint16_t marginRight;
+	uint16_t marginTop;
+	uint16_t marginBot;
 // Overrides
 public:
 	virtual BOOL InitInstance();

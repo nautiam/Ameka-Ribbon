@@ -1,4 +1,4 @@
-// This MFC Samples source code demonstrates using MFC Microsoft Office Fluent User Interface 
+﻿// This MFC Samples source code demonstrates using MFC Microsoft Office Fluent User Interface 
 // (the "Fluent UI") and is provided only as referential material to supplement the 
 // Microsoft Foundation Classes Reference and related electronic documentation 
 // included with the MFC C++ library software.  
@@ -17,6 +17,7 @@
 #include "AmekaView.h"
 #include "DSPModule.h"
 #include "LoaddingDlg.h"
+#include "QPrint.h"
 
 #include "MainFrm.h"
 #include <vector>
@@ -52,6 +53,7 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		ON_UPDATE_COMMAND_UI(MN_Scan, &CMainFrame::OnUpdateScan)
 		ON_UPDATE_COMMAND_UI(MN_PortName, &CMainFrame::OnUpdatePortname)
 		ON_UPDATE_COMMAND_UI(MN_Baud, &CMainFrame::OnUpdateBaud)
+		ON_COMMAND(MN_Print, &CMainFrame::OnPrint)
 	END_MESSAGE_MAP()
 
 	// CMainFrame construction/destruction
@@ -688,4 +690,51 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 	{
 		// TODO: Add your command update UI handler code here
 		pCmdUI->Enable(baudEnable);
+	}
+
+
+	void CMainFrame::OnPrint()
+	{
+		CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
+		if (!pDoc)
+			return;
+
+		// TODO: Add your command handler code here
+		CQPrint prt;
+		HPRIVATEFONT   hFont;
+
+		// Step 1 : call the CPrintDialog
+		if (prt.Dialog() == -1)
+			return;
+
+		//Step 2 : Start the Print
+		prt.StartPrint();      
+		prt.SetMargins(theApp.marginTop, theApp.marginBot, theApp.marginLeft, theApp.marginRight);
+
+		//Step 3 : Create a printing font
+		hFont = prt.AddFontToEnvironment("Arial Greek",8,8); 
+		prt.SetDistance(5);  
+
+		//Step 4 : Start Page
+		prt.StartPage(); 
+
+		//Step 5 : The actual printing goes here
+		//print partien info
+		prt.Print(hFont,L"Bệnh nhân: " + pDoc->patientInfo.fname,FORMAT_NORMAL);   
+		prt.Print(hFont,L"Giới tính: ", FORMAT_NORMAL);   
+		prt.Print(hFont,L"Ngày sinh: ",FORMAT_NORMAL);   
+
+		//print line
+		prt.Line(PS_SOLID);
+
+		//print graph
+		//prt.InsertBitmap(IDB_MAIN, FORMAT_NORMAL, NULL, 0);
+		prt.InsertBitmapFromView(FORMAT_NORMAL, NULL, 0);
+
+		//Step 6 :  now end the page
+		prt.EndPage();
+
+		//Step 7 :  close the print document
+		//          and release it in the spooler
+		prt.EndPrint();  
 	}

@@ -53,6 +53,7 @@
 #define DLG_Wave                        318
 #define DLG_Montage                     320
 #define DLG_Opt_COM                     321
+#define DLG_Opt_Print                   321
 #define DLG_Opt_View                    323
 #define DLG_Opt_Rec                     324
 #define DLG_Opt_Event                   325
@@ -75,9 +76,11 @@
 #define view_lp                         1007
 #define EV_5                            1007
 #define info_surName                    1007
+#define ID_TOP                          1007
 #define IDC_DATETIMEPICKER1             1008
 #define info_birthday                   1008
 #define IDC_CHECK5                      1008
+#define ID_BOT                          1008
 #define IDC_EDIT4                       1009
 #define IDC_EDIT5                       1010
 #define info_view                       1010
@@ -152,6 +155,9 @@
 #define EV_9                            1083
 #define EV_10                           1084
 #define IDC_BUTTON4                     1085
+#define ID_LEFT                         1086
+#define ID_RIGHT                        1087
+#define info_hand                       1088
 #define ID_WRITE_PASTEASHYPERLINK       32770
 #define MN_Open                         32771
 #define MN_Close                        32772
@@ -199,7 +205,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        329
 #define _APS_NEXT_COMMAND_VALUE         32823
-#define _APS_NEXT_CONTROL_VALUE         1086
+#define _APS_NEXT_CONTROL_VALUE         1089
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif
