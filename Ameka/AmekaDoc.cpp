@@ -126,7 +126,7 @@ CAmekaDoc::~CAmekaDoc()
 		object.Write(temp, sizeof(temp));
 
 		uint8_t nLen = _tcslen(mMon.mName);
-		uint8_t temp_mon[80];
+		uint8_t temp_mon[85];
 		uint8_t monNum =  mMon.mList.GetCount();
 		temp_mon[64] = monNum;
 		POSITION pos;
@@ -150,6 +150,17 @@ CAmekaDoc::~CAmekaDoc()
 		temp_mon[71] = patientInfo.lefthanded; // Thuan tay trai
 		temp_mon[72] = _tcsclen(patientInfo.surname); // So ky tu cua Ten dem
 		// Reserved for birthday
+		time_t birthday;
+		birthday = patientInfo.birthday.GetTime();
+		temp_mon[73] = birthday;
+		temp_mon[74] = birthday >> 8;
+		temp_mon[75] = birthday >> 16;
+		temp_mon[76] = birthday >> 24;
+		temp_mon[77] = birthday >> 32;
+		temp_mon[78] = birthday >> 40;
+		temp_mon[79] = birthday >> 48;
+		temp_mon[80] = birthday >> 56;
+
 		object.Write(temp_mon, sizeof(temp_mon));
 			
 		char *szTo = new char[nLen + 1];
