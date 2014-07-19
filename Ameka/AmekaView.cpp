@@ -1272,9 +1272,6 @@ void CAmekaView::drawRecData(CDC* pDC)
 	MemDC.SelectObject(&bmp);
 
 	MemDC.FillRect(CRect(0, 0, maxWidth, rect.Height()), WHITE_BRUSH);
-	
-	if (pDoc->counter == 0)
-		return;
 
 	//float crtPercent = (float)(this->GetScrollPos(SB_HORZ) - MONNAME_BAR - 2)/(GetTotalSize().cx - MONNAME_BAR - 2);
 	uint64_t minPos = this->GetScrollPos(SB_HORZ);;
@@ -1290,68 +1287,71 @@ void CAmekaView::drawRecData(CDC* pDC)
 
 	//draw lead name + line
 	//drawLeadName(&MemDC);
-	CFont txtFont;
-	txtFont.CreatePointFont(70, _T("Arial"), pDC);
-	//uint16_t maxPos = (arrPos + screenPosNum) <= pDoc->counter?(arrPos + screenPosNum):pDoc->counter;
-	channelNum = this->GetDocument()->mMon.mList.GetCount();
-
-	//CPoint point = GetScrollPosition();
-	//int minPos = int((point.x )/distance);
-	uint64_t maxPos = minPos + (uint64_t)(maxWidth/distance);
-	if (maxPos > pDoc->counter)
-		maxPos = pDoc->counter;
-	//if (maxPos > pDoc->counter)
-	//	maxPos = pDoc->counter - 1;
-	//draw all pos from buffer data
-	MemDC.SelectStockObject(BLACK_PEN);
-	for (int i = minPos; i < maxPos; i++)
+	if (pDoc->counter != 0)
 	{
-		//if ((MONNAME_BAR + 2 + (i - minPos)*distance) > maxWidth)
-		//	break;
-		PrimaryDataType crtData = pDoc->primaryDataArray[i];
-		if (crtData.isDraw)
-		{
-			CPen* tmpPen = MemDC.SelectObject(&silverPen);
-			MemDC.MoveTo((i-minPos)*distance, 0);
-			MemDC.LineTo((i-minPos)*distance, rect.Height() - FOOT_RANGE);
-			MemDC.SelectObject(tmpPen);
+		CFont txtFont;
+		txtFont.CreatePointFont(70, _T("Arial"), pDC);
+		//uint16_t maxPos = (arrPos + screenPosNum) <= pDoc->counter?(arrPos + screenPosNum):pDoc->counter;
+		channelNum = this->GetDocument()->mMon.mList.GetCount();
 
-			time_t tim =crtData.time;
-			if (tim > 0)
-				drawTime(&MemDC, tim, (i-minPos)*distance);
-		}
-		if (crtData.eventID >= 0 && crtData.eventID < 10)
+		//CPoint point = GetScrollPosition();
+		//int minPos = int((point.x )/distance);
+		uint64_t maxPos = minPos + (uint64_t)(maxWidth/distance);
+		if (maxPos > pDoc->counter)
+			maxPos = pDoc->counter;
+		//if (maxPos > pDoc->counter)
+		//	maxPos = pDoc->counter - 1;
+		//draw all pos from buffer data
+		MemDC.SelectStockObject(BLACK_PEN);
+		for (int i = minPos; i < maxPos; i++)
 		{
-			CFont* tmpFont = MemDC.SelectObject(&txtFont);
+			//if ((MONNAME_BAR + 2 + (i - minPos)*distance) > maxWidth)
+			//	break;
+			PrimaryDataType crtData = pDoc->primaryDataArray[i];
+			if (crtData.isDraw)
+			{
+				CPen* tmpPen = MemDC.SelectObject(&silverPen);
+				MemDC.MoveTo((i-minPos)*distance, 0);
+				MemDC.LineTo((i-minPos)*distance, rect.Height() - FOOT_RANGE);
+				MemDC.SelectObject(tmpPen);
 
-			MemDC.SetBkMode(TRANSPARENT);
-			CString evTxt = theApp.evName[crtData.eventID];
-			MemDC.TextOutW((i - minPos)*distance - 15, 0, evTxt);
-			MemDC.SelectObject(tmpFont);
-		}
-		for (int j = 0; j < channelNum; j++)
-		{
-			int tmp = (((rect.Height() - FOOT_RANGE)*j)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)crtData.value[j]-m_BaseLine)/m_Amp)*graphData.scaleRate);
-			if (tmp > (rect.Height() - FOOT_RANGE))
+				time_t tim =crtData.time;
+				if (tim > 0)
+					drawTime(&MemDC, tim, (i-minPos)*distance);
+			}
+			if (crtData.eventID >= 0 && crtData.eventID < 10)
+			{
+				CFont* tmpFont = MemDC.SelectObject(&txtFont);
+
+				MemDC.SetBkMode(TRANSPARENT);
+				CString evTxt = theApp.evName[crtData.eventID];
+				MemDC.TextOutW((i - minPos)*distance - 15, 0, evTxt);
+				MemDC.SelectObject(tmpFont);
+			}
+			for (int j = 0; j < channelNum; j++)
+			{
+				int tmp = (((rect.Height() - FOOT_RANGE)*j)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)crtData.value[j]-m_BaseLine)/m_Amp)*graphData.scaleRate);
+				if (tmp > (rect.Height() - FOOT_RANGE))
+					tmp = rect.Height() - FOOT_RANGE;
+				if (tmp < 0)
+					tmp = 0;
+				//MemDC.SetPixel((distance*j),tmp ,CUSTOM_PEN);
+				MemDC.MoveTo((distance*(i - minPos)), tmp);		//draw 16 channel
+				tmp = (((rect.Height() - FOOT_RANGE)*j)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)pDoc->primaryDataArray[i + 1].value[j]-m_BaseLine)/m_Amp)*graphData.scaleRate);
+				if (tmp > (rect.Height() - FOOT_RANGE))
 				tmp = rect.Height() - FOOT_RANGE;
-			if (tmp < 0)
-				tmp = 0;
-			//MemDC.SetPixel((distance*j),tmp ,CUSTOM_PEN);
-			MemDC.MoveTo((distance*(i - minPos)), tmp);		//draw 16 channel
-			tmp = (((rect.Height() - FOOT_RANGE)*j)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)pDoc->primaryDataArray[i + 1].value[j]-m_BaseLine)/m_Amp)*graphData.scaleRate);
-			if (tmp > (rect.Height() - FOOT_RANGE))
-			tmp = rect.Height() - FOOT_RANGE;
-			if (tmp < 0)
-				tmp = 0;
-			//MemDC.SetPixel((distance*(j+1)),tmp ,CUSTOM_PEN);
-			MemDC.LineTo((distance*(i + 1 - minPos)), tmp);	//
+				if (tmp < 0)
+					tmp = 0;
+				//MemDC.SetPixel((distance*(j+1)),tmp ,CUSTOM_PEN);
+				MemDC.LineTo((distance*(i + 1 - minPos)), tmp);	//
+			}
 		}
+		DeleteObject(&txtFont);
 	}
 
 	pDC->BitBlt(MONNAME_BAR + 2, 0, maxWidth, rect.Height(), &MemDC, 0, 0, SRCCOPY);
 
 	DeleteObject(&bmp);
-	DeleteObject(&txtFont);
 	DeleteObject(&silverPen);
 	MemDC.DeleteDC();
 	//isDrawRec = FALSE;

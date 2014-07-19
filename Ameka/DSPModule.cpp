@@ -776,8 +776,12 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	delete szTo;
 	delete wszTo;
 
-	//Doc ten dem
+	//Kiem tra thuan tay trai
 	no_c = temp_mon[71];
+	mDoc->patientInfo.lefthanded = no_c;
+
+	//Doc ten dem
+	no_c = temp_mon[72];
 	szTo = new char[no_c + 1];
 	wszTo = new WCHAR[no_c + 1];
 	wszTo[no_c] = '\0';
@@ -818,6 +822,8 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	//EnterCriticalSection(&mView->csess);
 	if (counter > 24000000)
 	{
+		mDoc->counter = 0;
+		SetEvent(mDoc->onReadSuccess);
 		return 1;
 	}
 	mDoc->PrimaryData = new amekaData<PrimaryDataType>(counter);
