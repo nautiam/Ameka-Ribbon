@@ -119,7 +119,7 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		// Create a caption bar:
 		if (!CreateCaptionBar())
 		{
-			TRACE0("Failed to create caption bar\n");
+			TRACE0("Không thể tạo thanh tiêu đề\n");
 			return -1;      // fail to create
 		}
 		// set the visual manager and style based on persisted value

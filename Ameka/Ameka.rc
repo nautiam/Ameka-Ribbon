@@ -17,6 +17,86 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+DLG_INPUT DIALOGEX 0, 0, 175, 65
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Ð?i s? ki?n"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "ÐôÌng yì",IDOK,64,44,50,14
+    PUSHBUTTON      "HuÒy",IDCANCEL,118,44,50,14
+    COMBOBOX        IDC_COMBO1,55,12,113,73,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Loaòi sýò kiêòn",IDC_STATIC,7,16,46,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    DLG_INPUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 168
+        VERTGUIDE, 24
+        VERTGUIDE, 72
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 58
+        HORZGUIDE, 24
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+DLG_INPUT DLGINIT
+BEGIN
+    IDC_COMBO1, 0x403, 2, 0
+0x0030, 
+    IDC_COMBO1, 0x403, 2, 0
+0x0031, 
+    IDC_COMBO1, 0x403, 2, 0
+0x0032, 
+    IDC_COMBO1, 0x403, 2, 0
+0x0033, 
+    IDC_COMBO1, 0x403, 2, 0
+0x0034, 
+    IDC_COMBO1, 0x403, 2, 0
+0x0035, 
+    IDC_COMBO1, 0x403, 2, 0
+0x0036, 
+    IDC_COMBO1, 0x403, 2, 0
+0x0037, 
+    IDC_COMBO1, 0x403, 2, 0
+0x0038, 
+    IDC_COMBO1, 0x403, 2, 0
+0x0039, 
+    0
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
 // Vietnamese (Vietnam) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_VIT)
@@ -305,9 +385,8 @@ CAPTION "Sýò kiêòn"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "Ðoìng",evt_ok,253,155,50,14
-    PUSHBUTTON      "Thêm",evt_add,6,155,50,14
-    PUSHBUTTON      "ÐôÒi tên",evt_rename,64,155,50,14
-    PUSHBUTTON      "Xóa",evt_del,122,155,50,14
+    PUSHBUTTON      "ÐôÒi tên",evt_rename,6,155,50,14
+    PUSHBUTTON      "Xóa",evt_del,64,155,50,14
     CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,7,295,142
 END
 

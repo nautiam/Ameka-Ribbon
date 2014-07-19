@@ -58,6 +58,8 @@
 #define DLG_Opt_Rec                     324
 #define DLG_Opt_Event                   325
 #define DLG_Loading                     328
+#define IDD_DIALOG1                     330
+#define DLG_INPUT                       330
 #define IDC_COMBO1                      1000
 #define IDC_CHECK1                      1001
 #define IDC_CHECK2                      1002
@@ -205,7 +207,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        330
+#define _APS_NEXT_RESOURCE_VALUE        332
 #define _APS_NEXT_COMMAND_VALUE         32823
 #define _APS_NEXT_CONTROL_VALUE         1091
 #define _APS_NEXT_SYMED_VALUE           310

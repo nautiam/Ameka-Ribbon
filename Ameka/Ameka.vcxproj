@@ -117,6 +117,7 @@
     <ClInclude Include="EventDlg.h" />
     <ClInclude Include="GraphModule.h" />
     <ClInclude Include="InfoDlg.h" />
+    <ClInclude Include="InputDlg.h" />
     <ClInclude Include="kiss_fft.h" />
     <ClInclude Include="LoaddingDlg.h" />
     <ClInclude Include="MainFrm.h" />
@@ -149,6 +150,7 @@
     <ClCompile Include="EventDlg.cpp" />
     <ClCompile Include="GraphModule.cpp" />
     <ClCompile Include="InfoDlg.cpp" />
+    <ClCompile Include="InputDlg.cpp" />
     <ClCompile Include="kiss_fft.cpp" />
     <ClCompile Include="LoaddingDlg.cpp" />
     <ClCompile Include="MainFrm.cpp" />

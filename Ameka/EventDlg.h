@@ -14,6 +14,8 @@ public:
 	CEventDlg();
 	int index;
 
+	void initItems();
+
 	// Dialog Data
 	enum { IDD = DLG_Event};
 
@@ -30,4 +32,5 @@ public:
 	CListCtrl event_list;
 	afx_msg void OnBnClickedrename();
 	afx_msg void OnLvnItemchangedList1(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickeddel();
 };
