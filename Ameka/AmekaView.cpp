@@ -1128,7 +1128,6 @@ int CAmekaView::drawBarGraph( void )
 	DeleteObject(&brushS);
 	DeleteObject(&pen2);
 	MemDC.DeleteDC();
-	DeleteObject(pDC);
 	delete bitmap;
 	delete [] data;
 

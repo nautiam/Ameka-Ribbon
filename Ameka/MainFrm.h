@@ -47,6 +47,8 @@ public:
 	bool portEnable;
 	bool baudEnable;
 	bool scanPortEnable;
+private:
+	CMFCRibbonApplicationButton m_wndRibbonButton;
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;

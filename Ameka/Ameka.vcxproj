@@ -114,6 +114,7 @@
     <ClInclude Include="C_ColorToolTip.h" />
     <ClInclude Include="DSPModule.h" />
     <ClInclude Include="EnvSetupModule.h" />
+    <ClInclude Include="EventDlg.h" />
     <ClInclude Include="GraphModule.h" />
     <ClInclude Include="InfoDlg.h" />
     <ClInclude Include="kiss_fft.h" />
@@ -145,6 +146,7 @@
     <ClCompile Include="C_ColorToolTip.cpp" />
     <ClCompile Include="DSPModule.cpp" />
     <ClCompile Include="dsp_filters.cpp" />
+    <ClCompile Include="EventDlg.cpp" />
     <ClCompile Include="GraphModule.cpp" />
     <ClCompile Include="InfoDlg.cpp" />
     <ClCompile Include="kiss_fft.cpp" />

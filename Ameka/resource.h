@@ -57,7 +57,6 @@
 #define DLG_Opt_View                    323
 #define DLG_Opt_Rec                     324
 #define DLG_Opt_Event                   325
-#define DLG_Print                       326
 #define DLG_Loading                     328
 #define IDC_COMBO1                      1000
 #define IDC_CHECK1                      1001
@@ -160,7 +159,6 @@
 #define info_hand                       1088
 #define ID_FONT                         1089
 #define ID_SIZE                         1090
-#define ID_SIZE2                        1091
 #define ID_DISTANCE                     1091
 #define ID_WRITE_PASTEASHYPERLINK       32770
 #define MN_Open                         32771

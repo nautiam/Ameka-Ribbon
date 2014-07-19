@@ -304,13 +304,11 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Sýò kiêòn"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "ÐôÌng yì",evt_ok,198,155,50,14
-    PUSHBUTTON      "HuÒy",evt_cancel,252,155,50,14
-    COMBOBOX        evt_list,7,23,116,72,CBS_DROPDOWN | CBS_SORT | CBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
-    LISTBOX         evt_lv,7,47,295,100,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Thêm",evt_add,131,22,50,14
-    PUSHBUTTON      "ÐôÒi tên",evt_rename,189,22,50,14
-    PUSHBUTTON      "Xóa",evt_del,247,22,50,14
+    DEFPUSHBUTTON   "Ðoìng",evt_ok,253,155,50,14
+    PUSHBUTTON      "Thêm",evt_add,6,155,50,14
+    PUSHBUTTON      "ÐôÒi tên",evt_rename,64,155,50,14
+    PUSHBUTTON      "Xóa",evt_del,122,155,50,14
+    CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,7,295,142
 END
 
 DLG_Info DIALOGEX 0, 0, 309, 176
@@ -320,20 +318,20 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     PUSHBUTTON      "ÐôÌng yì",info_ok,198,155,50,14
     PUSHBUTTON      "HuÒy",info_cancel,252,155,50,14
-    LTEXT           "Tên",IDC_STATIC,46,18,13,8
-    LTEXT           "Hoò",IDC_STATIC,49,42,10,8
-    LTEXT           "Tên ðêòm",IDC_STATIC,31,65,28,8
-    LTEXT           "Ngày sinh",IDC_STATIC,177,18,32,8
-    LTEXT           "Giõìi tính",IDC_STATIC,183,41,26,8
-    LTEXT           "MaÞ sôì",IDC_STATIC,189,65,20,8
-    EDITTEXT        info_fistName,60,16,90,14,ES_AUTOHSCROLL
-    EDITTEXT        info_lname,60,39,90,14,ES_AUTOHSCROLL
-    EDITTEXT        info_surName,60,63,90,14,ES_AUTOHSCROLL
-    CONTROL         "",info_birthday,"SysDateTimePick32",DTS_RIGHTALIGN | WS_TABSTOP,210,15,92,15
-    COMBOBOX        IDC_COMBO1,210,40,92,49,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    EDITTEXT        IDC_EDIT4,210,63,92,14,ES_AUTOHSCROLL
+    LTEXT           "Tên",IDC_STATIC,24,21,13,8
+    LTEXT           "Hoò",IDC_STATIC,24,44,10,8
+    LTEXT           "Tên ðêòm",IDC_STATIC,24,68,28,8
+    LTEXT           "Ngày sinh",IDC_STATIC,171,21,35,8
+    LTEXT           "Giõìi tính",IDC_STATIC,171,44,26,8
+    LTEXT           "MaÞ sôì",IDC_STATIC,171,68,20,8
+    EDITTEXT        info_fistName,56,16,94,14,ES_AUTOHSCROLL
+    EDITTEXT        info_lname,56,39,94,14,ES_AUTOHSCROLL
+    EDITTEXT        info_surName,56,63,94,14,ES_AUTOHSCROLL
+    CONTROL         "",info_birthday,"SysDateTimePick32",DTS_RIGHTALIGN | WS_TABSTOP,206,15,96,15
+    COMBOBOX        IDC_COMBO1,206,40,96,49,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT4,206,63,96,14,ES_AUTOHSCROLL
     EDITTEXT        info_view,7,97,295,50,ES_MULTILINE | ES_AUTOHSCROLL
-    CONTROL         "Thuâòn tay traìi",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,210,84,92,10
+    CONTROL         "Thuâòn tay traìi",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,206,84,96,10
 END
 
 DLG_Log DIALOGEX 0, 0, 309, 176
@@ -461,18 +459,18 @@ DLG_Opt_View DIALOGEX 0, 0, 270, 157
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Ðôò nhaòy soìng",IDC_STATIC,7,19,46,8
-    LTEXT           "Tôìc ðôò soìng",IDC_STATIC,7,42,40,8
-    LTEXT           "Loòc thông thâìp",IDC_STATIC,5,68,48,8
-    LTEXT           "Loòc thông cao",IDC_STATIC,6,91,47,8
-    EDITTEXT        view_sensitivity,71,14,190,14,ES_AUTOHSCROLL
-    EDITTEXT        view_speed,71,37,190,14,ES_AUTOHSCROLL
-    EDITTEXT        view_lp,71,62,190,14,ES_AUTOHSCROLL
-    EDITTEXT        view_hp,71,86,190,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "Thiêìt lâòp mãòc ðiònh",view_btdef,71,133,68,14
-    LTEXT           "30mm týõng ðýõng",IDC_STATIC,6,116,71,8
-    EDITTEXT        view_dotPmm,71,111,68,14,ES_AUTOHSCROLL
-    LTEXT           "pixels",IDC_STATIC,143,113,71,8
+    LTEXT           "Ðôò nhaòy soìng",IDC_STATIC,12,19,46,8
+    LTEXT           "Tôìc ðôò soìng",IDC_STATIC,12,42,40,8
+    LTEXT           "Loòc thông thâìp",IDC_STATIC,10,68,48,8
+    LTEXT           "Loòc thông cao",IDC_STATIC,11,91,47,8
+    EDITTEXT        view_sensitivity,76,14,181,14,ES_AUTOHSCROLL
+    EDITTEXT        view_speed,76,37,181,14,ES_AUTOHSCROLL
+    EDITTEXT        view_lp,76,62,181,14,ES_AUTOHSCROLL
+    EDITTEXT        view_hp,76,86,181,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Thiêìt lâòp mãòc ðiònh",view_btdef,76,133,68,14
+    LTEXT           "30mm týõng ðýõng",IDC_STATIC,11,116,71,8
+    EDITTEXT        view_dotPmm,76,111,68,14,ES_AUTOHSCROLL
+    LTEXT           "pixels",IDC_STATIC,148,113,71,8
 END
 
 DLG_Opt_Rec DIALOGEX 0, 0, 272, 157
@@ -492,32 +490,26 @@ DLG_Opt_Event DIALOGEX 0, 0, 273, 157
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Sýò kiêòn 1",IDC_STATIC,23,19,30,8
-    LTEXT           "Sýò kiêòn 3",IDC_STATIC,23,43,30,8
-    LTEXT           "Sýò kiêòn 5",IDC_STATIC,23,65,30,8
-    LTEXT           "Sýò kiêòn 7",IDC_STATIC,23,90,30,8
-    LTEXT           "Sýò kiêòn 9",IDC_STATIC,23,115,30,8
+    LTEXT           "Sýò kiêòn 1",IDC_STATIC,12,19,30,8
+    LTEXT           "Sýò kiêòn 3",IDC_STATIC,12,43,30,8
+    LTEXT           "Sýò kiêòn 5",IDC_STATIC,12,65,30,8
+    LTEXT           "Sýò kiêòn 7",IDC_STATIC,12,90,30,8
+    LTEXT           "Sýò kiêòn 9",IDC_STATIC,12,115,30,8
     EDITTEXT        EV_1,54,14,72,14,ES_AUTOHSCROLL
     EDITTEXT        EV_3,54,37,72,14,ES_AUTOHSCROLL
     EDITTEXT        EV_5,54,60,72,14,ES_AUTOHSCROLL
     EDITTEXT        EV_7,54,85,72,14,ES_AUTOHSCROLL
     EDITTEXT        EV_9,54,110,72,14,ES_AUTOHSCROLL
-    LTEXT           "Sýò kiêòn 2",IDC_STATIC,147,19,30,8
-    LTEXT           "Sýò kiêòn 4",IDC_STATIC,147,42,30,8
-    LTEXT           "Sýò kiêòn 6",IDC_STATIC,147,65,30,8
-    LTEXT           "Sýò kiêòn 8",IDC_STATIC,147,90,30,8
-    LTEXT           "Sýò kiêòn 10",IDC_STATIC,143,115,34,8
-    EDITTEXT        EV_2,178,13,74,14,ES_AUTOHSCROLL
-    EDITTEXT        EV_4,178,37,74,14,ES_AUTOHSCROLL
-    EDITTEXT        EV_6,178,60,74,14,ES_AUTOHSCROLL
-    EDITTEXT        EV_8,178,85,74,14,ES_AUTOHSCROLL
-    EDITTEXT        EV_10,178,110,74,14,ES_AUTOHSCROLL
-END
-
-DLG_Print DIALOGEX 0, 0, 272, 156
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
+    LTEXT           "Sýò kiêòn 2",IDC_STATIC,143,19,30,8
+    LTEXT           "Sýò kiêòn 4",IDC_STATIC,143,42,30,8
+    LTEXT           "Sýò kiêòn 6",IDC_STATIC,143,65,30,8
+    LTEXT           "Sýò kiêòn 8",IDC_STATIC,143,90,30,8
+    LTEXT           "Sýò kiêòn 10",IDC_STATIC,139,115,34,8
+    EDITTEXT        EV_2,185,13,74,14,ES_AUTOHSCROLL
+    EDITTEXT        EV_4,185,37,74,14,ES_AUTOHSCROLL
+    EDITTEXT        EV_6,185,60,74,14,ES_AUTOHSCROLL
+    EDITTEXT        EV_8,185,85,74,14,ES_AUTOHSCROLL
+    EDITTEXT        EV_10,185,110,74,14,ES_AUTOHSCROLL
 END
 
 DLG_Loading DIALOGEX 0, 0, 159, 59
@@ -589,18 +581,23 @@ BEGIN
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 302
+        VERTGUIDE, 18
         TOPMARGIN, 7
         BOTTOMMARGIN, 169
-        HORZGUIDE, 36
+        HORZGUIDE, 24
+        HORZGUIDE, 30
+        HORZGUIDE, 149
     END
 
     DLG_Info, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 302
-        VERTGUIDE, 60
+        VERTGUIDE, 24
+        VERTGUIDE, 56
         VERTGUIDE, 150
-        VERTGUIDE, 210
+        VERTGUIDE, 171
+        VERTGUIDE, 206
         TOPMARGIN, 7
         BOTTOMMARGIN, 169
         HORZGUIDE, 30
@@ -691,7 +688,9 @@ BEGIN
 
     DLG_Opt_View, DIALOG
     BEGIN
+        VERTGUIDE, 12
         VERTGUIDE, 71
+        VERTGUIDE, 257
     END
 
     DLG_Opt_Rec, DIALOG
@@ -700,10 +699,11 @@ BEGIN
 
     DLG_Opt_Event, DIALOG
     BEGIN
-    END
-
-    DLG_Print, DIALOG
-    BEGIN
+        VERTGUIDE, 12
+        VERTGUIDE, 42
+        VERTGUIDE, 138
+        VERTGUIDE, 143
+        VERTGUIDE, 186
     END
 
     DLG_Loading, DIALOG
@@ -740,15 +740,6 @@ BEGIN
 0x6546, 0x616d, 0x656c, "\000" 
     IDC_COMBO1, 0x403, 8, 0
 0x6e55, 0x6e6b, 0x776f, 0x006e, 
-    0
-END
-
-DLG_Event DLGINIT
-BEGIN
-    evt_list, 0x403, 7, 0
-0x7645, 0x6e65, 0x7374, "\000" 
-    evt_list, 0x403, 10, 0
-0x6e49, 0x6574, 0x7672, 0x6c61, 0x0073, 
     0
 END
 

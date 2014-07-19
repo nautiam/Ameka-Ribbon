@@ -31,6 +31,11 @@ int CInfoDlg::OnInitDialog()
 
 	m_Date.SetTime(&pDoc->patientInfo.birthday);
 	m_Hand.SetCheck(pDoc->patientInfo.lefthanded);
+	mName.SetWindowTextW(pDoc->patientInfo.fname);
+	mLName.SetWindowTextW(pDoc->patientInfo.lname);
+	mSurName.SetWindowTextW(pDoc->patientInfo.surname);
+	m_ID.SetWindowTextW(pDoc->patientInfo.uID);
+	m_Sex.SetWindowTextW(pDoc->patientInfo.sex);
 	return 0;
 }
 
@@ -38,8 +43,8 @@ void CInfoDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, info_fistName, mName);
-	DDX_Control(pDX, info_lname, mSurName);
-	DDX_Control(pDX, info_surName, m_SecondName);
+	DDX_Control(pDX, info_lname, mLName);
+	DDX_Control(pDX, info_surName, mSurName);
 	DDX_Control(pDX, info_birthday, m_Date);
 	DDX_Control(pDX, IDC_COMBO1, m_Sex);
 	DDX_Control(pDX, IDC_EDIT4, m_ID);
@@ -81,3 +86,4 @@ void CInfoDlg::OnBnClickedcancel()
 	// TODO: Add your control notification handler code here
 	CDialogEx::OnCancel();
 }
+

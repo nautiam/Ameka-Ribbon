@@ -108,6 +108,9 @@
     <ClInclude Include="QPrint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EventDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Ameka.cpp">
@@ -183,6 +186,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="QPrint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EventDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -92,7 +92,9 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 
 		m_wndRibbonBar.Create(this);
 		m_wndRibbonBar.LoadFromResource(IDR_RIBBON);
-		m_wndRibbonBar.EnablePrintPreview(FALSE);
+		m_wndRibbonButton.SetVisible(FALSE);
+		m_wndRibbonBar.SetApplicationButton(&m_wndRibbonButton, CSize());
+		
 
 		if (!m_wndStatusBar.Create(this))
 		{
@@ -704,6 +706,7 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		CQPrint prt;
 		HPRIVATEFONT   hFont;
 
+		//prt.SetPageOrientation(DMORIENT_LANDSCAPE);
 		// Step 1 : call the CPrintDialog
 		if (prt.Dialog() == -1)
 			return;
@@ -716,14 +719,15 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		hFont = prt.AddFontToEnvironment((char*)(LPCTSTR)theApp.printFont, 
 			theApp.printSize, (theApp.printSize*3)/2); 
 		prt.SetDistance(theApp.printDistance);  
+		//prt.SetPageOrientation(DMORIENT_LANDSCAPE);
 
 		//Step 4 : Start Page
 		prt.StartPage(); 
 
 		//Step 5 : The actual printing goes here
 		//print partien info
-		prt.Print(hFont,L"Bệnh nhân: " + pDoc->patientInfo.fname,FORMAT_NORMAL);   
-		prt.Print(hFont,L"Giới tính: ", FORMAT_NORMAL);   
+		prt.Print(hFont,L"Bệnh nhân: " + pDoc->patientInfo.fname + " " + pDoc->patientInfo.surname + " " + pDoc->patientInfo.lname,FORMAT_NORMAL);   
+		prt.Print(hFont,L"Giới tính: " + pDoc->patientInfo.sex, FORMAT_NORMAL);   
 		prt.Print(hFont,L"Ngày sinh: " + pDoc->patientInfo.birthday.Format(_T("%B %d, %Y")), FORMAT_NORMAL);   
 
 		//print line

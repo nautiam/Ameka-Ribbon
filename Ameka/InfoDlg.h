@@ -23,8 +23,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	CEdit mName;
+	CEdit mLName;
 	CEdit mSurName;
-	CEdit m_SecondName;
 	CDateTimeCtrl m_Date;
 	CComboBox m_Sex;
 	CEdit m_ID;

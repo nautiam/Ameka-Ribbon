@@ -1,4 +1,4 @@
-//Ameka Varibale Definition
+﻿//Ameka Varibale Definition
 #include <stdint.h>
 #include "stdafx.h"
 #include <winnt.h>

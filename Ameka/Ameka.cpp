@@ -31,6 +31,7 @@
 #include "OptionDlg.h"
 #include "InfoDlg.h"
 #include "PhoticDlg.h"
+#include "EventDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -454,7 +455,7 @@ void CAmekaApp::OnPhotic()
 	if (pView)
 	{
 		//Cameka
-		pView->onPhotic = ~pView->onPhotic;
+		pView->onPhotic = !pView->onPhotic;
 		if (pView->onPhotic && !pView->isDrawRec)
 		{
 			CAmekaView *pView = CAmekaView::GetView();
@@ -464,7 +465,72 @@ void CAmekaApp::OnPhotic()
 		{
 			if (pView->isDrawRec)
 			{
-				uint64_t startPos = pView->GetScrollPos(SB_HORZ);
+				CDC* pDC = pView->GetDC();
+				CDC MemDC;
+				CRect rect;
+				
+				pView->GetClientRect(&rect);
+				uint64_t startPos = rect.Width()*FACTOR;
+
+				if (NULL == MemDC.CreateCompatibleDC(pDC))
+				{
+					MemDC.DeleteDC();
+					DeleteObject(pDC);
+					return;
+
+				}
+				CBitmap* bitmap = new CBitmap;
+				if(bitmap != NULL)
+				{
+					if(NULL == bitmap->CreateCompatibleBitmap(pDC, (rect.Width()-startPos), rect.Height()))
+					{
+						DWORD tmp = GetLastError();
+						////LOG(ERROR) << static_cast <int>(tmp);
+						DeleteObject(pDC);
+						delete bitmap;
+						return;
+					}
+				}
+				//fill background
+				CBitmap* pOldBmp = MemDC.SelectObject(bitmap);
+
+				CBrush brush;
+				brush.CreateSolidBrush(CUSTOM_BARBACK);
+				CRect mrect(0,0,rect.Width(),rect.Height());
+				MemDC.FillRect(mrect,&brush);
+
+				//draw grid
+				float range = theApp.photicMax - theApp.photicMin;
+				MemDC.SetBkMode(TRANSPARENT);
+				int gridNum = range/theApp.photicTick;
+				CPen pen2(PS_SOLID, 1, CUSTOM_PEN1);
+				CPen* pOldPen = MemDC.SelectObject(&pen2);
+				CFont txtFont;
+				txtFont.CreatePointFont(70, _T("Arial"), &MemDC);
+				float barGridW = (float)(rect.Width() - startPos ) / gridNum;
+				for (int i = 0; i < gridNum; i++)
+				{
+					MemDC.MoveTo(i*barGridW, rect.Height() - FOOT_RANGE);
+					MemDC.LineTo(i*barGridW, 0);
+					CString text;
+					MemDC.SelectObject(&txtFont);
+					text.Format(_T("%d"), (int)(theApp.photicTick*i + theApp.photicMin));
+					MemDC.TextOutW(i*barGridW, (rect.Height() - FOOT_RANGE), text);
+				}
+				MemDC.SelectObject(pOldPen);
+				DeleteObject(&pen2);
+
+				pDC->BitBlt(startPos , 0, rect.Width(), rect.Height(), &MemDC, 0, 0, SRCCOPY);
+	
+				MemDC.SelectObject(pOldBmp);
+				DeleteObject(bitmap);
+				//DeleteObject(pen2);
+				DeleteObject(&brush);
+				DeleteObject(&pen2);
+				MemDC.DeleteDC();
+				DeleteObject(pDC);
+
+				startPos = pView->GetScrollPos(SB_HORZ);
 				photic_processing(FRE_STEP, pView->GetDocument(), startPos);
 				pView->drawBarGraph();
 				return;
@@ -610,52 +676,7 @@ void CAmekaApp::OnFileClose()
 		}
 	}
 }
-//------------------------------------------------------------------//
-// CEventDlg
-//------------------------------------------------------------------//
 
-class CEventDlg : public CDialogEx
-{
-public:
-	CEventDlg();
-
-	// Dialog Data
-	enum { IDD = DLG_Event};
-
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-	// Implementation
-protected:
-	DECLARE_MESSAGE_MAP()
-	virtual BOOL OnInitDialog();
-public:
-	afx_msg void OnBnClickedok();
-	afx_msg void OnBnClickedcancel();
-	CComboBox event_list;
-};
-
-CEventDlg::CEventDlg() : CDialogEx(CEventDlg::IDD)
-{
-}
-
-int CEventDlg::OnInitDialog()
-{
-	CDialog::OnInitDialog();
-	event_list.SetCurSel(0);
-	return 0;
-}
-
-void CEventDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, evt_list, event_list);
-}
-
-BEGIN_MESSAGE_MAP(CEventDlg, CDialogEx)
-	ON_BN_CLICKED(evt_ok, &CEventDlg::OnBnClickedok)
-	ON_BN_CLICKED(evt_cancel, &CEventDlg::OnBnClickedcancel)
-END_MESSAGE_MAP()
 
 //Show Setting Dialog
 void CAmekaApp::OnEvent()

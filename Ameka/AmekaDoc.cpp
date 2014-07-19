@@ -9,7 +9,7 @@
 // Copyright (C) Microsoft Corporation
 // All rights reserved.
 
-// AmekaDoc.cpp : implementation of the CAmekaDoc class
+// AmekaDoc.cpp : implementation of the CAmekaDoc clas0s
 //
 
 #include "stdafx.h"
@@ -74,7 +74,8 @@ CAmekaDoc::CAmekaDoc()
 	isRecord = FALSE;
 	isSave = FALSE;
 	m_dspProcess = NULL;
-	eventID = 0;
+	eventID = 10;
+	counter = 0;
 
 	onReadSuccess = CreateEvent( 
 		NULL,               // default security attributes

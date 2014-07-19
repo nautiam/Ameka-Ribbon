@@ -72,7 +72,7 @@ CQPrint::CQPrint()
 	m_VLine	= FALSE;
 	m_PenWidth = 0;
 	m_TableJustify = FORMAT_NORMAL;
-	m_Orientation = DMORIENT_PORTRAIT;
+	m_Orientation = DMORIENT_LANDSCAPE;
 	
 
 	m_numFonts = 0;
@@ -769,8 +769,8 @@ int CQPrint::InsertBitmapFromView (int fmt, CSize *dest, int left)
     // margins must calculated for printing-device
     margins.top = CALCY(m_Margins.top);
     margins.bottom = CALCY(m_Margins.bottom);
-	margins.left = CALCY(m_Margins.left);
-    margins.right = CALCY(m_Margins.right);    
+	margins.left = CALCX(m_Margins.left);
+    margins.right = CALCX(m_Margins.right);    
 
 	m_LastErrNo = PRERR_OK;
 	
