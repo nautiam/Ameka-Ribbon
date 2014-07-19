@@ -66,7 +66,7 @@ void CEventDlg::OnBnClickedrename()
 		if (!pDoc)
 			return;
 
-		pDoc->primaryDataArray[numID].eventID = _ttoi(dialog.strEvKind);
+		pDoc->primaryDataArray[numID].eventID = dialog.strEvKind;
 	}
 
 	initItems();

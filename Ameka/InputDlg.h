@@ -1,4 +1,5 @@
 #pragma once
+#include "afxwin.h"
 
 
 // CInputDlg dialog
@@ -11,10 +12,10 @@ public:
 	CInputDlg(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CInputDlg();
 
-	CString strEvKind;
+	int strEvKind;
 
 // Dialog Data
-	enum { IDD = IDD_DIALOG1 };
+	enum { IDD = DLG_INPUT };
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -23,4 +24,7 @@ protected:
 public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedCancel();
+
+	virtual BOOL OnInitDialog();
+	CComboBox event_Change;
 };

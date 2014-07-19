@@ -17,11 +17,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// Vietnamese (Vietnam) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-#pragma code_page(1252)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_VIT)
+LANGUAGE LANG_VIETNAMESE, SUBLANG_DEFAULT
+#pragma code_page(1258)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -30,13 +30,245 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 DLG_INPUT DIALOGEX 0, 0, 175, 65
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Ð?i s? ki?n"
+CAPTION "ÐôÒi sýò kiêòn"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "ÐôÌng yì",IDOK,64,44,50,14
     PUSHBUTTON      "HuÒy",IDCANCEL,118,44,50,14
     COMBOBOX        IDC_COMBO1,55,12,113,73,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Loaòi sýò kiêòn",IDC_STATIC,7,16,46,8
+END
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Thông tin"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,14,14,20,20
+    LTEXT           "Ameka, Phiên baÒn 1.0",IDC_STATIC,42,14,114,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2014",IDC_STATIC,42,26,114,8
+    DEFPUSHBUTTON   "Ðóng",IDOK,113,41,50,14,WS_GROUP
+END
+
+DLG_Event DIALOGEX 0, 0, 309, 176
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Sýò kiêòn"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Ðoìng",evt_ok,253,155,50,14
+    PUSHBUTTON      "ÐôÒi tên",evt_rename,6,155,50,14
+    PUSHBUTTON      "Xóa",evt_del,64,155,50,14
+    CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,7,295,142
+END
+
+DLG_Info DIALOGEX 0, 0, 309, 176
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Thông tin bêònh nhân"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "ÐôÌng yì",info_ok,198,155,50,14
+    PUSHBUTTON      "HuÒy",info_cancel,252,155,50,14
+    LTEXT           "Tên",IDC_STATIC,24,21,13,8
+    LTEXT           "Hoò",IDC_STATIC,24,44,10,8
+    LTEXT           "Tên ðêòm",IDC_STATIC,24,68,28,8
+    LTEXT           "Ngày sinh",IDC_STATIC,171,21,35,8
+    LTEXT           "Giõìi tính",IDC_STATIC,171,44,26,8
+    LTEXT           "MaÞ sôì",IDC_STATIC,171,68,20,8
+    EDITTEXT        info_fistName,56,16,94,14,ES_AUTOHSCROLL
+    EDITTEXT        info_lname,56,39,94,14,ES_AUTOHSCROLL
+    EDITTEXT        info_surName,56,63,94,14,ES_AUTOHSCROLL
+    CONTROL         "",info_birthday,"SysDateTimePick32",DTS_RIGHTALIGN | WS_TABSTOP,206,15,96,15
+    COMBOBOX        IDC_COMBO1,206,40,96,49,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT4,206,63,96,14,ES_AUTOHSCROLL
+    EDITTEXT        info_view,7,97,295,50,ES_MULTILINE | ES_AUTOHSCROLL
+    CONTROL         "Thuâòn tay traìi",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,206,84,96,10
+END
+
+DLG_Log DIALOGEX 0, 0, 309, 176
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Lýõòc sýÒ"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "ÐôÌng yì",log_ok,198,155,50,14
+    PUSHBUTTON      "HuÒy",log_cancel,252,155,50,14
+    EDITTEXT        log_view,7,36,295,106,ES_AUTOHSCROLL
+    LTEXT           "Danh saìch lýõòc sýÒ",IDC_STATIC,7,21,60,8
+END
+
+DLG_Option DIALOGEX 0, 0, 315, 211
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "TuÌy choòn"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "ÐôÌng yì",opt_ok,184,190,50,14
+    PUSHBUTTON      "HuÒy",opt_cancel,244,190,50,14
+    CONTROL         "",opt_tab,"SysTabControl32",0x8,7,14,301,168
+END
+
+DLG_Photic DIALOGEX 0, 0, 309, 176
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "PhôÒ"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "ÐôÌng yì",IDOK,198,155,50,14
+    PUSHBUTTON      "HuÒy",IDCANCEL,252,155,50,14
+    GROUPBOX        "Tên ðiònh nghiÞa",IDC_STATIC,106,15,196,135
+    GROUPBOX        "PhôÒ",IDC_STATIC,7,15,89,134
+    LTEXT           "Ticks",IDC_STATIC,20,80,16,8
+    LTEXT           "TýÌ",IDC_STATIC,26,34,10,8
+    EDITTEXT        photic_min,39,29,51,14,ES_AUTOHSCROLL
+    LTEXT           "Ðêìn",IDC_STATIC,22,56,14,8
+    EDITTEXT        photic_max,39,51,51,14,ES_AUTOHSCROLL
+    EDITTEXT        photic_tick,39,74,51,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,113,33,10,10
+    CONTROL         "",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,113,56,10,10
+    CONTROL         "",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,113,79,10,10
+    CONTROL         "",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,113,104,10,10
+    CONTROL         "",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,113,127,10,10
+    EDITTEXT        IDC_EDIT4,125,29,67,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT5,125,74,67,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT11,125,51,67,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT12,125,99,67,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT13,125,122,67,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT6,204,29,28,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT7,204,51,28,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT8,204,74,28,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT9,204,99,28,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT10,204,122,28,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT14,242,29,28,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT15,242,122,28,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT16,242,51,28,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT17,242,99,28,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT18,242,74,28,14,ES_AUTOHSCROLL
+    LTEXT           "Ðôò rôòng",IDC_STATIC,9,104,27,8
+    EDITTEXT        photic_Width,39,99,51,14,ES_AUTOHSCROLL
+    LTEXT           "TiÒ lêò",IDC_STATIC,22,128,14,8
+    EDITTEXT        photic_WRate,39,122,51,14,ES_AUTOHSCROLL
+END
+
+DLG_Setting DIALOGEX 0, 0, 309, 176
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Thiêìt lâòp"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "ÐôÌng yì",IDOK,198,155,50,14
+    PUSHBUTTON      "HuÒy",IDCANCEL,252,155,50,14
+    CONTROL         "",IDC_TAB1,"SysTabControl32",WS_BORDER,7,17,295,126
+END
+
+DLG_Wave DIALOGEX 0, 0, 309, 176
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Bôò taòo soìng"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "ÐôÌng yì",IDOK,198,155,50,14
+    PUSHBUTTON      "HuÒy",IDCANCEL,252,155,50,14
+END
+
+DLG_Montage DIALOGEX 0, 0, 367, 260
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Montage"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "ÐôÌng yì",IDOK,251,239,50,14
+    PUSHBUTTON      "HuÒy",IDCANCEL,310,239,50,14
+    LISTBOX         IDC_LIST3,7,22,118,189,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Tên",IDC_STATIC,7,245,13,8
+    COMBOBOX        mon_name,28,240,97,58,CBS_DROPDOWN | CBS_SORT | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Lýu laòi ...",mon_save,131,239,50,14
+    COMBOBOX        mon_1,167,215,48,79,CBS_DROPDOWN | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        mon_2,255,215,48,77,CBS_DROPDOWN | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Thêm",mon_add,310,214,50,14
+    LTEXT           "Ðiêòn cýòc 1",IDC_STATIC,131,218,35,8
+    LTEXT           "Ðiêòn cýòc 2",IDC_STATIC,220,218,35,8
+    PUSHBUTTON      "Xoìa node",mon_del,7,214,50,14
+    PUSHBUTTON      "Xoìa montage",IDC_BUTTON4,186,239,50,14
+END
+
+DLG_Opt_Print DIALOGEX 0, 0, 270, 157
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "LêÌ traìi",IDC_STATIC,12,19,33,8
+    LTEXT           "LêÌ phaÒi",IDC_STATIC,12,43,33,8
+    EDITTEXT        ID_LEFT,48,14,80,14,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        ID_RIGHT,48,38,80,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "LêÌ trên",IDC_STATIC,146,19,33,8
+    EDITTEXT        ID_TOP,179,15,80,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "LêÌ dýõìi",IDC_STATIC,145,44,33,8
+    EDITTEXT        ID_BOT,179,39,80,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",ID_FONT,"MfcFontComboBox",WS_VSCROLL | WS_TABSTOP | 0x312,48,62,80,85
+    LTEXT           "Phông",IDC_STATIC,12,67,21,8
+    EDITTEXT        ID_SIZE,48,85,80,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Kiìch cõÞ",IDC_STATIC,12,91,23,8
+    EDITTEXT        ID_DISTANCE,48,109,80,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Caìch doÌng",IDC_STATIC,12,115,35,8
+END
+
+DLG_Opt_View DIALOGEX 0, 0, 270, 157
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Ðôò nhaòy soìng",IDC_STATIC,12,19,46,8
+    LTEXT           "Tôìc ðôò soìng",IDC_STATIC,12,42,40,8
+    LTEXT           "Loòc thông thâìp",IDC_STATIC,10,68,48,8
+    LTEXT           "Loòc thông cao",IDC_STATIC,11,91,47,8
+    EDITTEXT        view_sensitivity,76,14,181,14,ES_AUTOHSCROLL
+    EDITTEXT        view_speed,76,37,181,14,ES_AUTOHSCROLL
+    EDITTEXT        view_lp,76,62,181,14,ES_AUTOHSCROLL
+    EDITTEXT        view_hp,76,86,181,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Thiêìt lâòp mãòc ðiònh",view_btdef,76,133,68,14
+    LTEXT           "30mm týõng ðýõng",IDC_STATIC,11,116,71,8
+    EDITTEXT        view_dotPmm,76,111,68,14,ES_AUTOHSCROLL
+    LTEXT           "pixels",IDC_STATIC,148,113,71,8
+END
+
+DLG_Opt_Rec DIALOGEX 0, 0, 272, 157
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "ÐýõÌng dâÞn lýu file EEG",IDC_STATIC,10,20,75,8
+    EDITTEXT        IDC_EDIT1,90,15,151,14,ES_AUTOHSCROLL
+    CONTROL         "MaÞ hoìa",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,90,33,39,10
+    LTEXT           "ÐýõÌng dâÞn lýu video",IDC_STATIC,10,69,68,8
+    EDITTEXT        IDC_EDIT2,90,63,151,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",rec_eeg,243,15,16,14
+    PUSHBUTTON      "...",rec_video,244,63,16,14
+END
+
+DLG_Opt_Event DIALOGEX 0, 0, 273, 157
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Sýò kiêòn 1",IDC_STATIC,12,19,30,8
+    LTEXT           "Sýò kiêòn 3",IDC_STATIC,12,43,30,8
+    LTEXT           "Sýò kiêòn 5",IDC_STATIC,12,65,30,8
+    LTEXT           "Sýò kiêòn 7",IDC_STATIC,12,90,30,8
+    LTEXT           "Sýò kiêòn 9",IDC_STATIC,12,115,30,8
+    EDITTEXT        EV_1,54,14,72,14,ES_AUTOHSCROLL
+    EDITTEXT        EV_3,54,37,72,14,ES_AUTOHSCROLL
+    EDITTEXT        EV_5,54,60,72,14,ES_AUTOHSCROLL
+    EDITTEXT        EV_7,54,85,72,14,ES_AUTOHSCROLL
+    EDITTEXT        EV_9,54,110,72,14,ES_AUTOHSCROLL
+    LTEXT           "Sýò kiêòn 2",IDC_STATIC,143,19,30,8
+    LTEXT           "Sýò kiêòn 4",IDC_STATIC,143,42,30,8
+    LTEXT           "Sýò kiêòn 6",IDC_STATIC,143,65,30,8
+    LTEXT           "Sýò kiêòn 8",IDC_STATIC,143,90,30,8
+    LTEXT           "Sýò kiêòn 10",IDC_STATIC,139,115,34,8
+    EDITTEXT        EV_2,185,13,74,14,ES_AUTOHSCROLL
+    EDITTEXT        EV_4,185,37,74,14,ES_AUTOHSCROLL
+    EDITTEXT        EV_6,185,60,74,14,ES_AUTOHSCROLL
+    EDITTEXT        EV_8,185,85,74,14,ES_AUTOHSCROLL
+    EDITTEXT        EV_10,185,110,74,14,ES_AUTOHSCROLL
+END
+
+DLG_Loading DIALOGEX 0, 0, 159, 59
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_BORDER
+EXSTYLE WS_EX_TRANSPARENT
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Ðang ðoòc tâòp tin. Vui loÌng ðõòi!",IDC_STATIC,7,14,98,8
+    CONTROL         "",LOAD_Progress,"msctls_progress32",WS_BORDER,7,31,145,12
 END
 
 
@@ -57,6 +289,153 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 58
         HORZGUIDE, 24
+    END
+
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 163
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 55
+    END
+
+    DLG_Event, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 302
+        VERTGUIDE, 18
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 169
+        HORZGUIDE, 24
+        HORZGUIDE, 30
+        HORZGUIDE, 149
+    END
+
+    DLG_Info, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 302
+        VERTGUIDE, 24
+        VERTGUIDE, 56
+        VERTGUIDE, 150
+        VERTGUIDE, 171
+        VERTGUIDE, 206
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 169
+        HORZGUIDE, 30
+        HORZGUIDE, 53
+        HORZGUIDE, 77
+    END
+
+    DLG_Log, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 302
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 169
+        HORZGUIDE, 29
+    END
+
+    DLG_Option, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 308
+        VERTGUIDE, 49
+        VERTGUIDE, 138
+        VERTGUIDE, 150
+        VERTGUIDE, 198
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 204
+        HORZGUIDE, 48
+        HORZGUIDE, 72
+        HORZGUIDE, 96
+        HORZGUIDE, 120
+        HORZGUIDE, 144
+    END
+
+    DLG_Photic, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 302
+        VERTGUIDE, 36
+        VERTGUIDE, 90
+        VERTGUIDE, 113
+        VERTGUIDE, 125
+        VERTGUIDE, 192
+        VERTGUIDE, 232
+        VERTGUIDE, 270
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 169
+        HORZGUIDE, 43
+        HORZGUIDE, 65
+        HORZGUIDE, 88
+        HORZGUIDE, 113
+        HORZGUIDE, 136
+    END
+
+    DLG_Setting, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 302
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 169
+    END
+
+    DLG_Wave, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 302
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 169
+    END
+
+    DLG_Montage, DIALOG
+    BEGIN
+        HORZGUIDE, 227
+    END
+
+    DLG_Opt_Print, DIALOG
+    BEGIN
+        VERTGUIDE, 12
+        VERTGUIDE, 48
+        VERTGUIDE, 128
+        VERTGUIDE, 146
+        HORZGUIDE, 26
+        HORZGUIDE, 50
+        HORZGUIDE, 74
+        HORZGUIDE, 98
+        HORZGUIDE, 122
+        HORZGUIDE, 133
+    END
+
+    DLG_Opt_View, DIALOG
+    BEGIN
+        VERTGUIDE, 12
+        VERTGUIDE, 71
+        VERTGUIDE, 257
+    END
+
+    DLG_Opt_Rec, DIALOG
+    BEGIN
+    END
+
+    DLG_Opt_Event, DIALOG
+    BEGIN
+        VERTGUIDE, 12
+        VERTGUIDE, 42
+        VERTGUIDE, 138
+        VERTGUIDE, 143
+        VERTGUIDE, 186
+    END
+
+    DLG_Loading, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 152
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 52
+        HORZGUIDE, 22
+        HORZGUIDE, 43
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -92,16 +471,38 @@ BEGIN
     0
 END
 
-#endif    // English (United States) resources
-/////////////////////////////////////////////////////////////////////////////
+DLG_Info DLGINIT
+BEGIN
+    IDC_COMBO1, 0x403, 5, 0
+0x614d, 0x656c, "\000" 
+    IDC_COMBO1, 0x403, 7, 0
+0x6546, 0x616d, 0x656c, "\000" 
+    IDC_COMBO1, 0x403, 8, 0
+0x6e55, 0x6e6b, 0x776f, 0x006e, 
+    0
+END
 
+DLG_Opt_Print DLGINIT
+BEGIN
+    ID_FONT, 0x37c, 269, 0
+0x4d3c, 0x4346, 0x6f43, 0x626d, 0x426f, 0x786f, 0x445f, 0x6172, 0x5577, 
+0x6973, 0x676e, 0x6f46, 0x746e, 0x463e, 0x4c41, 0x4553, 0x2f3c, 0x464d, 
+0x4343, 0x6d6f, 0x6f62, 0x6f42, 0x5f78, 0x7244, 0x7761, 0x7355, 0x6e69, 
+0x4667, 0x6e6f, 0x3e74, 0x4d3c, 0x4346, 0x6f43, 0x626d, 0x426f, 0x786f, 
+0x535f, 0x6f68, 0x5477, 0x7572, 0x5465, 0x7079, 0x4665, 0x6e6f, 0x7374, 
+0x543e, 0x5552, 0x3c45, 0x4d2f, 0x4346, 0x6f43, 0x626d, 0x426f, 0x786f, 
+0x535f, 0x6f68, 0x5477, 0x7572, 0x5465, 0x7079, 0x4665, 0x6e6f, 0x7374, 
+0x3c3e, 0x464d, 0x4343, 0x6d6f, 0x6f62, 0x6f42, 0x5f78, 0x6853, 0x776f, 
+0x6152, 0x7473, 0x7265, 0x7954, 0x6570, 0x6f46, 0x746e, 0x3e73, 0x5254, 
+0x4555, 0x2f3c, 0x464d, 0x4343, 0x6d6f, 0x6f62, 0x6f42, 0x5f78, 0x6853, 
+0x776f, 0x6152, 0x7473, 0x7265, 0x7954, 0x6570, 0x6f46, 0x746e, 0x3e73, 
+0x4d3c, 0x4346, 0x6f43, 0x626d, 0x426f, 0x786f, 0x535f, 0x6f68, 0x4477, 
+0x7665, 0x6369, 0x5465, 0x7079, 0x4665, 0x6e6f, 0x7374, 0x543e, 0x5552, 
+0x3c45, 0x4d2f, 0x4346, 0x6f43, 0x626d, 0x426f, 0x786f, 0x535f, 0x6f68, 
+0x4477, 0x7665, 0x6369, 0x5465, 0x7079, 0x4665, 0x6e6f, 0x7374, "\076" 
+    0
+END
 
-/////////////////////////////////////////////////////////////////////////////
-// Vietnamese (Vietnam) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_VIT)
-LANGUAGE LANG_VIETNAMESE, SUBLANG_DEFAULT
-#pragma code_page(1258)
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -365,244 +766,6 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Dialog
-//
-
-IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Thông tin"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
-BEGIN
-    ICON            IDR_MAINFRAME,IDC_STATIC,14,14,20,20
-    LTEXT           "Ameka, Phiên baÒn 1.0",IDC_STATIC,42,14,114,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2014",IDC_STATIC,42,26,114,8
-    DEFPUSHBUTTON   "Ðóng",IDOK,113,41,50,14,WS_GROUP
-END
-
-DLG_Event DIALOGEX 0, 0, 309, 176
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Sýò kiêòn"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "Ðoìng",evt_ok,253,155,50,14
-    PUSHBUTTON      "ÐôÒi tên",evt_rename,6,155,50,14
-    PUSHBUTTON      "Xóa",evt_del,64,155,50,14
-    CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,7,295,142
-END
-
-DLG_Info DIALOGEX 0, 0, 309, 176
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Thông tin bêònh nhân"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    PUSHBUTTON      "ÐôÌng yì",info_ok,198,155,50,14
-    PUSHBUTTON      "HuÒy",info_cancel,252,155,50,14
-    LTEXT           "Tên",IDC_STATIC,24,21,13,8
-    LTEXT           "Hoò",IDC_STATIC,24,44,10,8
-    LTEXT           "Tên ðêòm",IDC_STATIC,24,68,28,8
-    LTEXT           "Ngày sinh",IDC_STATIC,171,21,35,8
-    LTEXT           "Giõìi tính",IDC_STATIC,171,44,26,8
-    LTEXT           "MaÞ sôì",IDC_STATIC,171,68,20,8
-    EDITTEXT        info_fistName,56,16,94,14,ES_AUTOHSCROLL
-    EDITTEXT        info_lname,56,39,94,14,ES_AUTOHSCROLL
-    EDITTEXT        info_surName,56,63,94,14,ES_AUTOHSCROLL
-    CONTROL         "",info_birthday,"SysDateTimePick32",DTS_RIGHTALIGN | WS_TABSTOP,206,15,96,15
-    COMBOBOX        IDC_COMBO1,206,40,96,49,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    EDITTEXT        IDC_EDIT4,206,63,96,14,ES_AUTOHSCROLL
-    EDITTEXT        info_view,7,97,295,50,ES_MULTILINE | ES_AUTOHSCROLL
-    CONTROL         "Thuâòn tay traìi",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,206,84,96,10
-END
-
-DLG_Log DIALOGEX 0, 0, 309, 176
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Lýõòc sýÒ"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "ÐôÌng yì",log_ok,198,155,50,14
-    PUSHBUTTON      "HuÒy",log_cancel,252,155,50,14
-    EDITTEXT        log_view,7,36,295,106,ES_AUTOHSCROLL
-    LTEXT           "Danh saìch lýõòc sýÒ",IDC_STATIC,7,21,60,8
-END
-
-DLG_Option DIALOGEX 0, 0, 315, 211
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "TuÌy choòn"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "ÐôÌng yì",opt_ok,184,190,50,14
-    PUSHBUTTON      "HuÒy",opt_cancel,244,190,50,14
-    CONTROL         "",opt_tab,"SysTabControl32",0x8,7,14,301,168
-END
-
-DLG_Photic DIALOGEX 0, 0, 309, 176
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "PhôÒ"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "ÐôÌng yì",IDOK,198,155,50,14
-    PUSHBUTTON      "HuÒy",IDCANCEL,252,155,50,14
-    GROUPBOX        "Tên ðiònh nghiÞa",IDC_STATIC,106,15,196,135
-    GROUPBOX        "PhôÒ",IDC_STATIC,7,15,89,134
-    LTEXT           "Ticks",IDC_STATIC,20,80,16,8
-    LTEXT           "TýÌ",IDC_STATIC,26,34,10,8
-    EDITTEXT        photic_min,39,29,51,14,ES_AUTOHSCROLL
-    LTEXT           "Ðêìn",IDC_STATIC,22,56,14,8
-    EDITTEXT        photic_max,39,51,51,14,ES_AUTOHSCROLL
-    EDITTEXT        photic_tick,39,74,51,14,ES_AUTOHSCROLL
-    CONTROL         "",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,113,33,10,10
-    CONTROL         "",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,113,56,10,10
-    CONTROL         "",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,113,79,10,10
-    CONTROL         "",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,113,104,10,10
-    CONTROL         "",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,113,127,10,10
-    EDITTEXT        IDC_EDIT4,125,29,67,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT5,125,74,67,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT11,125,51,67,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT12,125,99,67,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT13,125,122,67,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT6,204,29,28,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT7,204,51,28,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT8,204,74,28,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT9,204,99,28,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT10,204,122,28,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT14,242,29,28,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT15,242,122,28,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT16,242,51,28,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT17,242,99,28,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT18,242,74,28,14,ES_AUTOHSCROLL
-    LTEXT           "Ðôò rôòng",IDC_STATIC,9,104,27,8
-    EDITTEXT        photic_Width,39,99,51,14,ES_AUTOHSCROLL
-    LTEXT           "TiÒ lêò",IDC_STATIC,22,128,14,8
-    EDITTEXT        photic_WRate,39,122,51,14,ES_AUTOHSCROLL
-END
-
-DLG_Setting DIALOGEX 0, 0, 309, 176
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Thiêìt lâòp"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "ÐôÌng yì",IDOK,198,155,50,14
-    PUSHBUTTON      "HuÒy",IDCANCEL,252,155,50,14
-    CONTROL         "",IDC_TAB1,"SysTabControl32",WS_BORDER,7,17,295,126
-END
-
-DLG_Wave DIALOGEX 0, 0, 309, 176
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Bôò taòo soìng"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "ÐôÌng yì",IDOK,198,155,50,14
-    PUSHBUTTON      "HuÒy",IDCANCEL,252,155,50,14
-END
-
-DLG_Montage DIALOGEX 0, 0, 367, 260
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Montage"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "ÐôÌng yì",IDOK,251,239,50,14
-    PUSHBUTTON      "HuÒy",IDCANCEL,310,239,50,14
-    LISTBOX         IDC_LIST3,7,22,118,189,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Tên",IDC_STATIC,7,245,13,8
-    COMBOBOX        mon_name,28,240,97,58,CBS_DROPDOWN | CBS_SORT | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Lýu laòi ...",mon_save,131,239,50,14
-    COMBOBOX        mon_1,167,215,48,79,CBS_DROPDOWN | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        mon_2,255,215,48,77,CBS_DROPDOWN | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Thêm",mon_add,310,214,50,14
-    LTEXT           "Ðiêòn cýòc 1",IDC_STATIC,131,218,35,8
-    LTEXT           "Ðiêòn cýòc 2",IDC_STATIC,220,218,35,8
-    PUSHBUTTON      "Xoìa node",mon_del,7,214,50,14
-    PUSHBUTTON      "Xoìa montage",IDC_BUTTON4,186,239,50,14
-END
-
-DLG_Opt_Print DIALOGEX 0, 0, 270, 157
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    LTEXT           "LêÌ traìi",IDC_STATIC,12,19,33,8
-    LTEXT           "LêÌ phaÒi",IDC_STATIC,12,43,33,8
-    EDITTEXT        ID_LEFT,48,14,80,14,ES_AUTOHSCROLL | ES_NUMBER
-    EDITTEXT        ID_RIGHT,48,38,80,14,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "LêÌ trên",IDC_STATIC,146,19,33,8
-    EDITTEXT        ID_TOP,179,15,80,14,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "LêÌ dýõìi",IDC_STATIC,145,44,33,8
-    EDITTEXT        ID_BOT,179,39,80,14,ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "",ID_FONT,"MfcFontComboBox",WS_VSCROLL | WS_TABSTOP | 0x312,48,62,80,85
-    LTEXT           "Phông",IDC_STATIC,12,67,21,8
-    EDITTEXT        ID_SIZE,48,85,80,14,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Kiìch cõÞ",IDC_STATIC,12,91,23,8
-    EDITTEXT        ID_DISTANCE,48,109,80,14,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Caìch doÌng",IDC_STATIC,12,115,35,8
-END
-
-DLG_Opt_View DIALOGEX 0, 0, 270, 157
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    LTEXT           "Ðôò nhaòy soìng",IDC_STATIC,12,19,46,8
-    LTEXT           "Tôìc ðôò soìng",IDC_STATIC,12,42,40,8
-    LTEXT           "Loòc thông thâìp",IDC_STATIC,10,68,48,8
-    LTEXT           "Loòc thông cao",IDC_STATIC,11,91,47,8
-    EDITTEXT        view_sensitivity,76,14,181,14,ES_AUTOHSCROLL
-    EDITTEXT        view_speed,76,37,181,14,ES_AUTOHSCROLL
-    EDITTEXT        view_lp,76,62,181,14,ES_AUTOHSCROLL
-    EDITTEXT        view_hp,76,86,181,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "Thiêìt lâòp mãòc ðiònh",view_btdef,76,133,68,14
-    LTEXT           "30mm týõng ðýõng",IDC_STATIC,11,116,71,8
-    EDITTEXT        view_dotPmm,76,111,68,14,ES_AUTOHSCROLL
-    LTEXT           "pixels",IDC_STATIC,148,113,71,8
-END
-
-DLG_Opt_Rec DIALOGEX 0, 0, 272, 157
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    LTEXT           "ÐýõÌng dâÞn lýu file EEG",IDC_STATIC,10,20,75,8
-    EDITTEXT        IDC_EDIT1,90,15,151,14,ES_AUTOHSCROLL
-    CONTROL         "MaÞ hoìa",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,90,33,39,10
-    LTEXT           "ÐýõÌng dâÞn lýu video",IDC_STATIC,10,69,68,8
-    EDITTEXT        IDC_EDIT2,90,63,151,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",rec_eeg,243,15,16,14
-    PUSHBUTTON      "...",rec_video,244,63,16,14
-END
-
-DLG_Opt_Event DIALOGEX 0, 0, 273, 157
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    LTEXT           "Sýò kiêòn 1",IDC_STATIC,12,19,30,8
-    LTEXT           "Sýò kiêòn 3",IDC_STATIC,12,43,30,8
-    LTEXT           "Sýò kiêòn 5",IDC_STATIC,12,65,30,8
-    LTEXT           "Sýò kiêòn 7",IDC_STATIC,12,90,30,8
-    LTEXT           "Sýò kiêòn 9",IDC_STATIC,12,115,30,8
-    EDITTEXT        EV_1,54,14,72,14,ES_AUTOHSCROLL
-    EDITTEXT        EV_3,54,37,72,14,ES_AUTOHSCROLL
-    EDITTEXT        EV_5,54,60,72,14,ES_AUTOHSCROLL
-    EDITTEXT        EV_7,54,85,72,14,ES_AUTOHSCROLL
-    EDITTEXT        EV_9,54,110,72,14,ES_AUTOHSCROLL
-    LTEXT           "Sýò kiêòn 2",IDC_STATIC,143,19,30,8
-    LTEXT           "Sýò kiêòn 4",IDC_STATIC,143,42,30,8
-    LTEXT           "Sýò kiêòn 6",IDC_STATIC,143,65,30,8
-    LTEXT           "Sýò kiêòn 8",IDC_STATIC,143,90,30,8
-    LTEXT           "Sýò kiêòn 10",IDC_STATIC,139,115,34,8
-    EDITTEXT        EV_2,185,13,74,14,ES_AUTOHSCROLL
-    EDITTEXT        EV_4,185,37,74,14,ES_AUTOHSCROLL
-    EDITTEXT        EV_6,185,60,74,14,ES_AUTOHSCROLL
-    EDITTEXT        EV_8,185,85,74,14,ES_AUTOHSCROLL
-    EDITTEXT        EV_10,185,110,74,14,ES_AUTOHSCROLL
-END
-
-DLG_Loading DIALOGEX 0, 0, 159, 59
-STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_BORDER
-EXSTYLE WS_EX_TRANSPARENT
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    LTEXT           "Ðang ðoòc tâòp tin. Vui loÌng ðõòi!",IDC_STATIC,7,14,98,8
-    CONTROL         "",LOAD_Progress,"msctls_progress32",WS_BORDER,7,31,145,12
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Version
 //
 
@@ -642,206 +805,10 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
-BEGIN
-    IDD_ABOUTBOX, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 163
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 55
-    END
-
-    DLG_Event, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 302
-        VERTGUIDE, 18
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 169
-        HORZGUIDE, 24
-        HORZGUIDE, 30
-        HORZGUIDE, 149
-    END
-
-    DLG_Info, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 302
-        VERTGUIDE, 24
-        VERTGUIDE, 56
-        VERTGUIDE, 150
-        VERTGUIDE, 171
-        VERTGUIDE, 206
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 169
-        HORZGUIDE, 30
-        HORZGUIDE, 53
-        HORZGUIDE, 77
-    END
-
-    DLG_Log, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 302
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 169
-        HORZGUIDE, 29
-    END
-
-    DLG_Option, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 308
-        VERTGUIDE, 49
-        VERTGUIDE, 138
-        VERTGUIDE, 150
-        VERTGUIDE, 198
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 204
-        HORZGUIDE, 48
-        HORZGUIDE, 72
-        HORZGUIDE, 96
-        HORZGUIDE, 120
-        HORZGUIDE, 144
-    END
-
-    DLG_Photic, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 302
-        VERTGUIDE, 36
-        VERTGUIDE, 90
-        VERTGUIDE, 113
-        VERTGUIDE, 125
-        VERTGUIDE, 192
-        VERTGUIDE, 232
-        VERTGUIDE, 270
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 169
-        HORZGUIDE, 43
-        HORZGUIDE, 65
-        HORZGUIDE, 88
-        HORZGUIDE, 113
-        HORZGUIDE, 136
-    END
-
-    DLG_Setting, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 302
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 169
-    END
-
-    DLG_Wave, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 302
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 169
-    END
-
-    DLG_Montage, DIALOG
-    BEGIN
-        HORZGUIDE, 227
-    END
-
-    DLG_Opt_Print, DIALOG
-    BEGIN
-        VERTGUIDE, 12
-        VERTGUIDE, 48
-        VERTGUIDE, 128
-        VERTGUIDE, 146
-        HORZGUIDE, 26
-        HORZGUIDE, 50
-        HORZGUIDE, 74
-        HORZGUIDE, 98
-        HORZGUIDE, 122
-        HORZGUIDE, 133
-    END
-
-    DLG_Opt_View, DIALOG
-    BEGIN
-        VERTGUIDE, 12
-        VERTGUIDE, 71
-        VERTGUIDE, 257
-    END
-
-    DLG_Opt_Rec, DIALOG
-    BEGIN
-    END
-
-    DLG_Opt_Event, DIALOG
-    BEGIN
-        VERTGUIDE, 12
-        VERTGUIDE, 42
-        VERTGUIDE, 138
-        VERTGUIDE, 143
-        VERTGUIDE, 186
-    END
-
-    DLG_Loading, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 152
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 52
-        HORZGUIDE, 22
-        HORZGUIDE, 43
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Ribbon
 //
 
 IDR_RIBBON              RT_RIBBON_XML           "res\\ribbon.mfcribbon-ms"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog Info
-//
-
-DLG_Info DLGINIT
-BEGIN
-    IDC_COMBO1, 0x403, 5, 0
-0x614d, 0x656c, "\000" 
-    IDC_COMBO1, 0x403, 7, 0
-0x6546, 0x616d, 0x656c, "\000" 
-    IDC_COMBO1, 0x403, 8, 0
-0x6e55, 0x6e6b, 0x776f, 0x006e, 
-    0
-END
-
-DLG_Opt_Print DLGINIT
-BEGIN
-    ID_FONT, 0x37c, 269, 0
-0x4d3c, 0x4346, 0x6f43, 0x626d, 0x426f, 0x786f, 0x445f, 0x6172, 0x5577, 
-0x6973, 0x676e, 0x6f46, 0x746e, 0x463e, 0x4c41, 0x4553, 0x2f3c, 0x464d, 
-0x4343, 0x6d6f, 0x6f62, 0x6f42, 0x5f78, 0x7244, 0x7761, 0x7355, 0x6e69, 
-0x4667, 0x6e6f, 0x3e74, 0x4d3c, 0x4346, 0x6f43, 0x626d, 0x426f, 0x786f, 
-0x535f, 0x6f68, 0x5477, 0x7572, 0x5465, 0x7079, 0x4665, 0x6e6f, 0x7374, 
-0x543e, 0x5552, 0x3c45, 0x4d2f, 0x4346, 0x6f43, 0x626d, 0x426f, 0x786f, 
-0x535f, 0x6f68, 0x5477, 0x7572, 0x5465, 0x7079, 0x4665, 0x6e6f, 0x7374, 
-0x3c3e, 0x464d, 0x4343, 0x6d6f, 0x6f62, 0x6f42, 0x5f78, 0x6853, 0x776f, 
-0x6152, 0x7473, 0x7265, 0x7954, 0x6570, 0x6f46, 0x746e, 0x3e73, 0x5254, 
-0x4555, 0x2f3c, 0x464d, 0x4343, 0x6d6f, 0x6f62, 0x6f42, 0x5f78, 0x6853, 
-0x776f, 0x6152, 0x7473, 0x7265, 0x7954, 0x6570, 0x6f46, 0x746e, 0x3e73, 
-0x4d3c, 0x4346, 0x6f43, 0x626d, 0x426f, 0x786f, 0x535f, 0x6f68, 0x4477, 
-0x7665, 0x6369, 0x5465, 0x7079, 0x4665, 0x6e6f, 0x7374, 0x543e, 0x5552, 
-0x3c45, 0x4d2f, 0x4346, 0x6f43, 0x626d, 0x426f, 0x786f, 0x535f, 0x6f68, 
-0x4477, 0x7665, 0x6369, 0x5465, 0x7079, 0x4665, 0x6e6f, 0x7374, "\076" 
-    0
-END
 
 
 /////////////////////////////////////////////////////////////////////////////

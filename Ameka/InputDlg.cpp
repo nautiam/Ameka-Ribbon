@@ -24,7 +24,8 @@ CInputDlg::~CInputDlg()
 void CInputDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Text(pDX, IDC_COMBO1, strEvKind);
+	//DDX_Text(pDX, IDC_COMBO1, strEvKind);
+	DDX_Control(pDX, IDC_COMBO1, event_Change);
 }
 
 
@@ -40,6 +41,7 @@ END_MESSAGE_MAP()
 void CInputDlg::OnBnClickedOk()
 {
 	// TODO: Add your control notification handler code here
+	strEvKind = event_Change.GetCurSel();
 	CDialogEx::OnOK();
 }
 
@@ -48,4 +50,13 @@ void CInputDlg::OnBnClickedCancel()
 {
 	// TODO: Add your control notification handler code here
 	CDialogEx::OnCancel();
+}
+
+BOOL CInputDlg::OnInitDialog()
+{
+	for (int i = 0; i < 10; i++)
+	{
+		event_Change.AddString(theApp.evName[i]);
+	}
+	return TRUE;
 }

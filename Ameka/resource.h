@@ -58,7 +58,6 @@
 #define DLG_Opt_Rec                     324
 #define DLG_Opt_Event                   325
 #define DLG_Loading                     328
-#define IDD_DIALOG1                     330
 #define DLG_INPUT                       330
 #define IDC_COMBO1                      1000
 #define IDC_CHECK1                      1001
