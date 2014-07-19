@@ -158,6 +158,10 @@
 #define ID_LEFT                         1086
 #define ID_RIGHT                        1087
 #define info_hand                       1088
+#define ID_FONT                         1089
+#define ID_SIZE                         1090
+#define ID_SIZE2                        1091
+#define ID_DISTANCE                     1091
 #define ID_WRITE_PASTEASHYPERLINK       32770
 #define MN_Open                         32771
 #define MN_Close                        32772
@@ -203,9 +207,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        329
+#define _APS_NEXT_RESOURCE_VALUE        330
 #define _APS_NEXT_COMMAND_VALUE         32823
-#define _APS_NEXT_CONTROL_VALUE         1089
+#define _APS_NEXT_CONTROL_VALUE         1091
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

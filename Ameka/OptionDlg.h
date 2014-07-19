@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "Ameka.h"
 #include "afxwin.h"
+#include "afxfontcombobox.h"
 
 //------------------------------------------------------------------//
 //Tab Dialog
@@ -182,4 +183,7 @@ public:
 	CEdit ed_right;
 	CEdit ed_top;
 	CEdit ed_bot;
+	CMFCFontComboBox ed_font;
+	CEdit ed_size;
+	CEdit ed_distance;
 };

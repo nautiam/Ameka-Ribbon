@@ -50,6 +50,9 @@
 #define RIGHT_MARGIN 20
 #define TOP_MARGIN 20
 #define BOT_MARGIN 20
+#define DEF_FONT "Arial Greek"
+#define DEF_SIZE 8
+#define DEF_DISTANCE 8
 
 using namespace std;
 
@@ -81,16 +84,21 @@ public:
 	uint16_t elecNum;
 	CString evName[10];
 
+	//draw setup
 	float photicMin;
 	float photicWRate;
 	float photicMax;
 	float photicTick;
 	float photicBarW;
 
+	//Print setup
 	uint16_t marginLeft;
 	uint16_t marginRight;
 	uint16_t marginTop;
 	uint16_t marginBot;
+	CString printFont;
+	uint16_t printSize;
+	uint16_t printDistance;
 // Overrides
 public:
 	virtual BOOL InitInstance();

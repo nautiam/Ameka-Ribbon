@@ -367,20 +367,21 @@ void CAmekaView::drawMouseMove(CDC* pDC, int xPos, int maxVal, int minVal, int d
 		}
 		for (int j = 0; j < channelNum; j++)
 		{
-			if (j == drawVal)
-				continue;
-			int tmp = ((bmpRect.Height()*j)/channelNum + (bmpRect.Height()/channelNum)/2 - (((float)pDoc->primaryDataArray[minVal + i].value[j]- pView->m_BaseLine)/pView->m_Amp)*pView->graphData.scaleRate);
-			if (tmp > bmpRect.Height())
-				tmp = bmpRect.Height();
-			if (tmp < 0)
-				tmp = 0;
-			MemDC.MoveTo(i*mDistance, tmp);
-			tmp = ((bmpRect.Height()*j)/channelNum + (bmpRect.Height()/channelNum)/2 - (((float)pDoc->primaryDataArray[minVal + i + 1].value[j]- pView->m_BaseLine)/pView->m_Amp)*pView->graphData.scaleRate);
-			if (tmp > bmpRect.Height())
-				tmp = bmpRect.Height();
-			if (tmp < 0)
-				tmp = 0;
-			MemDC.LineTo((i+1)*mDistance, tmp);
+			if (j != drawVal)
+			{
+				int tmp = ((bmpRect.Height()*j)/channelNum + (bmpRect.Height()/channelNum)/2 - (((float)pDoc->primaryDataArray[minVal + i].value[j]- pView->m_BaseLine)/pView->m_Amp)*pView->graphData.scaleRate);
+				if (tmp > bmpRect.Height())
+					tmp = bmpRect.Height();
+				if (tmp < 0)
+					tmp = 0;
+				MemDC.MoveTo(i*mDistance, tmp);
+				tmp = ((bmpRect.Height()*j)/channelNum + (bmpRect.Height()/channelNum)/2 - (((float)pDoc->primaryDataArray[minVal + i + 1].value[j]- pView->m_BaseLine)/pView->m_Amp)*pView->graphData.scaleRate);
+				if (tmp > bmpRect.Height())
+					tmp = bmpRect.Height();
+				if (tmp < 0)
+					tmp = 0;
+				MemDC.LineTo((i+1)*mDistance, tmp);
+			}
 		}
 	}
 	CPen redPen(PS_SOLID, 1, RGB(255, 15, 15));
@@ -1159,7 +1160,7 @@ uint16_t* CAmekaView::getDataFromPos(CPoint mousePos, CAmekaView* pView)
 	
 	int pos = 0;
 	
-	uint16_t val = abs(mousePos.y - (((rect.Height() - FOOT_RANGE)/channelNum)/2
+	uint32_t val = abs(mousePos.y - (((rect.Height() - FOOT_RANGE)/channelNum)/2
 			- (((float)pDoc->primaryDataArray[posNum].value[0]-m_BaseLine)/m_Amp)*graphData.scaleRate));
 	for (int i = 0; i < channelNum; i++)
 	{

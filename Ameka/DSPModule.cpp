@@ -746,6 +746,10 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 		//LeaveCriticalSection(&mView->csess);
 	}
 	//EnterCriticalSection(&mView->csess);
+	if (counter > 24000000)
+	{
+		return 1;
+	}
 	mDoc->PrimaryData = new amekaData<PrimaryDataType>(counter);
 
 	if (mDoc->primaryDataArray)

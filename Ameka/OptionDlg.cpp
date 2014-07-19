@@ -377,6 +377,9 @@ void CTabPrintDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, ID_RIGHT, ed_right);
 	DDX_Control(pDX, ID_TOP, ed_top);
 	DDX_Control(pDX, ID_BOT, ed_bot);
+	DDX_Control(pDX, ID_FONT, ed_font);
+	DDX_Control(pDX, ID_SIZE, ed_size);
+	DDX_Control(pDX, ID_DISTANCE, ed_distance);
 
 	CString tmp;
 	DDX_Text(pDX, ID_LEFT, tmp);
@@ -394,6 +397,16 @@ void CTabPrintDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, ID_BOT, tmp);
 	if (tmp != "")
 		theApp.marginBot= atoi((LPCSTR)(CStringA)tmp);
+
+	DDX_Text(pDX, ID_FONT, theApp.printFont);
+
+	DDX_Text(pDX, ID_SIZE, tmp);
+	if (tmp != "")
+		theApp.printSize = atoi((LPCSTR)(CStringA)tmp);
+
+	DDX_Text(pDX, ID_DISTANCE, tmp);
+	if (tmp != "")
+		theApp.printDistance = atoi((LPCSTR)(CStringA)tmp);
 }
 
 int CTabPrintDlg::OnInitDialog()
@@ -412,6 +425,14 @@ int CTabPrintDlg::OnInitDialog()
 
 	str.Format(L"%d", theApp.marginBot);	
 	ed_bot.SetWindowTextW(str);
+
+	ed_font.SetWindowTextW(theApp.printFont);
+
+	str.Format(L"%d", theApp.printSize);	
+	ed_size.SetWindowTextW(str);
+
+	str.Format(L"%d", theApp.printDistance);	
+	ed_distance.SetWindowTextW(str);
 
 	return 0;
 }

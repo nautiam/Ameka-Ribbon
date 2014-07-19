@@ -92,6 +92,7 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 
 		m_wndRibbonBar.Create(this);
 		m_wndRibbonBar.LoadFromResource(IDR_RIBBON);
+		m_wndRibbonBar.EnablePrintPreview(FALSE);
 
 		if (!m_wndStatusBar.Create(this))
 		{
@@ -712,8 +713,9 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		prt.SetMargins(theApp.marginTop, theApp.marginBot, theApp.marginLeft, theApp.marginRight);
 
 		//Step 3 : Create a printing font
-		hFont = prt.AddFontToEnvironment("Arial Greek",8,8); 
-		prt.SetDistance(5);  
+		hFont = prt.AddFontToEnvironment((char*)(LPCTSTR)theApp.printFont, 
+			theApp.printSize, (theApp.printSize*3)/2); 
+		prt.SetDistance(theApp.printDistance);  
 
 		//Step 4 : Start Page
 		prt.StartPage(); 
@@ -722,7 +724,7 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		//print partien info
 		prt.Print(hFont,L"Bệnh nhân: " + pDoc->patientInfo.fname,FORMAT_NORMAL);   
 		prt.Print(hFont,L"Giới tính: ", FORMAT_NORMAL);   
-		prt.Print(hFont,L"Ngày sinh: ",FORMAT_NORMAL);   
+		prt.Print(hFont,L"Ngày sinh: " + pDoc->patientInfo.birthday.Format(_T("%B %d, %Y")), FORMAT_NORMAL);   
 
 		//print line
 		prt.Line(PS_SOLID);

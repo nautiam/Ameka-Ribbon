@@ -152,6 +152,9 @@ CAmekaApp::CAmekaApp()
 	marginRight= RIGHT_MARGIN;
 	marginTop = TOP_MARGIN;
 	marginBot = BOT_MARGIN;
+	printFont = DEF_FONT;
+	printSize = DEF_SIZE;
+	printDistance = DEF_DISTANCE;
 
 	char line[100];
 	ifstream setFile;
