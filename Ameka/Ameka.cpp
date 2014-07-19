@@ -813,7 +813,7 @@ void CAmekaApp::OnStop()
 			pDoc->object.Write(temp, sizeof(temp));
 			
 			uint8_t nLen = _tcslen(pDoc->mMon.mName);
-			uint8_t temp_mon[80];
+			uint8_t temp_mon[85];
 			uint8_t monNum =  pDoc->mMon.mList.GetCount();
 			temp_mon[64] = monNum;
 			POSITION pos;
@@ -838,7 +838,17 @@ void CAmekaApp::OnStop()
 			temp_mon[71] = pDoc->patientInfo.lefthanded; // Thuan tay trai
 			temp_mon[72] = _tcsclen(pDoc->patientInfo.surname); // So ky tu cua Ten dem
 			// Reserved for birthday
-			
+			time_t birthday;
+			birthday = pDoc->patientInfo.birthday.GetTime();
+			temp_mon[73] = birthday;
+			temp_mon[74] = birthday >> 8;
+			temp_mon[75] = birthday >> 16;
+			temp_mon[76] = birthday >> 24;
+			temp_mon[77] = birthday >> 32;
+			temp_mon[78] = birthday >> 40;
+			temp_mon[79] = birthday >> 48;
+			temp_mon[80] = birthday >> 56;
+
 			pDoc->object.Write(temp_mon, sizeof(temp_mon));
 			
 			// Ghi montage name vao file

@@ -706,7 +706,7 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	uint64_t counter = 0;
 	counter = (uint64_t)(temp[4]) | (uint64_t)(temp[5] << 16) | (uint64_t)(temp[6] << 32) | (uint64_t)(temp[7] << 48);
 	mDoc->counter = counter;
-	uint8_t temp_mon[80];
+	uint8_t temp_mon[85];
 	mDoc->object.Read(temp_mon, sizeof(temp_mon));
 	uint8_t monNum = temp_mon[64];
 	uint8_t nLen = temp_mon[65];
@@ -790,6 +790,13 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	mDoc->patientInfo.surname = (CString)wszTo;
 	delete szTo;
 	delete wszTo;
+
+	// Doc ngay sinh
+	time_t birthday;
+	birthday = (time_t)(temp_mon[73]) | (time_t)(temp_mon[74] << 8) | (time_t)(temp_mon[75] << 16) | (time_t)(temp_mon[76] << 24) | 
+		(time_t)(temp_mon[77] << 32) | (time_t)(temp_mon[78] << 40) | (time_t)(temp_mon[79] << 48) | (time_t)(temp_mon[80] << 56);
+	CTime temp_bd(birthday);
+	mDoc->patientInfo.birthday = temp_bd;
 
 	POSITION pos;
 	mDoc->mMon.mList.RemoveAll();
