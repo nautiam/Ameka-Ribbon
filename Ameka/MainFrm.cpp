@@ -72,6 +72,7 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 
 	CMainFrame::~CMainFrame()
 	{
+		
 	}
 
 
@@ -92,8 +93,11 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 
 		m_wndRibbonBar.Create(this);
 		m_wndRibbonBar.LoadFromResource(IDR_RIBBON);
-		m_wndRibbonButton.SetVisible(FALSE);
-		m_wndRibbonBar.SetApplicationButton(&m_wndRibbonButton, CSize());
+		m_MainButton.SetVisible(FALSE);
+		//m_MainButton.SetImage(IDB_MAIN);
+		//m_MainButton.SetText(_T("\nf"));
+		//m_MainButton.SetToolTipText(L"huhu");
+		m_wndRibbonBar.SetApplicationButton(&m_MainButton, CSize(0,0));
 		
 		if (!m_wndStatusBar.Create(this))
 		{
