@@ -154,12 +154,15 @@ CTabViewDlg::CTabViewDlg() : CDialogEx(CTabViewDlg::IDD)
 
 int CTabViewDlg::OnInitDialog()
 {
+	CAmekaView* pView = CAmekaView::GetView();
+	if (!pView)
+		return -1;
 	CDialog::OnInitDialog();
 	m_view_sen.SetWindowTextW(theApp.m_sensitivity);
 	m_view_speed.SetWindowTextW(theApp.m_speed);
 	m_view_lp.SetWindowTextW(theApp.m_LP);
 	m_view_hp.SetWindowTextW(theApp.m_HP);
-	CAmekaView* pView = CAmekaView::GetView();
+	
 	if (pView)
 	{
 		

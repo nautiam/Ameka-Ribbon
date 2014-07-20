@@ -92,7 +92,7 @@ void C_ColorToolTip::OnPaint()
 	CRect rtWin;
 	GetClientRect(rtWin);
 	CFont txtFont;
-	txtFont.CreatePointFont(70, _T("Arial"), &dc);
+	txtFont.CreatePointFont(80, _T("Arial"), &dc);
 	dc.SelectObject(&txtFont);
 	dc.FillSolidRect(rtWin, m_clrBack);
 	dc.SetBkMode(TRANSPARENT);

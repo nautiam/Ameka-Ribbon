@@ -587,8 +587,10 @@ void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
 
 		CAmekaDoc* pDoc = GetDocument();
 
-		strTemp.Format((L"Value: %d\nMin: %d\nMax: %d\n"), pDoc->primaryDataArray[posResult[0]].value[posResult[1]],
-			pDoc->primaryDataArray[valResult[0]].value[posResult[1]], pDoc->primaryDataArray[valResult[1]].value[posResult[1]]) ;
+		int elecVal = (float(pDoc->primaryDataArray[posResult[0]].value[posResult[1]])/baseLine)*ELEC_VAL;
+		/*strTemp.Format((L"Value: %d\nMin: %d\nMax: %d\n"), pDoc->primaryDataArray[posResult[0]].value[posResult[1]],
+			pDoc->primaryDataArray[valResult[0]].value[posResult[1]], pDoc->primaryDataArray[valResult[1]].value[posResult[1]]) ;*/
+		strTemp.Format((L"%d mV"), elecVal);
 		//strTemp.Format(L"Data value: %d\r\nMix value: %d\r\nMax value: %d", this->dataBuffer[posResult[0]].value[posResult[1]], fuck[0], fuck[1]);
 		// show tool tip in mouse move
 		int xPos, yPos;
@@ -610,7 +612,7 @@ void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
 		}
 		if (valResult[0] < valResult[1])
 		{
-			int xDraw = (valResult[0] - this->GetScrollPos(SB_HORZ))*distance + MONNAME_BAR + 2;
+			int xDraw = (valResult[0] - (float)this->GetScrollPos(SB_HORZ))*distance + MONNAME_BAR + 2;
 			drawMouseMove(this->GetDC(), xDraw, valResult[1], valResult[0], posResult[1]);
 		}
 		else
@@ -1144,13 +1146,13 @@ uint16_t* CAmekaView::getDataFromPos(CPoint mousePos, CAmekaView* pView)
 	int yMousePos = mousePos.y;
 
 	CAmekaDoc* pDoc = GetDocument();
-
+	
 	/*if (onPhotic)
 		maxWidth = rect.Width()*FACTOR;
 	else
 		maxWidth = rect.Width();*/
 
-	uint64_t posNum = this->GetScrollPos(SB_HORZ) + (xMousePos - MONNAME_BAR - 2)/distance;
+	uint64_t posNum = this->GetScrollPos(SB_HORZ) + float(xMousePos - MONNAME_BAR - 2)/distance;
 
 	//float xDistance;
 	//float distance = (float)this->graphData.paperSpeed*(float)this->graphData.dotPmm/this->graphData.sampleRate;
@@ -1159,17 +1161,18 @@ uint16_t* CAmekaView::getDataFromPos(CPoint mousePos, CAmekaView* pView)
 	
 	int pos = 0;
 	
-	uint32_t val = abs(mousePos.y - (((rect.Height() - FOOT_RANGE)/channelNum)/2
+	uint32_t val = abs(mousePos.y - ((float(rect.Height() - FOOT_RANGE)/channelNum)/2
 			- (((float)pDoc->primaryDataArray[posNum].value[0]-m_BaseLine)/m_Amp)*graphData.scaleRate));
 	for (int i = 0; i < channelNum; i++)
 	{
-		int tmp = (((rect.Height() - FOOT_RANGE)*i)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2
-			- (((float)pDoc->primaryDataArray[posNum].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
+		PrimaryDataType crtData = pDoc->primaryDataArray[posNum];
+		int tmp = (((rect.Height() - FOOT_RANGE)*i)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 
+			- (((float)crtData.value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
 		if (tmp < 0)
 			tmp = 0;
 		if (tmp > (rect.Height() - FOOT_RANGE))
 			tmp = rect.Height() - FOOT_RANGE;
-		if (abs(mousePos.y - tmp) < val)
+		if (abs(mousePos.y - (long)tmp) <= val)
 		{
 			pos = i;
 			val = abs(mousePos.y - tmp);

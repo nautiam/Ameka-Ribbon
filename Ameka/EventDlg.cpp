@@ -20,15 +20,15 @@ int CEventDlg::OnInitDialog()
 
 	CRect rect;
 	event_list.GetClientRect(&rect);
-	int nColInterval = rect.Width()/4;
+	int nColInterval = rect.Width()/3;
 
-	event_list.InsertColumn(0, _T("Loaòi sýò kiêòn"), LVCFMT_LEFT, nColInterval);
+	//event_list.InsertColumn(0, _T("Loaòi sýò kiêòn"), LVCFMT_LEFT, nColInterval);
 	//event_list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
-	event_list.InsertColumn(1, _T("Tên sýò kiêòn"), LVCFMT_LEFT, nColInterval*3/2);
+	event_list.InsertColumn(0, _T("Tên sýò kiêòn"), LVCFMT_LEFT, nColInterval*3/2);
 	//event_list.SetColumnWidth(1, LVSCW_AUTOSIZE_USEHEADER);
-	event_list.InsertColumn(2, _T("ThõÌi gian"), LVCFMT_LEFT, nColInterval*3/2);
+	event_list.InsertColumn(1, _T("ThõÌi gian"), LVCFMT_LEFT, nColInterval*3/2);
 	//event_list.SetColumnWidth(2, LVSCW_AUTOSIZE_USEHEADER);
-	event_list.InsertColumn(3, _T("ID"), LVCFMT_LEFT, nColInterval);
+	event_list.InsertColumn(2, _T("ID"), LVCFMT_LEFT, nColInterval);
 
 	//event_list.SetColumnWidth(3, LVSCW_AUTOSIZE_USEHEADER);
 	initItems();
@@ -59,7 +59,7 @@ void CEventDlg::OnBnClickedrename()
 	CInputDlg dialog;
 	if (dialog.DoModal() == IDOK) {
 		// Do something
-		CString strID = event_list.GetItemText(index, 3);
+		CString strID = event_list.GetItemText(index, 2);
 		uint64_t numID = _ttoi(strID);
 
 		CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
@@ -79,10 +79,16 @@ void CEventDlg::OnLvnItemchangedList1(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
 	// TODO: Add your control notification handler code here
 	*pResult = 0;
-	if (event_list.GetSelectedCount() > 0)
-		index = event_list.GetSelectedCount() - 1;
-	else
+
+	POSITION pos = event_list.GetFirstSelectedItemPosition();
+	if (pos == NULL)
+	{
 		index = -1;
+	}
+	else
+	{
+		index =  event_list.GetNextSelectedItem(pos);
+	}
 }
 
 void CEventDlg::initItems()
@@ -98,19 +104,19 @@ void CEventDlg::initItems()
 		if (pDoc->primaryDataArray[i].eventID != 10)
 		{
 			CString str;
-			str.Format(_T("%d"), pDoc->primaryDataArray[i].eventID);
-			int nIndex = event_list.InsertItem(mID++, str);
+			//str.Format(_T("%d"), pDoc->primaryDataArray[i].eventID);
+			int nIndex = event_list.InsertItem(mID++, theApp.evName[pDoc->primaryDataArray[i].eventID]);
 
-			event_list.SetItemText(nIndex, 1, theApp.evName[pDoc->primaryDataArray[i].eventID]);
+			//event_list.SetItemText(nIndex, 1, theApp.evName[pDoc->primaryDataArray[i].eventID]);
 
 			char buff[20];
 			time_t now = time(NULL);
 			strftime(buff, 20, "%Y-%m-%d %H:%M:%S", localtime(&pDoc->primaryDataArray[i].time));
 			str = CString(buff, 20);
-			event_list.SetItemText(nIndex, 2, str);
+			event_list.SetItemText(nIndex, 1, str);
 
 			str.Format(_T("%d"), i);
-			event_list.SetItemText(nIndex, 3, str);
+			event_list.SetItemText(nIndex, 2, str);
 		}
 	}
 };

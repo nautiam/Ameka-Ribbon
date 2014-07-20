@@ -769,8 +769,8 @@ int CQPrint::InsertBitmapFromView (int fmt, CSize *dest, int left)
     // margins must calculated for printing-device
     margins.top = CALCY(m_Margins.top);
     margins.bottom = CALCY(m_Margins.bottom);
-	margins.left = CALCX(m_Margins.left);
-    margins.right = CALCX(m_Margins.right);    
+	margins.left = CALCY(m_Margins.left);
+    margins.right = CALCY(m_Margins.right);    
 
 	m_LastErrNo = PRERR_OK;
 	
@@ -1127,7 +1127,7 @@ void CQPrint::SetTableReset ()
 
 void CQPrint::SetPageOrientation (int orientation)
 {
-	if(orientation !=DMORIENT_LANDSCAPE && orientation != DMORIENT_PORTRAIT)
+	if(orientation != DMORIENT_LANDSCAPE && orientation != DMORIENT_PORTRAIT)
 		return;	
 	//device initialization and environment of a printer
 

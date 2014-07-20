@@ -130,6 +130,7 @@ public:
 	afx_msg void OnLan();
 	afx_msg void OnRecording();
 //	afx_msg void OnStoprec();
+	void SetLandscape(void);
 };
 
 extern CAmekaApp theApp;

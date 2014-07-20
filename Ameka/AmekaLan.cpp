@@ -183,7 +183,16 @@ void loadSetting(const char* fileName)
 				if (e->Attribute("Name") != NULL && e->Attribute("ID") != NULL &&
 					atoi(e->Attribute("ID")) < 10 && atoi(e->Attribute("ID")) >= 0)
 				{
-					theApp.evName[atoi(e->Attribute("ID"))] = e->Attribute("Name");
+					char const *utf8String = e->Attribute("Name");
+					int len = MultiByteToWideChar(CP_UTF8, 0, utf8String, -1, NULL, 0);
+					if (len == 0) 
+					{ 
+						theApp.evName[atoi(e->Attribute("ID"))] = L""; 
+					}
+					LPWSTR utf16Buf = new WCHAR[len];
+					MultiByteToWideChar(CP_UTF8, 0, utf8String, -1, &utf16Buf[0], len);
+
+					theApp.evName[atoi(e->Attribute("ID"))] = (CString)utf16Buf;
 				}
 			}
 		}
@@ -242,7 +251,11 @@ void writeSetting(const char* fileName)
 	{
 		TiXmlElement* element1 = new TiXmlElement("Event");
 		element->LinkEndChild(element1);
-		element1->SetAttribute("Name", (LPCSTR)(CStringA)theApp.evName[i]);
+
+		int len = WideCharToMultiByte(CP_UTF8, 0, theApp.evName[i], -1, NULL, 0, 0, 0);
+		char *szTo = new char[len];
+		WideCharToMultiByte(CP_UTF8, 0, theApp.evName[i], -1, szTo, len, 0, 0);		
+		element1->SetAttribute("Name", szTo);
 		element1->SetAttribute("ID", i);
 	}
 

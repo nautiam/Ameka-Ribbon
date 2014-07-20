@@ -54,6 +54,7 @@ void CInputDlg::OnBnClickedCancel()
 
 BOOL CInputDlg::OnInitDialog()
 {
+	CDialogEx::OnInitDialog();
 	for (int i = 0; i < 10; i++)
 	{
 		event_Change.AddString(theApp.evName[i]);

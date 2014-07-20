@@ -35,7 +35,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "ÐôÌng yì",IDOK,64,44,50,14
     PUSHBUTTON      "HuÒy",IDCANCEL,118,44,50,14
-    COMBOBOX        IDC_COMBO1,55,12,113,73,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO1,55,12,113,73,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Loaòi sýò kiêòn",IDC_STATIC,7,16,46,8
 END
 
@@ -211,7 +211,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "Ðôò nhaòy soìng",IDC_STATIC,12,19,46,8
     LTEXT           "Tôìc ðôò soìng",IDC_STATIC,12,42,40,8
-    LTEXT           "Loòc thông thâìp",IDC_STATIC,10,68,48,8
+    LTEXT           "Loòc thông thâìp",IDC_STATIC,12,68,48,8
     LTEXT           "Loòc thông cao",IDC_STATIC,11,91,47,8
     EDITTEXT        view_sensitivity,76,14,181,14,ES_AUTOHSCROLL
     EDITTEXT        view_speed,76,37,181,14,ES_AUTOHSCROLL
@@ -445,31 +445,6 @@ END
 //
 // Dialog Info
 //
-
-DLG_INPUT DLGINIT
-BEGIN
-    IDC_COMBO1, 0x403, 2, 0
-0x0030, 
-    IDC_COMBO1, 0x403, 2, 0
-0x0031, 
-    IDC_COMBO1, 0x403, 2, 0
-0x0032, 
-    IDC_COMBO1, 0x403, 2, 0
-0x0033, 
-    IDC_COMBO1, 0x403, 2, 0
-0x0034, 
-    IDC_COMBO1, 0x403, 2, 0
-0x0035, 
-    IDC_COMBO1, 0x403, 2, 0
-0x0036, 
-    IDC_COMBO1, 0x403, 2, 0
-0x0037, 
-    IDC_COMBO1, 0x403, 2, 0
-0x0038, 
-    IDC_COMBO1, 0x403, 2, 0
-0x0039, 
-    0
-END
 
 DLG_Info DLGINIT
 BEGIN

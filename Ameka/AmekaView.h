@@ -41,9 +41,11 @@
 
 #define FACTOR 0.667
 
-#define X_TOOLTIP 100
-#define Y_TOOLTIP 50
+#define X_TOOLTIP 50
+#define Y_TOOLTIP 20
 #define CHECK_RANGE 5
+
+#define ELEC_VAL 50
 
 class CAmekaView : public CScrollView
 {

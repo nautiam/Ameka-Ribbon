@@ -23,11 +23,11 @@ CInfoDlg::~CInfoDlg()
 
 int CInfoDlg::OnInitDialog()
 {
-	CDialogEx::OnInitDialog();
-
 	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
 	if (!pDoc)
 		return 1;
+
+	CDialogEx::OnInitDialog();
 
 	m_Date.SetTime(&pDoc->patientInfo.birthday);
 	m_Hand.SetCheck(pDoc->patientInfo.lefthanded);

@@ -13,6 +13,8 @@
 //
 
 #include "stdafx.h"
+
+#include <Winspool.h>
 #include "afxwinappex.h"
 #include "afxdialogex.h"
 #include <vector>
@@ -39,7 +41,7 @@
 
 //_INITIALIZE_EASYLOGGINGPP
 
-	using namespace std;
+using namespace std;
 
 // CAmekaApp
 
@@ -204,6 +206,8 @@ CAmekaApp theApp;
 
 BOOL CAmekaApp::InitInstance()
 {
+	SetLandscape();
+
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
 	// InitComMonControlsEx() is required on Windows XP if an application
@@ -468,7 +472,7 @@ void CAmekaApp::OnPhotic()
 				CDC* pDC = pView->GetDC();
 				CDC MemDC;
 				CRect rect;
-				
+
 				pView->GetClientRect(&rect);
 				uint64_t startPos = rect.Width()*FACTOR;
 
@@ -521,7 +525,7 @@ void CAmekaApp::OnPhotic()
 				DeleteObject(&pen2);
 
 				pDC->BitBlt(startPos , 0, rect.Width(), rect.Height(), &MemDC, 0, 0, SRCCOPY);
-	
+
 				MemDC.SelectObject(pOldBmp);
 				DeleteObject(bitmap);
 				//DeleteObject(pen2);
@@ -732,7 +736,7 @@ void CAmekaApp::OnDemo()
 		sizeTotal.cx = rect.Width();
 		sizeTotal.cy = rect.Height();
 		pView->SetScrollSizes(MM_TEXT, sizeTotal);
-		
+
 		{
 			//LPVOID pParam;
 			initial_dsp_data((LPVOID)pDoc);
@@ -811,7 +815,7 @@ void CAmekaApp::OnStop()
 			temp[6] = (uint16_t)(pDoc->counter >> 32);
 			temp[7] = (uint16_t)(pDoc->counter >> 48);
 			pDoc->object.Write(temp, sizeof(temp));
-			
+
 			uint8_t nLen = _tcslen(pDoc->mMon.mName);
 			uint8_t temp_mon[85];
 			uint8_t monNum =  pDoc->mMon.mList.GetCount();
@@ -850,7 +854,7 @@ void CAmekaApp::OnStop()
 			temp_mon[80] = birthday >> 56;
 
 			pDoc->object.Write(temp_mon, sizeof(temp_mon));
-			
+
 			// Ghi montage name vao file
 			char *szTo = new char[nLen + 1];
 			WideCharToMultiByte(1258, 0, pDoc->mMon.mName, nLen, szTo, nLen, NULL, NULL);			
@@ -925,8 +929,8 @@ void CAmekaApp::OnStop()
 				/*if (pView->onPhotic)
 				{
 
-					photic_processing(FRE_STEP, pView->GetDocument(), pView->this->GetScrollPos(SB_HORZ));
-					pView->drawBarGraph();
+				photic_processing(FRE_STEP, pView->GetDocument(), pView->this->GetScrollPos(SB_HORZ));
+				pView->drawBarGraph();
 				}*/
 			}
 			else
@@ -1396,3 +1400,43 @@ void CAmekaApp::OnRecording()
 //		}
 //	}
 //}
+
+
+void CAmekaApp::SetLandscape(void)
+{
+	// Get default printer settings.
+	PRINTDLG   pd;
+
+	pd.lStructSize = (DWORD) sizeof(PRINTDLG);
+	if (GetPrinterDeviceDefaults(&pd))
+	{
+		// Lock memory handle.
+		DEVMODE FAR* pDevMode =
+			(DEVMODE FAR*)::GlobalLock(m_hDevMode);
+		LPDEVNAMES lpDevNames;
+		LPTSTR lpszDriverName, lpszDeviceName, lpszPortName;
+		HANDLE hPrinter;
+
+
+		if (pDevMode)
+		{
+			// Change printer settings in here.
+			pDevMode->dmOrientation = DMORIENT_LANDSCAPE;
+			// Unlock memory handle.
+			lpDevNames = (LPDEVNAMES)GlobalLock(pd.hDevNames);
+			lpszDriverName = (LPTSTR )lpDevNames + lpDevNames->wDriverOffset;
+			lpszDeviceName = (LPTSTR )lpDevNames + lpDevNames->wDeviceOffset;
+			lpszPortName   = (LPTSTR )lpDevNames + lpDevNames->wOutputOffset;
+
+			::OpenPrinter(lpszDeviceName, &hPrinter, NULL);
+			::DocumentProperties(NULL,hPrinter,lpszDeviceName,pDevMode,
+				pDevMode, DM_IN_BUFFER|DM_OUT_BUFFER);
+
+			// Sync the pDevMode.
+			// See SDK help for DocumentProperties for more info.
+			::ClosePrinter(hPrinter);
+			::GlobalUnlock(m_hDevNames);
+			::GlobalUnlock(m_hDevMode);
+		}
+	}
+}

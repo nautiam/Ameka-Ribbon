@@ -95,7 +95,6 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		m_wndRibbonButton.SetVisible(FALSE);
 		m_wndRibbonBar.SetApplicationButton(&m_wndRibbonButton, CSize());
 		
-
 		if (!m_wndStatusBar.Create(this))
 		{
 			TRACE0("Failed to create status bar\n");
@@ -436,6 +435,10 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 	void CMainFrame::OnScalerate()
 	{
 		// TODO: Add your command handler code here
+		CAmekaView* pView = CAmekaView::GetView();
+		if (!pView)
+			return;
+
 		CMFCRibbonComboBox* pScale = DYNAMIC_DOWNCAST(
 			CMFCRibbonComboBox, m_wndRibbonBar.FindByID(MN_ScaleRate));
 		// Get the selected index
@@ -443,7 +446,6 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		if (nCurSel >= 0)
 		{
 			CString item=pScale->GetItem(nCurSel);
-			CAmekaView* pView = CAmekaView::GetView();
 			EnterCriticalSection(&pView->csess);
 			pView->graphData.scaleRate = atoi((LPCSTR)(CStringA)item);
 			LeaveCriticalSection(&pView->csess);
@@ -455,6 +457,9 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 	void CMainFrame::OnSpeedrate()
 	{
 		// TODO: Add your command handler code here
+		CAmekaView* pView = CAmekaView::GetView();
+		if (!pView)
+			return;
 		CMFCRibbonComboBox* pScale = DYNAMIC_DOWNCAST(
 			CMFCRibbonComboBox, m_wndRibbonBar.FindByID(MN_SpeedRate));
 		// Get the selected index
@@ -462,7 +467,6 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		if (nCurSel >= 0)
 		{
 			CString item=pScale->GetItem(nCurSel);
-			CAmekaView* pView = CAmekaView::GetView();
 			EnterCriticalSection(&pView->csess);
 			pView->graphData.paperSpeed = atoi((LPCSTR)(CStringA)item);
 			LeaveCriticalSection(&pView->csess);
@@ -478,6 +482,8 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 			CMFCRibbonComboBox, pMainWnd->m_wndRibbonBar.FindByID(MN_MonList));
 
 		CAmekaDoc* doc = CAmekaDoc::GetDoc();
+		if (!doc)
+			return;
 
 		int nCurSel = pMon->GetCurSel();
 		CString data = pMon->GetItem(nCurSel);
@@ -499,6 +505,10 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 	void CMainFrame::OnLp()
 	{
 		// TODO: Add your command handler code here
+		CAmekaView* pView = CAmekaView::GetView();
+		if (!pView)
+			return;
+
 		CMFCRibbonComboBox* pLP = DYNAMIC_DOWNCAST(
 			CMFCRibbonComboBox, m_wndRibbonBar.FindByID(MN_LP));
 		// Get the selected index
@@ -506,7 +516,6 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		if (nCurSel >= 0)
 		{
 			CString item=pLP->GetItem(nCurSel);
-			CAmekaView* pView = CAmekaView::GetView();
 			EnterCriticalSection(&pView->csess);
 			pView->GetDocument()->mDSP.LPFFre = atoi((LPCSTR)(CStringA)item);
 			LeaveCriticalSection(&pView->csess);
@@ -522,6 +531,10 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 	void CMainFrame::OnHp()
 	{
 		// TODO: Add your command handler code here
+		CAmekaView* pView = CAmekaView::GetView();
+		if (!pView)
+			return;
+
 		CMFCRibbonComboBox* pHP = DYNAMIC_DOWNCAST(
 			CMFCRibbonComboBox, m_wndRibbonBar.FindByID(MN_HP));
 		// Get the selected index
@@ -529,7 +542,6 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		if (nCurSel >= 0)
 		{
 			CString item=pHP->GetItem(nCurSel);
-			CAmekaView* pView = CAmekaView::GetView();
 			EnterCriticalSection(&pView->csess);
 			pView->GetDocument()->mDSP.HPFFre = atoi((LPCSTR)(CStringA)item);
 			LeaveCriticalSection(&pView->csess);
@@ -671,8 +683,16 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 			try
 			{
 				CString saveFName = FileDlg.GetPathName();
-				CFile::Rename(pDoc->saveFileName, saveFName);
+				if (pDoc->saveFileName.Find(L".dat") != -1)
+				//if (pDoc->saveFileName.Find(L".dat"))
+
+					CFile::Rename(pDoc->saveFileName, saveFName);
+				else
+				{
+					::CopyFile(pDoc->saveFileName, saveFName, FALSE);
+				}
 				pDoc->saveFileName = saveFName;
+				pDoc->recordFileName = saveFName;
 			}
 			catch(CFileException* pEx )
 			{
@@ -710,6 +730,7 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 			}
 
 			pDoc->saveFileName = FileDlg.GetPathName();
+			pDoc->recordFileName = FileDlg.GetPathName();
 
 			DWORD exit_code= NULL;
 			if (pView->pThread != NULL && pView->isRunning)
@@ -816,18 +837,19 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		CQPrint prt;
 		HPRIVATEFONT   hFont;
 
-		//prt.SetPageOrientation(DMORIENT_LANDSCAPE);
 		// Step 1 : call the CPrintDialog
 		if (prt.Dialog() == -1)
 			return;
-
+		//prt.SetPageOrientation(DMORIENT_LANDSCAPE);
 		//Step 2 : Start the Print
 		prt.StartPrint();      
 		prt.SetMargins(theApp.marginTop, theApp.marginBot, theApp.marginLeft, theApp.marginRight);
 
 		//Step 3 : Create a printing font
-		hFont = prt.AddFontToEnvironment((char*)(LPCTSTR)theApp.printFont, 
-			theApp.printSize, (theApp.printSize*3)/2); 
+		char strBuf[100];
+		sprintf(strBuf, "%S", theApp.printFont);
+		hFont = prt.AddFontToEnvironment(strBuf, theApp.printSize, (theApp.printSize*3)/2); 
+		prt.SetActiveFont(hFont);
 		prt.SetDistance(theApp.printDistance);  
 		//prt.SetPageOrientation(DMORIENT_LANDSCAPE);
 
@@ -836,9 +858,16 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 
 		//Step 5 : The actual printing goes here
 		//print partien info
-		prt.Print(hFont,L"Bệnh nhân: " + pDoc->patientInfo.fname + " " + pDoc->patientInfo.surname + " " + pDoc->patientInfo.lname,FORMAT_NORMAL);   
-		prt.Print(hFont,L"Giới tính: " + pDoc->patientInfo.sex, FORMAT_NORMAL);   
-		prt.Print(hFont,L"Ngày sinh: " + pDoc->patientInfo.birthday.Format(_T("%B %d, %Y")), FORMAT_NORMAL);   
+		try
+		{
+			prt.Print(hFont,L"Bệnh nhân: " + pDoc->patientInfo.fname + " " + pDoc->patientInfo.surname + " " + pDoc->patientInfo.lname,FORMAT_NORMAL);   
+			prt.Print(hFont,L"Giới tính: " + pDoc->patientInfo.sex, FORMAT_NORMAL);   
+			prt.Print(hFont,L"Ngày sinh: " + pDoc->patientInfo.birthday.Format(_T("%B %d, %Y")), FORMAT_NORMAL);   
+		}
+		catch (exception e)
+		{
+			MessageBoxW(L"Không thể in trong trạng thái hiện tại!");
+		}
 
 		//print line
 		prt.Line(PS_SOLID);

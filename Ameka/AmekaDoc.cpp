@@ -228,7 +228,8 @@ CAmekaDoc::~CAmekaDoc()
 	// Try to remove old record file whatever it is created or not
 	try
 	{
-		CFile::Remove(recordFileName);
+		if (recordFileName.Find(L".dat") != -1)
+			CFile::Remove(recordFileName);
 	}
 	catch (CFileException* pEx)
 	{

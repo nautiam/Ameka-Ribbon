@@ -378,7 +378,8 @@ UINT DSP::DSPThread(LPVOID pParam)
 	{
 		try
 		{
-			CFile::Remove(mDoc->recordFileName);
+			if (mDoc->recordFileName.Find(L".dat") != -1)
+				CFile::Remove(mDoc->recordFileName);
 		}
 		catch (CFileException* pEx)
 		{
@@ -402,7 +403,8 @@ UINT DSP::DSPThread(LPVOID pParam)
 			// Try to remove old record file
 			try
 			{
-				CFile::Remove(mDoc->recordFileName);
+				if (mDoc->recordFileName.Find(L".dat") != -1)
+					CFile::Remove(mDoc->recordFileName);
 			}
 			catch (CFileException* pEx)
 			{
