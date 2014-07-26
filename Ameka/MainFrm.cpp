@@ -54,6 +54,7 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		ON_UPDATE_COMMAND_UI(MN_PortName, &CMainFrame::OnUpdatePortname)
 		ON_UPDATE_COMMAND_UI(MN_Baud, &CMainFrame::OnUpdateBaud)
 		ON_COMMAND(MN_Print, &CMainFrame::OnPrint)
+		ON_COMMAND(MN_FullScr, &CMainFrame::OnFullscr)
 	END_MESSAGE_MAP()
 
 	// CMainFrame construction/destruction
@@ -65,14 +66,17 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		// TODO: add member initialization code here
 		theApp.m_nAppLook = theApp.GetInt(_T("ApplicationLook"), ID_VIEW_APPLOOK_OFF_2007_BLUE);
 
-		startEnable = FALSE;
-		stopEnable = FALSE;
-		recEnable = FALSE;
+		//startEnable = FALSE;
+		//stopEnable = FALSE;
+		//recEnable = FALSE;
+		portEnable = TRUE;
+		baudEnable = TRUE;
+		scanPortEnable = TRUE;
 	}
 
 	CMainFrame::~CMainFrame()
 	{
-		
+
 	}
 
 
@@ -98,7 +102,7 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		//m_MainButton.SetText(_T("\nf"));
 		//m_MainButton.SetToolTipText(L"huhu");
 		m_wndRibbonBar.SetApplicationButton(&m_MainButton, CSize(0,0));
-		
+
 		if (!m_wndStatusBar.Create(this))
 		{
 			TRACE0("Failed to create status bar\n");
@@ -257,12 +261,8 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 			pBaud->SelectItem(4);
 		}
 
-		CMFCRibbonButton* pStart = DYNAMIC_DOWNCAST(
-			CMFCRibbonButton, m_wndRibbonBar.FindByID(MN_StartDemo));
-		/*if (pStart)
-		{
-		pStart->
-		}*/
+		EnableFullScreenMode (MN_FullScr);
+		EnableFullScreenMainMenu(FALSE);
 
 		return 0;
 	}
@@ -582,7 +582,7 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		temp[6] = (uint16_t)(pDoc->counter >> 32);
 		temp[7] = (uint16_t)(pDoc->counter >> 48);
 		pDoc->object.Write(temp, sizeof(temp));
-			
+
 		uint8_t nLen = _tcslen(pDoc->mMon.mName);
 		uint8_t temp_mon[85];
 		uint8_t monNum =  pDoc->mMon.mList.GetCount();
@@ -619,9 +619,9 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		temp_mon[78] = birthday >> 40;
 		temp_mon[79] = birthday >> 48;
 		temp_mon[80] = birthday >> 56;
-			
+
 		pDoc->object.Write(temp_mon, sizeof(temp_mon));
-			
+
 		// Ghi montage name vao file
 		char *szTo = new char[nLen + 1];
 		WideCharToMultiByte(1258, 0, pDoc->mMon.mName, nLen, szTo, nLen, NULL, NULL);			
@@ -688,9 +688,9 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 			{
 				CString saveFName = FileDlg.GetPathName();
 				if (pDoc->saveFileName.Find(L".dat") != -1)
-				//if (pDoc->saveFileName.Find(L".dat"))
+					//if (pDoc->saveFileName.Find(L".dat"))
 
-					CFile::Rename(pDoc->saveFileName, saveFName);
+						CFile::Rename(pDoc->saveFileName, saveFName);
 				else
 				{
 					::CopyFile(pDoc->saveFileName, saveFName, FALSE);
@@ -792,21 +792,33 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 	void CMainFrame::OnUpdateStartdemo(CCmdUI *pCmdUI)
 	{
 		// TODO: Add your command update UI handler code here
-		pCmdUI->Enable(startEnable);
+		CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
+		if (!pDoc)
+			pCmdUI->Enable(FALSE);
+		else
+			pCmdUI->Enable(pDoc->startEnable);
 	}
 
 
 	void CMainFrame::OnUpdateStopdemo(CCmdUI *pCmdUI)
 	{
 		// TODO: Add your command update UI handler code here
-		pCmdUI->Enable(stopEnable);
+		CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
+		if (!pDoc)
+			pCmdUI->Enable(FALSE);
+		else
+			pCmdUI->Enable(pDoc->stopEnable);
 	}
 
 
 	void CMainFrame::OnUpdateRecording(CCmdUI *pCmdUI)
 	{
 		// TODO: Add your command update UI handler code here
-		pCmdUI->Enable(recEnable);
+		CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
+		if (!pDoc)
+			pCmdUI->Enable(FALSE);
+		else
+			pCmdUI->Enable(pDoc->recEnable);
 	}
 
 
@@ -886,4 +898,18 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		//Step 7 :  close the print document
 		//          and release it in the spooler
 		prt.EndPrint();  
+	}
+
+
+	void CMainFrame::OnFullscr()
+	{
+		// TODO: Add your command handler code here
+		CMDIFrameWnd *pFrame = (CMDIFrameWnd*)AfxGetApp()->GetMainWnd();
+
+		// Get the active MDI child window.
+		CMDIChildWnd *pChild = (CMDIChildWnd*)pFrame->GetActiveFrame();
+
+		pChild->ActivateFrame(SW_MAXIMIZE);
+
+		ShowFullScreen();
 	}

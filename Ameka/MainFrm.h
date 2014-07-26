@@ -41,9 +41,7 @@ public:
 public:
 	virtual ~CMainFrame();
 	MyToolBar     m_wndRibbonBar;
-	bool startEnable;
-	bool stopEnable;
-	bool recEnable;
+
 	bool portEnable;
 	bool baudEnable;
 	bool scanPortEnable;
@@ -87,6 +85,7 @@ public:
 	afx_msg void OnUpdatePortname(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateBaud(CCmdUI *pCmdUI);
 	afx_msg void OnPrint();
+	afx_msg void OnFullscr();
 };
 
 

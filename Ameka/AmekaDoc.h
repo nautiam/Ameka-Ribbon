@@ -51,8 +51,10 @@ public:
 	uint64_t counter; // Dem so mau duoc ghi vao file
 	uint16_t eventID;
 	HANDLE onReadSuccess;
-	//UINT genData(LPVOID pParam);
-	//AmekaData<RawDataType>* dataBuffer;
+	
+	bool startEnable;
+	bool stopEnable;
+	bool recEnable;
 // Operations
 
 public:

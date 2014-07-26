@@ -77,6 +77,10 @@ CAmekaDoc::CAmekaDoc()
 	eventID = 10;
 	counter = 0;
 
+	startEnable = TRUE;
+	stopEnable = FALSE;
+	recEnable = TRUE;
+
 	onReadSuccess = CreateEvent( 
 		NULL,               // default security attributes
 		TRUE,               // manual-reset event

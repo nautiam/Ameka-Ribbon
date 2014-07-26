@@ -14,7 +14,7 @@
 
 #define FRE_STEP 0.1
 #define LEAD_NUMBER 16
-#define MONTAGE_NUM 32
+#define MONTAGE_NUM 64
 #define BASELINE 16383
 
 template <typename T , typename T2>

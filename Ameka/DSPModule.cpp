@@ -135,7 +135,9 @@ void dsp_processing(LPVOID pParam)
 
 	if (!mDoc->object.Open(mDoc->saveFileName, CFile::modeRead))
 	{
-		AfxMessageBox(L"File cannot be opened");
+		AfxMessageBox(L"Không thêÒ taòo ðýõòc tâòp tin taòm!");
+		mDoc->isRecord = FALSE;
+		return;
 	}
 	//LONGLONG offset = 0x11000;
 	//mDoc->object.Seek(offset, CFile::begin);
@@ -416,7 +418,9 @@ UINT DSP::DSPThread(LPVOID pParam)
 			mDoc->recordFileName = temp.Format("record-%H%M%S.dat");
 			if (!mDoc->object.Open(mDoc->recordFileName, CFile::modeCreate | CFile::modeReadWrite))
 			{
-				AfxMessageBox(L"File cannot be created");
+				AfxMessageBox(L"Không thêÒ taòo ðýõòc tâòp tin taòm!");
+				mDoc->isRecord = FALSE;
+				return -1;
 			}
 			else
 			{
@@ -697,7 +701,8 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	
 	if (!mDoc->object.Open(fileName, CFile::modeRead))
 	{
-		AfxMessageBox(L"File cannot be opened");
+		AfxMessageBox(L"Không thêÒ mõÒ tâòp tin!");
+		return 1;
 	}
 
 	mDoc->object.Read(temp, sizeof(temp));

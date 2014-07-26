@@ -724,6 +724,12 @@ void CAmekaApp::OnDemo()
 	//if ((theApp.pIO != NULL) && (theApp.pIO->m_bState == S_CONNECTED))
 	CAmekaView *pView = CAmekaView::GetView();
 	CAmekaDoc *pDoc = CAmekaDoc::GetDoc();
+	if (!pDoc)
+	{
+			pDoc->startEnable = FALSE;
+			pDoc->stopEnable = FALSE;
+			pDoc->recEnable = FALSE;
+	}
 	if (pView->isRunning || pDoc->isRecord)
 		return;
 	{
@@ -740,6 +746,9 @@ void CAmekaApp::OnDemo()
 		{
 			//LPVOID pParam;
 			initial_dsp_data((LPVOID)pDoc);
+			pDoc->startEnable = FALSE;
+			pDoc->stopEnable = TRUE;
+			pDoc->recEnable = TRUE;
 
 			pDoc->m_dspProcess = AfxBeginThread(DSP::DSPThread, (LPVOID)pDoc);
 			pView->resetData();
@@ -757,7 +766,12 @@ void CAmekaApp::OnStop()
 	if (theApp.docList.IsEmpty())
 		return;
 	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
-
+	if (!pDoc)
+	{
+			pDoc->startEnable = FALSE;
+			pDoc->stopEnable = FALSE;
+			pDoc->recEnable = FALSE;
+	}
 	DWORD exit_code= NULL;
 	if (pView->pThread != NULL && pView->isRunning)
 	{
@@ -780,6 +794,10 @@ void CAmekaApp::OnStop()
 		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_StopDemo));
 	if (!pStopRec)
 		return;
+
+	pDoc->startEnable = TRUE;
+	pDoc->stopEnable = FALSE;
+	pDoc->recEnable = TRUE;
 
 	if (pDoc)
 	{
@@ -1083,15 +1101,22 @@ void CAmekaApp::OnPortOpen()
 	//portDlg.DoModal();
 	CString portFullName = L"\\\.\\" + m_portNo;
 	//MessageBox("Opening Port " + portFullName,"Info",0);
+	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
 	if (!pIO)
 	{
 		pIO = new CSerialIO(portFullName, m_baudRate);
 		Sleep(1000);
+
 		if (pIO->m_bState == S_CONNECTED)
 		{
-			pMainWnd->stopEnable = TRUE;
-			pMainWnd->startEnable = TRUE;
-			pMainWnd->recEnable = TRUE;
+			if (!pDoc)
+				return;
+			else
+			{
+				pDoc->stopEnable = TRUE;
+				pDoc->startEnable = TRUE;
+				pDoc->recEnable = TRUE;
+			}
 			pMainWnd->portEnable = FALSE;
 			pMainWnd->baudEnable = FALSE;
 			pMainWnd->scanPortEnable = FALSE;
@@ -1108,9 +1133,14 @@ void CAmekaApp::OnPortOpen()
 	else
 	{
 		pPortOpen->SetText(L"Mở cổng");
-		pMainWnd->startEnable = FALSE;
-		pMainWnd->stopEnable = FALSE;
-		pMainWnd->recEnable = FALSE;
+		if (!pDoc)
+				return;
+		else
+		{
+			pDoc->startEnable = FALSE;
+			pDoc->stopEnable = FALSE;
+			pDoc->recEnable = FALSE;
+		}
 		pMainWnd->portEnable = TRUE;
 		pMainWnd->baudEnable = TRUE;
 		pMainWnd->scanPortEnable = TRUE;
@@ -1342,6 +1372,12 @@ void CAmekaApp::OnRecording()
 
 	// TODO: Add your command handler code here.
 	CAmekaDoc* pDoc = CAmekaDoc::GetDoc();
+	if (!pDoc)
+	{
+			pDoc->startEnable = FALSE;
+			pDoc->stopEnable = FALSE;
+			pDoc->recEnable = FALSE;
+	}
 	CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
 	CMFCRibbonButton* pRec = DYNAMIC_DOWNCAST(
 		CMFCRibbonButton, pMainWnd->m_wndRibbonBar.FindByID(MN_Recording));
@@ -1355,6 +1391,10 @@ void CAmekaApp::OnRecording()
 			pDoc->isRecord = TRUE;
 		}
 	}
+
+	pDoc->startEnable = FALSE;
+	pDoc->stopEnable = TRUE;
+	pDoc->recEnable = FALSE;
 
 	//if ((theApp.pIO != NULL) && (theApp.pIO->m_bState == S_CONNECTED))
 	{
