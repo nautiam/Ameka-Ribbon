@@ -20,8 +20,6 @@
 #include "C_ColorToolTip.h"
 #include "CDrawPos.h"
 
-#define baseLine 16383
-#define amp 812
 
 #define timeSleep 25
 #define dataNum 8
@@ -112,8 +110,8 @@ private:
 	uint16_t count;
 	uint8_t channelNum;
 	uint16_t bufLen;
-	static const uint16_t m_BaseLine = baseLine;
-	static const uint16_t m_Amp = amp;
+	static const uint16_t m_BaseLine = BASELINE;
+	static const uint16_t m_Amp = AMP;
 
 	float crtPos;
 	

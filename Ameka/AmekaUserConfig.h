@@ -15,7 +15,8 @@
 #define FRE_STEP 0.1
 #define LEAD_NUMBER 16
 #define MONTAGE_NUM 64
-#define BASELINE 16383
+#define BASELINE 8192
+#define AMP 812
 
 template <typename T , typename T2>
 class CMyArray : public CArray<T , T2> 
