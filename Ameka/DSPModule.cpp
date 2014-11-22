@@ -170,7 +170,7 @@ void dsp_processing(LPVOID pParam)
 	uint16_t monNum = mDoc->mMon.mList.GetCount();
 	uint16_t raw_cnt = 0;
 	uint16_t buffer[1];
-	POSITION pos;
+
 	while (mDoc->object.Read(buffer, sizeof(buffer)) != NULL)
 	{
 		m_recvBuffer->pushData(buffer[0]);
@@ -527,7 +527,7 @@ UINT DSP::DSPThread(LPVOID pParam)
 			}
 
 			int monNum =  mDoc->mMon.mList.GetCount();
-			POSITION pos;
+
 			//pos = mDoc->mMon.mList.GetHeadPosition();
 			for (int i=0; i<monNum; i++)
 			{
@@ -805,7 +805,6 @@ UINT DSP::ProcessRecordDataThread(LPVOID pParam)
 	CTime temp_bd(birthday);
 	mDoc->patientInfo.birthday = temp_bd;
 
-	POSITION pos;
 	mDoc->mMon.mList.RemoveAll();
 	if (monNum > 32)
 		monNum = 32;

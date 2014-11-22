@@ -30,6 +30,7 @@
 #define new DEBUG_NEW
 #endif
 
+using namespace Gdiplus;
 
 // CAmekaView
 
@@ -818,6 +819,7 @@ int CAmekaView::drawAtPos(CDC* pDC)
 	}
 
 	MemDC.SelectObject(bitmap);
+	Graphics graphics(MemDC.m_hDC);
 
 	//memcpy(dataBuffer[count],data,sizeof(RawDataType));
 	//count = (count+1)%bufLen;

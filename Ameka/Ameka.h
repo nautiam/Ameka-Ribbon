@@ -31,6 +31,8 @@
 #include "tinyxml.h"
 #include "AmekaLan.h"
 #include "AmekaUserConfig.h"
+#include "EventDlg.h"
+#include "EventListDlg.h"
 
 #define portNo "COM2"
 #define BAUD_RATE "115200"
@@ -84,6 +86,10 @@ public:
 	uint16_t elecNum;
 	CString evName[10];
 
+	//Dialog
+	CEventDlg* eventDlg;
+	CEventListDlg* eventListDlg;
+
 	//draw setup
 	float photicMin;
 	float photicWRate;
@@ -99,6 +105,10 @@ public:
 	CString printFont;
 	uint16_t printSize;
 	uint16_t printDistance;
+
+	//GDI+
+	GdiplusStartupInput gdiplusStartupInput;
+	ULONG_PTR gdiplusToken;
 // Overrides
 public:
 	virtual BOOL InitInstance();

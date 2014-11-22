@@ -194,11 +194,11 @@ void CTabViewDlg::DoDataExchange(CDataExchange* pDX)
 void CTabViewDlg::OnBnClickedbtdef()
 {
 	// TODO: Add your control notification handler code here
-	m_view_sen.SetWindowTextW((LPCTSTR)strSen);
-	m_view_speed.SetWindowTextW((LPCTSTR)strSpeed);
-	m_view_lp.SetWindowTextW((LPCTSTR)strLP);
-	m_view_hp.SetWindowTextW((LPCTSTR)strHP);
-	m_view_dotPmm.SetWindowTextW((LPCTSTR)"30");
+	m_view_sen.SetWindowTextW(_T(strSen));
+	m_view_speed.SetWindowTextW(_T(strSpeed));
+	m_view_lp.SetWindowTextW(_T(strLP));
+	m_view_hp.SetWindowTextW(_T(strHP));
+	m_view_dotPmm.SetWindowTextW(L"200");
 }
 
 BEGIN_MESSAGE_MAP(CTabViewDlg, CDialogEx)

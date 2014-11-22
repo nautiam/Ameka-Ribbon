@@ -33,7 +33,6 @@
 #include "OptionDlg.h"
 #include "InfoDlg.h"
 #include "PhoticDlg.h"
-#include "EventDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -208,8 +207,7 @@ BOOL CAmekaApp::InitInstance()
 {
 	SetLandscape();
 
-	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-	Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
+	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 	// InitComMonControlsEx() is required on Windows XP if an application
 	// manifest specifies use of ComCtl32.dll version 6 or later to enable
 	// visual styles.  Otherwise, any window creation will fail.
@@ -300,13 +298,19 @@ BOOL CAmekaApp::InitInstance()
 	pMainFrame->ShowWindow(m_nCmdShow);
 	pMainFrame->UpdateWindow();
 
+	eventDlg = new CEventDlg();
+	eventDlg->Create(DLG_Event, this->m_pMainWnd);
+
+	eventListDlg = new CEventListDlg();
+	eventListDlg->Create(DLG_EventList, this->m_pMainWnd);
+
 	return TRUE;
 }
 
 int CAmekaApp::ExitInstance()
 {
 	//TODO: handle additional resources you may have added
-	Gdiplus::GdiplusShutdown(m_gdiplusToken);
+	GdiplusShutdown(gdiplusToken);
 	AfxOleTerm(FALSE);
 	if (this->pIO)
 	{
@@ -328,6 +332,9 @@ int CAmekaApp::ExitInstance()
 	delete mon;
 	}
 	monList.RemoveAll();*/
+
+	delete eventDlg;
+
 	return CWinAppEx::ExitInstance();
 }
 
@@ -685,8 +692,8 @@ void CAmekaApp::OnFileClose()
 //Show Setting Dialog
 void CAmekaApp::OnEvent()
 {
-	CEventDlg eventDlg;
-	eventDlg.DoModal();
+	eventDlg->ShowWindow(SW_SHOW);
+	eventListDlg->ShowWindow(SW_SHOW);
 }
 
 //------------------------------------------------------------------//
@@ -838,7 +845,7 @@ void CAmekaApp::OnStop()
 			uint8_t temp_mon[85];
 			uint8_t monNum =  pDoc->mMon.mList.GetCount();
 			temp_mon[64] = monNum;
-			POSITION pos;
+
 			//pos = pDoc->mMon.mList.GetHeadPosition();
 			if (monNum > 32)
 				monNum = 32;

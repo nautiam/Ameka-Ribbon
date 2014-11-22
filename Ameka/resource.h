@@ -59,6 +59,7 @@
 #define DLG_Opt_Event                   325
 #define DLG_Loading                     328
 #define DLG_INPUT                       330
+#define DLG_EventList                   332
 #define IDC_COMBO1                      1000
 #define IDC_CHECK1                      1001
 #define IDC_CHECK2                      1002
@@ -161,6 +162,7 @@
 #define ID_FONT                         1089
 #define ID_SIZE                         1090
 #define ID_DISTANCE                     1091
+#define IDC_LISTEV                      1091
 #define ID_WRITE_PASTEASHYPERLINK       32770
 #define MN_Open                         32771
 #define MN_Close                        32772
@@ -207,9 +209,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        332
+#define _APS_NEXT_RESOURCE_VALUE        333
 #define _APS_NEXT_COMMAND_VALUE         32823
-#define _APS_NEXT_CONTROL_VALUE         1091
+#define _APS_NEXT_CONTROL_VALUE         1092
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

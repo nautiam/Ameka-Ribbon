@@ -587,7 +587,7 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 		uint8_t temp_mon[85];
 		uint8_t monNum =  pDoc->mMon.mList.GetCount();
 		temp_mon[64] = monNum;
-		POSITION pos;
+
 		//pos = pDoc->mMon.mList.GetHeadPosition();
 		if (monNum > 32)
 			monNum = 32;

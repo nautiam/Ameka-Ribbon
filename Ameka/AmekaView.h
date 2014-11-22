@@ -23,7 +23,7 @@
 #define baseLine 16383
 #define amp 812
 
-#define timeSleep 25
+#define timeSleep 16
 #define dataNum 8
 
 #define CUSTOM_SCANBAR RGB(92,64,51)
@@ -100,6 +100,8 @@ public:
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
 #endif
+
+	friend class CEventListDlg;
 
 public:
 	BOOL isDrawRec;

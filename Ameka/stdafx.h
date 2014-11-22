@@ -59,9 +59,9 @@
 #else
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #endif
-#include <Gdiplus.h>
-//#pragma comment (lib, "GDIPlus.lib")
+#include <gdiplus.h>
 using namespace Gdiplus;
+#pragma comment(lib, "gdiplus.lib")
 #endif
 
 

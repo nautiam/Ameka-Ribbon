@@ -19,7 +19,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
@@ -115,6 +115,7 @@
     <ClInclude Include="DSPModule.h" />
     <ClInclude Include="EnvSetupModule.h" />
     <ClInclude Include="EventDlg.h" />
+    <ClInclude Include="EventListDlg.h" />
     <ClInclude Include="GraphModule.h" />
     <ClInclude Include="InfoDlg.h" />
     <ClInclude Include="InputDlg.h" />
@@ -148,6 +149,7 @@
     <ClCompile Include="DSPModule.cpp" />
     <ClCompile Include="dsp_filters.cpp" />
     <ClCompile Include="EventDlg.cpp" />
+    <ClCompile Include="EventListDlg.cpp" />
     <ClCompile Include="GraphModule.cpp" />
     <ClCompile Include="InfoDlg.cpp" />
     <ClCompile Include="InputDlg.cpp" />
