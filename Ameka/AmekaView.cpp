@@ -588,7 +588,7 @@ void CAmekaView::OnMouseMove(UINT nFlags, CPoint point)
 
 		CAmekaDoc* pDoc = GetDocument();
 
-		int elecVal = (float(pDoc->primaryDataArray[posResult[0]].value[posResult[1]])/baseLine)*ELEC_VAL;
+		int elecVal = (float(pDoc->primaryDataArray[posResult[0]].value[posResult[1]])/BASELINE)*ELEC_VAL;
 		/*strTemp.Format((L"Value: %d\nMin: %d\nMax: %d\n"), pDoc->primaryDataArray[posResult[0]].value[posResult[1]],
 			pDoc->primaryDataArray[valResult[0]].value[posResult[1]], pDoc->primaryDataArray[valResult[1]].value[posResult[1]]) ;*/
 		strTemp.Format((L"%d mV"), elecVal);
