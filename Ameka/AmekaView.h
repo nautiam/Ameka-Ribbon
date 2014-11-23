@@ -22,7 +22,7 @@
 
 
 #define timeSleep 16
-#define dataNum 8
+#define dataNum 16
 
 #define CUSTOM_SCANBAR RGB(92,64,51)
 #define CUSTOM_PEN RGB(72,61,139)
@@ -106,6 +106,7 @@ public:
 	CRITICAL_SECTION csess;
 	float distance;
 	bool isNull;
+	bool drawEnable;
 private:
 	CBitmap oldBitmap;
 	PrimaryDataType* dataBuffer;
@@ -147,6 +148,8 @@ public:
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnMouseLeave();
+	afx_msg void OnEnterSizeMove();
+	afx_msg void OnExitSizeMove();
 };
 
 #ifndef _DEBUG  // debug version in AmekaView.cpp

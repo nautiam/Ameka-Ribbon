@@ -25,6 +25,7 @@
 #include <stdint.h>
 //#include "easylogging++.h"
 #include "AmekaLan.h"
+#include "TGraphics.h"
 #include <algorithm>
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -48,6 +49,8 @@ BEGIN_MESSAGE_MAP(CAmekaView, CView)
 	ON_WM_HSCROLL()
 	ON_WM_KEYUP()
 	ON_WM_MOUSELEAVE()
+	ON_WM_ENTERSIZEMOVE()
+	ON_WM_EXITSIZEMOVE()
 END_MESSAGE_MAP()
 
 // CAmekaView construction/destruction
@@ -77,6 +80,7 @@ CAmekaView::CAmekaView()
 	lastDistance = 0;
 	isDrawRec = FALSE;
 	m_Tips.Create(CSize(X_TOOLTIP, Y_TOOLTIP), this);
+	drawEnable = TRUE;
 	//m_Pos.Create(CSize(X_TOOLTIP, Y_TOOLTIP), this);
 }
 
@@ -117,7 +121,8 @@ BOOL CAmekaView::PreCreateWindow(CREATESTRUCT& cs)
 {
 	// TODO: Modify the Window class or styles here by modifying
 	//  the CREATESTRUCT cs
-
+	SetClassLong(this->m_hWnd, GCL_STYLE, (GetClassLong(this->m_hWnd,
+		GCL_STYLE) & ~(CS_HREDRAW | CS_VREDRAW)));
 	return CView::PreCreateWindow(cs);
 }
 
@@ -126,9 +131,12 @@ BOOL CAmekaView::PreCreateWindow(CREATESTRUCT& cs)
 void CAmekaView::OnDraw(CDC* pDC)
 {
 	CAmekaDoc* pDoc = GetDocument();
+	CTGraphics graphic;
+
 	ASSERT_VALID(pDoc);
-	if (!pDoc)
+	if (!pDoc || !drawEnable)
 		return;
+
 	//check if draw record data
 	if (isDrawRec)
 	{
@@ -212,14 +220,19 @@ void CAmekaView::OnDraw(CDC* pDC)
 				if (tmp < 0)
 					tmp = 0;
 				//MemDC.SetPixel(0, tmp, CUSTOM_PEN);
-				MemDC.MoveTo((crtPos - distance*j), tmp);
+				//MemDC.MoveTo((crtPos - distance*j), tmp);
+				int x1 = (crtPos - distance*j);
+				int y1 = tmp;
 				tmp = ((rect.Height() - FOOT_RANGE)*i/channelNum) + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)dataBuffer[(count-1+bufLen-j-1)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
 				if (tmp > (rect.Height() - FOOT_RANGE))
 					tmp = rect.Height() - FOOT_RANGE;
 				if (tmp < 0)
 					tmp = 0;
 				//MemDC.SetPixel(0, tmp, CUSTOM_PEN);
-				MemDC.LineTo((crtPos - distance*(j+1)), tmp);
+				//MemDC.LineTo((crtPos - distance*(j+1)), tmp);
+				int x2 = (crtPos - distance*(j + 1));
+				int y2 = tmp;
+				graphic.DrawLine(MemDC.m_hDC, x1, y1, x2, y2, RGB(0, 0, 0));
 				j++;
 			}
 		}
@@ -246,14 +259,19 @@ void CAmekaView::OnDraw(CDC* pDC)
 				if (tmp < 0)
 					tmp = 0;
 				//MemDC.SetPixel(0, tmp, CUSTOM_PEN);
-				MemDC.MoveTo((maxWidth-distance*j), tmp);
+				//MemDC.MoveTo((maxWidth-distance*j), tmp);
+				int x1 = (maxWidth - distance*j);
+				int y1 = tmp;
 				tmp = ((rect.Height() - FOOT_RANGE)*i/channelNum) + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)dataBuffer[(firstPos+bufLen-j-1)%bufLen].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate;
 				if (tmp > rect.Height() - FOOT_RANGE)
 					tmp = rect.Height() - FOOT_RANGE;
 				if (tmp < 0)
 					tmp = 0;
 				//MemDC.SetPixel(0, tmp, CUSTOM_PEN);
-				MemDC.LineTo((maxWidth-distance*(j+1)), tmp);
+				//MemDC.LineTo((maxWidth-distance*(j+1)), tmp);
+				int x2 = (maxWidth - distance*(j + 1));
+				int y2 = tmp;
+				graphic.DrawLine(MemDC.m_hDC, x1, y1, x2, y2, RGB(0, 0, 0));
 				j++;
 			}
 		}
@@ -265,8 +283,6 @@ void CAmekaView::OnDraw(CDC* pDC)
 		}
 
 	}
-
-	drawLeadName(&MemDC);
 
 	//draw photic
 	if (onPhotic)
@@ -300,6 +316,7 @@ void CAmekaView::OnDraw(CDC* pDC)
 			
 		}
 	}
+	drawLeadName(&MemDC);
 	
 	pDC->BitBlt(0, 0, rect.Width(), rect.Height(), &MemDC, 0, 0, SRCCOPY);
 	LeaveCriticalSection(&csess);
@@ -727,6 +744,7 @@ int CAmekaView::drawAtPos(CDC* pDC)
 	//CBitmap bitmap;
 	CDC MemDC;
 	CBitmap* bitmap = new CBitmap;
+	CTGraphics graphic;
 	//RawDataType* data = new RawDataType[dataNum];
 	uint16_t buflen = 0;
 	float maxWidth;
@@ -819,7 +837,7 @@ int CAmekaView::drawAtPos(CDC* pDC)
 	}
 
 	MemDC.SelectObject(bitmap);
-	Graphics graphics(MemDC.m_hDC);
+	//Graphics graphics(MemDC.m_hDC);
 
 	//memcpy(dataBuffer[count],data,sizeof(RawDataType));
 	//count = (count+1)%bufLen;
@@ -870,6 +888,7 @@ int CAmekaView::drawAtPos(CDC* pDC)
 				CPen* tmpPen = MemDC.SelectObject(&silverPen);
 				MemDC.MoveTo(0, 0);
 				MemDC.LineTo(0, rect.Height() - FOOT_RANGE);
+				//graphic.DrawLine(MemDC.m_hDC, 0, 0, 0, rect.Height() - FOOT_RANGE, RGB(0xC0, 0xC0, 0xC0));
 				MemDC.SelectObject(tmpPen);
 
 				drawTime(pDC, data[0].time, crtPos);
@@ -880,14 +899,19 @@ int CAmekaView::drawAtPos(CDC* pDC)
 			if (tmp < 0)
 				tmp = 0;
 			//MemDC.SetPixel(0, tmp, CUSTOM_PEN);
-			MemDC.MoveTo(0, (int)tmp);
+			//MemDC.MoveTo(0, (int)tmp);
+			int x1 = 0;
+			int y1 = (int)tmp;
 			tmp = (((rect.Height() - FOOT_RANGE)*i)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)data[0].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
 			if (tmp > (rect.Height() - FOOT_RANGE))
 				tmp = rect.Height() - FOOT_RANGE;
 			if (tmp < 0)
 				tmp = 0;
 			//MemDC.SetPixel(distance,tmp ,CUSTOM_PEN);
-			MemDC.LineTo(int(distance), (int)tmp);
+			//MemDC.LineTo(int(distance), (int)tmp);
+			int x2 = int(distance);
+			int y2 = (int)tmp;
+			graphic.DrawLine(MemDC.m_hDC, x1, y1, x2, y2, RGB(0, 0, 0));
 		}
 	}
 	isNull = FALSE;
@@ -917,14 +941,19 @@ int CAmekaView::drawAtPos(CDC* pDC)
 			if (tmp < 0)
 				tmp = 0;
 			//MemDC.SetPixel((distance*j),tmp ,CUSTOM_PEN);
-			MemDC.MoveTo((int)(distance*j), tmp);		//draw 16 channel
+			//MemDC.MoveTo((int)(distance*j), tmp);		//draw 16 channel
+			int x1 = (int)(distance*j);
+			int y1 = tmp;
 			tmp = (((rect.Height() - FOOT_RANGE)*i)/channelNum + ((rect.Height() - FOOT_RANGE)/channelNum)/2 - (((float)data[j].value[i]-m_BaseLine)/m_Amp)*graphData.scaleRate);
 			if (tmp > (rect.Height() - FOOT_RANGE))
 			tmp = rect.Height() - FOOT_RANGE;
 			if (tmp < 0)
 				tmp = 0;
 			//MemDC.SetPixel((distance*(j+1)),tmp ,CUSTOM_PEN);
-			MemDC.LineTo((int)(distance*(j+1)), tmp);	//
+			//MemDC.LineTo((int)(distance*(j+1)), tmp);
+			int x2 = (int)(distance*(j + 1));
+			int y2 = tmp;
+			graphic.DrawLine(MemDC.m_hDC, x1, y1, x2, y2, RGB(0, 0, 0));
 		}
 	}
 	
@@ -1555,4 +1584,21 @@ void CAmekaView::OnMouseLeave()
 	CScrollView::OnMouseLeave();
 	m_Tips.HideTips();
 
+}
+
+
+void CAmekaView::OnEnterSizeMove()
+{
+	// TODO: Add your message handler code here and/or call default
+	drawEnable = FALSE;
+	CScrollView::OnEnterSizeMove();
+}
+
+
+void CAmekaView::OnExitSizeMove()
+{
+	// TODO: Add your message handler code here and/or call default
+	drawEnable = TRUE;
+	//OnDraw(GetDC());
+	CScrollView::OnExitSizeMove();
 }
