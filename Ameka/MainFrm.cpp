@@ -64,11 +64,10 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 	CMainFrame::CMainFrame()
 	{
 		// TODO: add member initialization code here
+		//EnableDocking(CBRS_ALIGN_ANY);
+
 		theApp.m_nAppLook = theApp.GetInt(_T("ApplicationLook"), ID_VIEW_APPLOOK_OFF_2007_BLUE);
 
-		//startEnable = FALSE;
-		//stopEnable = FALSE;
-		//recEnable = FALSE;
 		portEnable = TRUE;
 		baudEnable = TRUE;
 		scanPortEnable = TRUE;
@@ -76,7 +75,7 @@ IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 
 	CMainFrame::~CMainFrame()
 	{
-
+		SAFE_DELETE(theApp.eventDlg);
 	}
 
 

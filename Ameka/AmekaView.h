@@ -61,6 +61,7 @@ public:
 	CBitmap bmp;
 	boolean onPhotic;
 	float factor;
+	boolean isSmooth;
 // Operations
 public:
 	

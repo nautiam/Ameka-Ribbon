@@ -204,13 +204,15 @@
 #define ID_MN_Spec                      32820
 #define ID_MN_Setup                     32821
 #define ID_MN_Info                      32822
+#define ID_MN_Smooth                    32823
+#define ID_EDIT_L32824                  32824
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        333
-#define _APS_NEXT_COMMAND_VALUE         32823
+#define _APS_NEXT_COMMAND_VALUE         32825
 #define _APS_NEXT_CONTROL_VALUE         1092
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

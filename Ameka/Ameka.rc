@@ -51,9 +51,8 @@ BEGIN
 END
 
 DLG_Event DIALOGEX 0, 0, 123, 176
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-EXSTYLE WS_EX_TOOLWINDOW
-CAPTION "Sýò kiêòn"
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE
+EXSTYLE WS_EX_TRANSPARENT
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     PUSHBUTTON      "ÐôÒi tên",evt_rename,40,3,37,14
@@ -272,10 +271,9 @@ BEGIN
     CONTROL         "",LOAD_Progress,"msctls_progress32",WS_BORDER,7,31,145,12
 END
 
-DLG_EventList DIALOGEX 0, 0, 123, 176
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-EXSTYLE WS_EX_TOOLWINDOW
-CAPTION "Danh saìch sýò kiêòn"
+DLG_EventList DIALOGEX 0, 0, 124, 176
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE
+EXSTYLE WS_EX_TRANSPARENT
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LISTBOX         IDC_LISTEV,0,7,123,168,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
@@ -451,6 +449,7 @@ BEGIN
 
     DLG_EventList, DIALOG
     BEGIN
+        RIGHTMARGIN, 123
         TOPMARGIN, 7
     END
 END
@@ -707,7 +706,8 @@ BEGIN
     BEGIN
         MENUITEM "Bâòt/Tãìt phôÒ",              ID_MN_Spec
         MENUITEM "Câìu hiÌnh",                  ID_MN_Setup
-        MENUITEM "Thông tin bêònh nhân",        32822
+        MENUITEM "Thông tin bêònh nhân",        ID_MN_Info
+        MENUITEM "LaÌm mýõòt soìng",            ID_MN_Smooth, CHECKED
     END
 END
 
@@ -941,8 +941,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_STATUS_PANE1        "Ameka"
-    IDS_STATUS_PANE2        "V1.00"
+    IDS_STATUS_PANE1        "Ameka V1.00"
+    IDS_STATUS_PANE2        " "
 END
 
 STRINGTABLE

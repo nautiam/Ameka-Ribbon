@@ -138,3 +138,28 @@ void CEventDlg::OnBnClickeddel()
 
 	initItems();
 }
+
+/**********************************************************************/
+IMPLEMENT_DYNAMIC(CEvPane, CDockablePane)
+BEGIN_MESSAGE_MAP(CEvPane, CDockablePane)
+	ON_WM_CREATE()
+	ON_WM_SIZE()
+END_MESSAGE_MAP()
+
+CEvPane::CEvPane(){}
+CEvPane::~CEvPane(){}
+
+int CEvPane::OnCreate(LPCREATESTRUCT lp)
+{
+	if (CDockablePane::OnCreate(lp) == -1)
+		return -1;
+	if (!m_wndDlg.Create(CEventDlg::IDD, this))
+		return -1;
+	m_wndDlg.ShowWindow(SW_SHOWDEFAULT);
+	return  0;
+}
+void CEvPane::OnSize(UINT nType, int cx, int cy)
+{
+	CDockablePane::OnSize(nType, cx, cy);
+	m_wndDlg.SetWindowPos(NULL, 0, 0, cx, cy, SWP_NOACTIVATE | SWP_NOZORDER);
+}

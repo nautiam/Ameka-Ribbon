@@ -34,6 +34,10 @@
 #include "EventDlg.h"
 #include "EventListDlg.h"
 
+#define SAFE_DELETE(ptr) if (ptr) { delete ptr; ptr = NULL; }
+#define IDC_DLG_EVLIST 95959
+#define IDC_DLG_EV 59595
+
 #define portNo "COM2"
 #define BAUD_RATE "115200"
 #define settingFileName "AmekaSetting.conf"
@@ -87,8 +91,8 @@ public:
 	CString evName[10];
 
 	//Dialog
-	CEventDlg* eventDlg;
-	CEventListDlg* eventListDlg;
+	CDockablePane* eventListDlg;
+	CDockablePane* eventDlg;
 
 	//draw setup
 	float photicMin;

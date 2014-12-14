@@ -65,5 +65,36 @@ void CEventListDlg::OnLbnDblclkListev()
 		if (pView->evPos < MONNAME_BAR + 2 + 15)
 			pView->evPos = MONNAME_BAR + 2 + 15;
 		pView->hasEv = TRUE;
+		if (mID == 2)
+		{
+			CMainFrame *pMainWnd = (CMainFrame *)AfxGetMainWnd();
+			if (pMainWnd)
+				pMainWnd->m_wndRibbonBar.SetWindowTextW(L"ASAD");
+		}
 	}
+}
+
+/**********************************************************************/
+IMPLEMENT_DYNAMIC(CEvListPane, CDockablePane)
+BEGIN_MESSAGE_MAP(CEvListPane, CDockablePane)
+	ON_WM_CREATE()
+	ON_WM_SIZE()
+END_MESSAGE_MAP()
+
+CEvListPane::CEvListPane(){}
+CEvListPane::~CEvListPane(){}
+
+int CEvListPane::OnCreate(LPCREATESTRUCT lp)
+{
+	if (CDockablePane::OnCreate(lp) == -1)
+		return -1;
+	if (!m_wndDlg.Create(CEventListDlg::IDD, this))
+		return -1;
+	m_wndDlg.ShowWindow(SW_SHOWDEFAULT);
+	return  0;
+}
+void CEvListPane::OnSize(UINT nType, int cx, int cy)
+{
+	CDockablePane::OnSize(nType, cx, cy);
+	m_wndDlg.SetWindowPos(NULL, 0, 0, cx, cy, SWP_NOACTIVATE | SWP_NOZORDER);
 }

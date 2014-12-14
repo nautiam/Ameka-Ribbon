@@ -298,12 +298,6 @@ BOOL CAmekaApp::InitInstance()
 	pMainFrame->ShowWindow(m_nCmdShow);
 	pMainFrame->UpdateWindow();
 
-	eventDlg = new CEventDlg();
-	eventDlg->Create(DLG_Event, this->m_pMainWnd);
-
-	eventListDlg = new CEventListDlg();
-	eventListDlg->Create(DLG_EventList, this->m_pMainWnd);
-
 	return TRUE;
 }
 
@@ -692,8 +686,56 @@ void CAmekaApp::OnFileClose()
 //Show Setting Dialog
 void CAmekaApp::OnEvent()
 {
-	eventDlg->ShowWindow(SW_SHOW);
-	eventListDlg->ShowWindow(SW_SHOW);
+	CMainFrame *pMainFrame = (CMainFrame *)AfxGetMainWnd();
+	if (!pMainFrame)
+	{
+		return;
+	}
+
+	//event list dialog
+	if (eventListDlg && eventListDlg->GetSafeHwnd())
+	{
+		eventListDlg->ShowPane(TRUE, FALSE, TRUE);
+		return;
+	}
+	eventListDlg = new CEvListPane;
+	UINT style = WS_CHILD | CBRS_RIGHT | CBRS_FLOAT_MULTI;
+	CString strTitle = _T("List of Events");
+	if (!eventListDlg->Create(strTitle, pMainFrame, CRect(0, 0, 200, 400), TRUE,
+		IDC_DLG_EVLIST, style, AFX_CBRS_OUTLOOK_TABS))
+	{
+		TRACE0("Failed to create dialog pane\n");
+		SAFE_DELETE(eventListDlg);
+		return;
+	}
+	eventListDlg->EnableDocking(CBRS_ALIGN_ANY);
+	pMainFrame->DockPane((CBasePane*)eventListDlg, AFX_IDW_DOCKBAR_RIGHT);
+	eventListDlg->ShowPane(TRUE, FALSE, TRUE);
+	pMainFrame->RecalcLayout();
+
+	//event dialog
+
+	if (eventDlg && eventDlg->GetSafeHwnd())
+	{
+		eventDlg->ShowPane(TRUE, FALSE, TRUE);
+		return;
+	}
+	eventDlg = new CEvPane;
+	CString strTitle1 = _T("Events");
+	if (!eventDlg->Create(strTitle1, pMainFrame, CRect(0, 0, 200, 400), TRUE,
+		IDC_DLG_EV, style, AFX_CBRS_OUTLOOK_TABS))
+	{
+		TRACE0("Failed to create dialog pane\n");
+		SAFE_DELETE(eventDlg);
+		return;
+	}
+	eventDlg->EnableDocking(CBRS_ALIGN_ANY);
+	pMainFrame->DockPane((CBasePane*)eventDlg, AFX_IDW_DOCKBAR_RIGHT);
+	eventDlg->ShowPane(TRUE, FALSE, TRUE);
+	pMainFrame->RecalcLayout();
+	//eventDlg = new CEventDlg();
+	//eventDlg->Create(DLG_Event, this->m_pMainWnd);
+	//eventListDlg->ShowWindow(SW_SHOW);
 }
 
 //------------------------------------------------------------------//

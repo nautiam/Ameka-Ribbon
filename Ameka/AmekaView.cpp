@@ -81,6 +81,7 @@ CAmekaView::CAmekaView()
 	isDrawRec = FALSE;
 	m_Tips.Create(CSize(X_TOOLTIP, Y_TOOLTIP), this);
 	drawEnable = TRUE;
+	isSmooth = TRUE;
 	//m_Pos.Create(CSize(X_TOOLTIP, Y_TOOLTIP), this);
 }
 
@@ -232,7 +233,15 @@ void CAmekaView::OnDraw(CDC* pDC)
 				//MemDC.LineTo((crtPos - distance*(j+1)), tmp);
 				int x2 = (crtPos - distance*(j + 1));
 				int y2 = tmp;
-				graphic.DrawLine(MemDC.m_hDC, x1, y1, x2, y2, RGB(0, 0, 0));
+				if (isSmooth)
+				{
+					graphic.DrawLine(MemDC.m_hDC, x1, y1, x2, y2, RGB(0, 0, 0));
+				}
+				else
+				{
+					MemDC.MoveTo(x1, y1);
+					MemDC.LineTo(x2, y2);
+				}
 				j++;
 			}
 		}
@@ -271,7 +280,15 @@ void CAmekaView::OnDraw(CDC* pDC)
 				//MemDC.LineTo((maxWidth-distance*(j+1)), tmp);
 				int x2 = (maxWidth - distance*(j + 1));
 				int y2 = tmp;
-				graphic.DrawLine(MemDC.m_hDC, x1, y1, x2, y2, RGB(0, 0, 0));
+				if (isSmooth)
+				{
+					graphic.DrawLine(MemDC.m_hDC, x1, y1, x2, y2, RGB(0, 0, 0));
+				}
+				else
+				{
+					MemDC.MoveTo(x1, y1);
+					MemDC.LineTo(x2, y2);
+				}
 				j++;
 			}
 		}
@@ -337,11 +354,7 @@ void CAmekaView::drawMouseMove(CDC* pDC, int xPos, int maxVal, int minVal, int d
 
 	CRect rtWin;
 	GetClientRect(&rtWin);
-	//dc.FillSolidRect(rtWin, m_clrBack);
-	//dc.SetBkMode(TRANSPARENT);
-	//dc.Draw3dRect(rtWin, m_clrFrameColor, m_clrFrameColor);
-	//dc.SetTextColor(m_clrText);                
-	//dc.DrawText(m_strTips, rtWin,  DT_CENTER |DT_VCENTER);	
+
 	CDC MemDC;
 	CBitmap bmp;
 
@@ -485,6 +498,15 @@ void CAmekaView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
 	rMenu.LoadMenuW(IDR_POPUP_EDIT);
 	CMenu* subMenu = rMenu.GetSubMenu(0);
 	UINT tmpFlags = TPM_LEFTALIGN|TPM_RETURNCMD|TPM_NONOTIFY;
+
+	UINT state = subMenu->GetMenuState(ID_MN_Smooth, MF_BYCOMMAND);
+	ASSERT(state != 0xFFFFFFFF);
+
+	if (!isSmooth)
+		subMenu->CheckMenuItem(ID_MN_Smooth, MF_UNCHECKED | MF_BYCOMMAND);
+	else
+		subMenu->CheckMenuItem(ID_MN_Smooth, MF_CHECKED | MF_BYCOMMAND);
+
 	int rID = subMenu->TrackPopupMenu(tmpFlags, point.x, point.y, this);
 	switch (rID)
 	{
@@ -496,6 +518,10 @@ void CAmekaView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
 		break;
 	case ID_MN_Info:
 		theApp.OnInfo();
+		break;
+	case ID_MN_Smooth:
+		isSmooth = !isSmooth;
+		OnDraw(GetDC());
 		break;
 	default:
 		break;
@@ -911,7 +937,15 @@ int CAmekaView::drawAtPos(CDC* pDC)
 			//MemDC.LineTo(int(distance), (int)tmp);
 			int x2 = int(distance);
 			int y2 = (int)tmp;
-			graphic.DrawLine(MemDC.m_hDC, x1, y1, x2, y2, RGB(0, 0, 0));
+			if (isSmooth)
+			{
+				graphic.DrawLine(MemDC.m_hDC, x1, y1, x2, y2, RGB(0, 0, 0));
+			}
+			else
+			{
+				MemDC.MoveTo(x1, y1);
+				MemDC.LineTo(x2, y2);
+			}
 		}
 	}
 	isNull = FALSE;
@@ -953,7 +987,15 @@ int CAmekaView::drawAtPos(CDC* pDC)
 			//MemDC.LineTo((int)(distance*(j+1)), tmp);
 			int x2 = (int)(distance*(j + 1));
 			int y2 = tmp;
-			graphic.DrawLine(MemDC.m_hDC, x1, y1, x2, y2, RGB(0, 0, 0));
+			if (isSmooth)
+			{
+				graphic.DrawLine(MemDC.m_hDC, x1, y1, x2, y2, RGB(0, 0, 0));
+			}
+			else
+			{
+				MemDC.MoveTo(x1, y1);
+				MemDC.LineTo(x2, y2);
+			}
 		}
 	}
 	

@@ -34,3 +34,18 @@ public:
 	afx_msg void OnLvnItemchangedList1(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickeddel();
 };
+
+/***********************************************************************/
+class CEvPane : public CDockablePane
+{
+	DECLARE_DYNAMIC(CEvPane)
+	DECLARE_MESSAGE_MAP()
+public:
+	CEvPane();
+	virtual ~CEvPane();
+protected:
+	afx_msg int OnCreate(LPCREATESTRUCT lp);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+private:
+	CEventDlg m_wndDlg;
+};
